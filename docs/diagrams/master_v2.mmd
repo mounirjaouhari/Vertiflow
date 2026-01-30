@@ -1,0 +1,71 @@
+---
+config:
+  layout: elk
+---
+flowchart TB
+    subgraph SOURCES["📡 1. SOURCES"]
+        IOT["🌱 Capteurs IoT"]
+        VISION["📷 Vision IA"]
+        APIS["🛰️ APIs NASA/RTE"]
+        LAB["🔬 Saisie Labo"]
+    end
+    
+    subgraph NIFI["🔄 2. APACHE NIFI"]
+        N_NORM["🔄 Normalisation"]
+        N_ENRICH["✨ Enrichissement"]
+        N_QUAL["🔐 Traçabilité"]
+    end
+    
+    subgraph KAFKA["📬 3. APACHE KAFKA"]
+        K_TOPIC["📊 Topic Principal"]
+    end
+    
+    subgraph STORAGE["💾 4. STOCKAGE"]
+        MONGO[("⚡ MongoDB - Temps Réel")]
+        CLICK[("📈 ClickHouse - Analytique")]
+    end
+    
+    subgraph INTELLIGENCE["🧠 5. INTELLIGENCE"]
+        ALGO_REFLEXE["🚨 Algo Réflexe"]
+        ALGO_STAT["📊 Algo Statistique"]
+        ALGO_PREDICT["🤖 Algo Prédictif"]
+    end
+    
+    subgraph VIZ["📊 6. VISUALISATION"]
+        PBI_LIVE["⚡ Dashboard Live"]
+        PBI_SCIENCE["🔬 Rapport Science"]
+    end
+    
+    %% CONNECTIONS
+    IOT --> N_NORM
+    VISION --> N_NORM
+    APIS --> N_NORM
+    LAB --> N_NORM
+    N_NORM --> N_ENRICH
+    N_ENRICH --> N_QUAL
+    N_QUAL --> K_TOPIC
+    K_TOPIC --> MONGO
+    K_TOPIC --> CLICK
+    K_TOPIC --> ALGO_PREDICT
+    MONGO <--> ALGO_REFLEXE
+    CLICK <--> ALGO_STAT
+    ALGO_PREDICT -.->|Feedback| K_TOPIC
+    MONGO --> PBI_LIVE
+    K_TOPIC -->|Streaming| PBI_LIVE
+    CLICK --> PBI_SCIENCE
+    ALGO_REFLEXE -.->|Contrôle| IOT
+
+    %% STYLES
+    MONGO:::Class_Mongo
+    CLICK:::Class_Click
+    K_TOPIC:::Class_Kafka
+    N_QUAL:::Class_NiFi
+    
+    classDef Class_Mongo fill:#00C853,stroke:#333,color:white
+    classDef Class_Click fill:#FFD600,stroke:#333,color:black
+    classDef Class_Kafka fill:#FF9800,stroke:#333,color:white
+    classDef Class_NiFi fill:#03A9F4,stroke:#333,color:white
+    
+    linkStyle 6 stroke:#FF9800,stroke-width:4px
+    linkStyle 7 stroke:#00C853,stroke-width:4px
+    linkStyle 13 stroke:#D50000,stroke-width:3px,stroke-dasharray:5 5

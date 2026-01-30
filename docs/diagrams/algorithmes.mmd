@@ -1,0 +1,57 @@
+
+        
+```mermaid
+   graph TD
+    %% ---------------------------------------------------------
+    %% PHASE 1 : HYGIÈNE & QUALITÉ (NiFi)
+    %% ---------------------------------------------------------
+    subgraph P1 ["PHASE 1 : PRÉ-TRAITEMENT (NiFi)"]
+        style P1 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+   DATA["Donnée Brute"] --> A1
+    
+    A1["Algo 1: Normalisation"]
+    A1 --> A2["Algo 2: Détection d'Aberration"]
+    A2 --> A3["Algo 3: Enrichissement Contextuel"]
+end
+
+%% ---------------------------------------------------------
+%% PHASE 2 : SURVIE & CONTRÔLE (MongoDB)
+%% ---------------------------------------------------------
+subgraph P2 ["PHASE 2 : CONTRÔLE RÉFLEXE (MongoDB)"]
+    style P2 fill:#ffebee,stroke:#c62828,stroke-width:2px
+    
+    A3 --> A4
+    
+    A4["Algo 4: Seuillage"]
+    A4 --> A5["Algo 5: Règles Métier"]
+end
+
+%% ---------------------------------------------------------
+%% PHASE 3 : ANALYSE SCIENTIFIQUE (ClickHouse)
+%% ---------------------------------------------------------
+subgraph P3 ["PHASE 3 : STATISTIQUES (ClickHouse)"]
+    style P3 fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    
+    A3 --> A6
+    
+    A6["Algo 6: Agrégation Temporelle"]
+    A6 --> A7["Algo 7: Corrélation"]
+    A7 --> A8["Algo 8: Segmentation"]
+end
+
+%% ---------------------------------------------------------
+%% PHASE 4 : INTELLIGENCE PRÉDICTIVE (Python/ML)
+%% ---------------------------------------------------------
+subgraph P4 ["PHASE 4 : PRÉDICTION & OPTIMISATION"]
+    style P4 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    
+    A6 & A7 --> A9
+    
+    A9["Algo 9: Séries Temporelles"]
+    A9 --> A10["Algo 10: Classification"]
+    A10 --> A11["Algo 11: Optimisation"]
+end
+
+%% RÉTROACTION
+A11 -.->|Mise à jour des Cibles| A4
+```

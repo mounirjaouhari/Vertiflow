@@ -1,0 +1,81 @@
+graph TD
+    %% ZONE 1 : SOURCES
+    subgraph Z1 ["📡 ZONE 1 : SOURCES"]
+        style Z1 fill:#eceff1,stroke:#455a64
+        S_IOT["🌱 Capteurs IoT"]
+        S_VIS["📷 Vision IA"]
+        S_API["🛰️ APIs Externes"]
+        S_LAB["🔬 Saisie Labo"]
+    end
+
+    %% ZONE 2 : NIFI
+    subgraph Z2 ["🔄 ZONE 2 : APACHE NIFI"]
+        style Z2 fill:#e3f2fd,stroke:#1565c0
+        N1["🔄 Normalisation"]
+        N2["✨ Enrichissement"]
+        N3["✅ Qualité Z-Score"]
+        N4["🔐 Traçabilité"]
+        N_FAIL["💾 Dead Letter Queue"]
+    end
+
+    %% ZONE 3 : KAFKA
+    subgraph Z3 ["📬 ZONE 3 : APACHE KAFKA"]
+        style Z3 fill:#fff3e0,stroke:#ef6c00
+        K_TOPIC["📊 Topic Principal"]
+        K_STREAM["⚡ Stream Processing"]
+    end
+
+    %% ZONE 4 : MONGODB
+    subgraph Z4 ["⚡ ZONE 4 : MONGODB"]
+        style Z4 fill:#e8f5e9,stroke:#2e7d32
+        M_STATE[("💾 État Actuel")]
+        A4["🚨 Seuillage"]
+        A5["⚙️ Règles Métier"]
+        A6["🔧 Maintenance"]
+    end
+
+    %% ZONE 5 : CLICKHOUSE & ML
+    subgraph Z5 ["🧠 ZONE 5 : ANALYTIQUE & ML"]
+        style Z5 fill:#fff9c4,stroke:#fbc02d
+        C_HIST[("📈 Data Warehouse")]
+        A7["📊 Statistiques"]
+        A8["💰 ROI Financier"]
+        ML_ENG["🤖 Moteur ML"]
+        A9["⏳ LSTM"]
+        A10["🌳 Random Forest"]
+    end
+
+    %% ZONE 6 : POWER BI
+    subgraph Z6 ["📊 ZONE 6 : VISUALISATION"]
+        style Z6 fill:#f3e5f5,stroke:#7b1fa2
+        PBI_S["⚡ Dashboard Temps Réel"]
+        PBI_D["📈 Rapports Analytiques"]
+    end
+
+    %% CONNEXIONS
+    S_IOT --> N1
+    S_VIS --> N1
+    S_API --> N1
+    S_LAB --> N1
+    
+    N1 --> N2 --> N3 --> N4
+    N3 -.->|Erreur| N_FAIL
+    N4 --> K_TOPIC
+    
+    K_TOPIC --> M_STATE
+    M_STATE <--> A4
+    A4 --> A5 --> A6
+    
+    K_TOPIC --> C_HIST
+    C_HIST <--> A7
+    C_HIST <--> A8
+    
+    C_HIST --> ML_ENG
+    ML_ENG --> A9
+    ML_ENG --> A10
+    A9 -.->|Prédictions| K_TOPIC
+    A10 -.->|Prédictions| K_TOPIC
+    
+    K_TOPIC --> PBI_S
+    C_HIST --> PBI_D
+    A5 -.->|Action| S_IOT

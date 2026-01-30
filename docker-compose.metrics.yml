@@ -1,0 +1,98 @@
+# ============================================================================
+# PROJET VERTIFLOW - Agriculture Verticale Intelligente
+# ============================================================================
+# Date de création    : 25/12/2025
+# Équipe              : VertiFlow Core Team
+#
+# Membres:
+#   🧙‍♂️ @Mounir      - Architecte & Scientifique
+#   🏗️ @Imrane      - DevOps & Infrastructure
+#   🐍 @Mouhammed   - Data Engineer & Analyste ETL
+#   🧬 @Asama       - Biologiste & Domain Expert
+#   ⚖️ @MrZakaria   - Encadrant & Architecte Data
+#
+# ----------------------------------------------------------------------------
+# FICHIER: docker-compose.metrics.yml
+# DESCRIPTION: Monitoring and observability stack (Grafana + Prometheus)
+#
+# Services inclus:
+#   - Prometheus: Metrics collection and storage
+#   - Grafana: Dashboards and visualization
+#   - Node Exporter: System metrics
+#
+# Développé par       : @Imrane
+# Ticket(s) associé(s): TICKET-060
+# Sprint              : Semaine 6 - Phase Monitoring
+#
+# ----------------------------------------------------------------------------
+# © 2025 VertiFlow Core Team
+# Initiative Nationale Marocaine JobInTech - YNOV Maroc Campus
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # Prometheus - Metrics collection
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - vertiflow-network
+    restart: unless-stopped
+
+  # Grafana - Dashboards and visualization
+  grafana:
+    image: grafana/grafana:10.1.5
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./dashboards/grafana:/etc/grafana/provisioning/dashboards
+    networks:
+      - vertiflow-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+  # Node Exporter - System metrics
+  node-exporter:
+    image: prom/node-exporter:v1.6.1
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - vertiflow-network
+    restart: unless-stopped
+
+networks:
+  vertiflow-network:
+    external: true
+    # NOTE: J'ai retiré le 'name' spécifique pour éviter les erreurs si le dossier change de nom sur le Cloud.
+
+volumes:
+  prometheus-data:
+  grafana-data:

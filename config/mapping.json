@@ -1,0 +1,22 @@
+{
+    "version": "v1",
+    "spec": [
+        {
+            "operation": "shift",
+            "spec": {
+                "*": {
+                    "sensor_id": "tower_id",
+                    "timestamp": "event_time",
+                    "metrics": {
+                        "t_air": "air_temperature",
+                        "h_air": "air_humidity",
+                        "co2": "co2_level",
+                        "par": "light_intensity_par",
+                        "ec": "nutrient_ec",
+                        "ph": "nutrient_ph"
+                    }
+                }
+            }
+        }
+    ]
+}

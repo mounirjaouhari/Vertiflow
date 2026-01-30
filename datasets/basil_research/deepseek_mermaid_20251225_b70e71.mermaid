@@ -1,0 +1,376 @@
+flowchart TD
+    %% ==== STYLE DEFINITIONS ====
+    classDef source fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef process fill:#bbdefb,stroke:#1565c0,stroke-width:2px
+    classDef storage fill:#ffecb3,stroke:#ff8f00,stroke-width:2px
+    classDef alert fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    classDef ml fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px
+    classDef bi fill:#b2dfdb,stroke:#00695c,stroke-width:2px
+    classDef control fill:#d1c4e9,stroke:#4527a0,stroke-width:2px
+    classDef integration fill:#f8bbd0,stroke:#ad1457,stroke-width:2px
+
+    %% ==== SECTION 1: SOURCES PHYSIQUES ====
+    subgraph SG1 [1.0 SOURCES PHYSIQUES & CAPTEURS EDGE]
+        S1[Capteurs Environnement<br/>BME280/DHT22]:::source
+        S2[Capteurs Racinaires<br/>pH/EC/DO]:::source
+        S3[Système Hydraulique<br/>Pression/Débit]:::source
+        S4[Imagerie Thermique<br/>Caméras IR]:::source
+        S5[Imagerie Multispectrale<br/>Caméras RGB+IR]:::source
+        S6[Système Lumière<br/>PAR/UV-B]:::source
+        S7[CO2 & Climat<br/>NDIR/CO2]:::source
+        S8[Électronique Edge<br/>ESP32/Arduino Logs]:::source
+        S9[Interface Opérateur<br/>Scanners/Mobile]:::source
+    end
+
+    %% ==== SECTION 2: INGESTION & PROTOCOLES EDGE ====
+    subgraph SG2 [2.0 INGESTION & PROTOCOLES EDGE]
+        P1[ConsumeMQTT/HTTP<br/>Agrégation Edge]:::process
+        P2[Formatage JSON<br/>Schéma Normalisé]:::process
+        P3[Horodatage &<br/>Timezone Conversion]:::process
+        P4[Validation<br/>Plages Acceptables]:::process
+        P5[Gestion QoS<br/>Exactly-Once Semantics]:::process
+        
+        %% Protocoles Spécifiques
+        P20[Orchestrateur Cycle Phénologique<br/>DAT → Mode (ROOTING/VEGETATIVE/FINISH)]:::process
+        P21[Contrôleur Irrigation HPAS<br/>Algo Section 5.3]:::process
+        P22[Gestion Ratio K:Ca<br/>Validation Section 3.3]:::process
+        P23[Calculateur VPD<br/>Formule Section 4.2]:::process
+        P24[Monitoring ΔTleaf-air<br/>Section 4.1 Logique]:::process
+    end
+
+    %% ==== SECTION 3: BUS D'ÉVÉNEMENTS CENTRAL ====
+    subgraph SG3 [3.0 BUS D'ÉVÉNEMENTS KAFKA]
+        K1[vertiflow-telemetry-raw<br/>10K msg/s]:::storage
+        K2[vertiflow-telemetry-enriched<br/>VPD/ΔT calculés]:::storage
+        K3[hp-system-metrics<br/>Pression/Débit]:::storage
+        K4[anomaly-detection-events<br/>Alertes en temps réel]:::storage
+        K5[control-commands<br/>Consignes Edge]:::storage
+        K6[image-metadata<br/>Références MinIO]:::storage
+        K7[batch-tracking-events<br/>Suivi Lot]:::storage
+        K8[harvest-quality-events<br/>Qualité Récolte]:::storage
+    end
+
+    %% ==== SECTION 4: TRANSFORMATION & ENRICHISSEMENT ====
+    subgraph SG4 [4.0 TRANSFORMATION & ENRICHISSEMENT]
+        T1[ConsumeKafka<br/>Lecture Topics]:::process
+        T2[Calcul VPD Dynamique<br/>Ajustement Mode]:::process
+        T3[Détection Anomalies Pythium<br/>Chute pH Nocturne]:::process
+        T4[Corrélation T°air-T°feuille<br/>Diagnostic Stress]:::process
+        T5[Validation Invariants<br/>pH/EC/DO/Temp]:::process
+        T6[Agrégation Temporelle<br/>1s→1min→5min→1h]:::process
+        T7[Jointure Données<br/>Sensors + Images]:::process
+        T8[Enrichissement Géospatial<br/>Zone/Tour/Étage]:::process
+    end
+
+    %% ==== SECTION 5: STOCKAGE & PERSISTANCE ====
+    subgraph SG5 [5.0 STOCKAGE & PERSISTANCE]
+        DB1[(ClickHouse<br/>Time-Series Analytics)]:::storage
+        DB2[(PostgreSQL<br/>Metadata & Relations)]:::storage
+        DB3[(MinIO/S3<br/>Images & Fichiers)]:::storage
+        DB4[(Redis<br/>Cache & Session State)]:::storage
+        DB5[(Elasticsearch<br/>Logs & Recherche)]:::storage
+        DB6[(MySQL<br/>Application Transactionnel)]:::storage
+        DB7[Hyperledger Fabric<br/>Blockchain Traçabilité]:::storage
+    end
+
+    %% ==== SECTION 6: DÉTECTION ALERTES & SÉCURITÉ ====
+    subgraph SG6 [6.0 ALERTES & SÉCURITÉ]
+        A1[RouteOnAttribute<br/>Seuils Critiques]:::alert
+        A2[Alertes Pythium<br/>Root Rot Detection]:::alert
+        A3[Alertes Tipburn<br/>Nécrose Calcique]:::alert
+        A4[Alertes Bolting<br/>Montaison Prématurée]:::alert
+        A5[Alertes Sécurité<br/>Pression < 70 bars]:::alert
+        A6[Alertes Climat<br/>VPD Hors Plage]:::alert
+        A7[Alertes Nutrition<br/>Ratio K:Ca > 1.4]:::alert
+        
+        %% Canaux de Notification
+        N1[Slack/Teams<br/>Notifications Temps Réel]:::alert
+        N2[Email/SMS<br/>Alertes Critiques]:::alert
+        N3[Dashboards Grafana<br/>Visualisation Alerte]:::alert
+        N4[Webhooks API<br/>Intégration Externe]:::alert
+    end
+
+    %% ==== SECTION 7: INTELLIGENCE ARTIFICIELLE ====
+    subgraph SG7 [7.0 INTELLIGENCE ARTIFICIELLE & ML]
+        ML1[Feature Engineering<br/>Préparation Données]:::ml
+        ML2[Feature Store<br/>Redis/PostgreSQL]:::storage
+        ML3[Modèles Prédictifs<br/>Yield Estimation]:::ml
+        ML4[Recommandations<br/>Optimisation Paramètres]:::ml
+        ML5[Computer Vision<br/>Analyse Images]:::ml
+        ML6[Anomaly Detection<br/>ML Avancé]:::ml
+        ML7[Reinforcement Learning<br/>Optimisation Continue]:::ml
+        ML8[Modèle Chimiotypique<br/>Prédiction Terpènes]:::ml
+    end
+
+    %% ==== SECTION 8: CONTRÔLE COMMANDE ====
+    subgraph SG8 [8.0 CONTRÔLE COMMANDE AUTOMATIQUE]
+        C1[Algorithmes PID<br/>Correction Paramètres]:::control
+        C2[Orchestrateur Irrigation<br/>Cycles Section 5.2]:::control
+        C3[Gestion Climat<br/>Ventilation/Chauffage]:::control
+        C4[Contrôle Lumière<br/>Spectre & Intensité]:::control
+        C5[Gestion CO2<br/>Enrichissement Dynamique]:::control
+        C6[Mode Bio-Stimulation<br/>Stress Contrôlé]:::control
+        C7[Emergency Protocols<br/>Procédures Urgence]:::control
+        
+        %% Sorties vers Edge
+        E1[PublishMQTT<br/>Commandes ESP32]:::control
+        E2[PublishKafka<br/>Consignes Système]:::control
+    end
+
+    %% ==== SECTION 9: BUSINESS INTELLIGENCE ====
+    subgraph SG9 [9.0 BUSINESS INTELLIGENCE & REPORTING]
+        B1[Calcul KPIs<br/>WPR/DLI/VPD Stabilité]:::bi
+        B2[Reporting Quotidien<br/>PDF/Excel]:::bi
+        B3[Dashboards Temps Réel<br/>Grafana]:::bi
+        B4[Analyse Comparative<br/>Lot vs Lot]:::bi
+        B5[Prédictions Business<br/>Rendement/Coûts]:::bi
+        B6[Conformité Normative<br/>GlobalG.A.P./Codex]:::bi
+        B7[Audit & Traçabilité<br/>Rapports Complets]:::bi
+    end
+
+    %% ==== SECTION 10: INTÉGRATIONS SYSTÈMES ====
+    subgraph SG10 [10.0 INTÉGRATIONS SYSTÈMES]
+        I1[ERP Integration<br/>SAP/Odoo]:::integration
+        I2[CRM Integration<br/>Suivi Client]:::integration
+        I3[Supply Chain<br/>Logistique]:::integration
+        I4[Laboratoires Externes<br/>Résultats Analytiques]:::integration
+        I5[Mobile Apps<br/>Opérateurs/Techniciens]:::integration
+        I6[APIs Externes<br/>Météo/Marchés]:::integration
+        I7[Archivage Long Terme<br/>Glacier/Tape]:::integration
+    end
+
+    %% ==== SECTION 11: QUALITÉ & TRACABILITÉ ====
+    subgraph SG11 [11.0 QUALITÉ & TRACABILITÉ]
+        Q1[Suivi Lot<br/>QR Code Scanning]:::process
+        Q2[Saisie Qualité<br/>Labels A/B/C]:::process
+        Q3[Analyses Laboratoire<br/>GC/MS Résultats]:::process
+        Q4[Blockchain Immutabilité<br/>Hyperledger]:::storage
+        Q5[Certification Produit<br/>Documents Conformité]:::process
+        Q6[Recall Management<br/>Gestion Rappels]:::process
+        Q7[Food Safety<br/>HACCP Traçabilité]:::process
+    end
+
+    %% ==== CONNECTIONS PRINCIPALES ====
+    
+    %% Sources → Ingestion
+    S1 --> P1
+    S2 --> P1
+    S3 --> P1
+    S4 --> P1
+    S5 --> P1
+    S6 --> P1
+    S7 --> P1
+    S8 --> P1
+    S9 --> P1
+    
+    %% Ingestion → Protocoles
+    P1 --> P2 --> P3 --> P4 --> P5
+    P5 --> P20
+    P5 --> P21
+    P5 --> P22
+    P5 --> P23
+    P5 --> P24
+    
+    %% Protocoles → Kafka
+    P20 --> K1
+    P21 --> K3
+    P22 --> K1
+    P23 --> K2
+    P24 --> K2
+    P5 --> K1
+    
+    %% Kafka → Transformation
+    K1 --> T1
+    K2 --> T1
+    K3 --> T1
+    
+    %% Transformation → Enrichissement
+    T1 --> T2
+    T1 --> T3
+    T1 --> T4
+    T1 --> T5
+    T2 --> T6
+    T3 --> T6
+    T4 --> T6
+    T5 --> T6
+    
+    %% Enrichissement → Stockage
+    T6 --> DB1
+    T6 --> DB2
+    T7 --> DB1
+    T8 --> DB2
+    
+    %% Images → Stockage
+    S4 --> DB3
+    S5 --> DB3
+    
+    %% Stockage → Alertes
+    DB1 --> A1
+    DB2 --> A1
+    A1 --> A2
+    A1 --> A3
+    A1 --> A4
+    A1 --> A5
+    A1 --> A6
+    A1 --> A7
+    
+    %% Alertes → Notifications
+    A2 --> N1
+    A3 --> N1
+    A4 --> N1
+    A5 --> N2
+    A6 --> N2
+    A7 --> N2
+    
+    %% Stockage → ML
+    DB1 --> ML1
+    DB2 --> ML1
+    DB3 --> ML5
+    
+    %% ML Pipeline
+    ML1 --> ML2
+    ML2 --> ML3
+    ML2 --> ML4
+    ML3 --> ML6
+    ML4 --> ML6
+    ML5 --> ML6
+    ML6 --> ML7
+    ML7 --> ML8
+    
+    %% ML → Contrôle
+    ML3 --> C1
+    ML4 --> C1
+    ML8 --> C6
+    
+    %% Contrôle → Edge
+    C1 --> E1
+    C2 --> E1
+    C3 --> E1
+    C4 --> E1
+    C5 --> E1
+    C6 --> E1
+    C7 --> E1
+    E1 --> S1
+    E1 --> S3
+    E1 --> S6
+    E1 --> S7
+    
+    %% Contrôle → Kafka
+    C1 --> K5
+    C2 --> K5
+    C3 --> K5
+    
+    %% Stockage → BI
+    DB1 --> B1
+    DB2 --> B1
+    DB6 --> B1
+    
+    %% BI Pipeline
+    B1 --> B2
+    B1 --> B3
+    B2 --> B4
+    B3 --> B4
+    B4 --> B5
+    B5 --> B6
+    B6 --> B7
+    
+    %% Qualité Pipeline
+    S9 --> Q1
+    Q1 --> Q2
+    Q2 --> DB6
+    DB6 --> Q3
+    Q3 --> Q4
+    Q4 --> Q5
+    Q5 --> Q6
+    Q6 --> Q7
+    
+    %% Intégrations
+    B7 --> I1
+    Q7 --> I1
+    DB6 --> I2
+    I1 --> I3
+    Q3 --> I4
+    B3 --> I5
+    I5 --> S9
+    I6 --> B1
+    
+    %% Logs & Monitoring
+    S8 --> DB5
+    P1 --> DB5
+    E1 --> DB5
+    A1 --> DB5
+    
+    %% Flux de Retour (Feedback Loops)
+    
+    %% BI → ML (Amélioration Modèles)
+    B4 -.->|Performance Data| ML7
+    
+    %% Qualité → ML (Ground Truth)
+    Q2 -.->|Labels A/B/C| ML1
+    
+    %% Alertes → Contrôle (Correctif Immédiat)
+    A5 -.->|Emergency Stop| C7
+    A2 -.->|Sanitation Protocol| C7
+    
+    %% ML → BI (Prédictions Business)
+    ML3 -.->|Yield Forecast| B5
+    
+    %% Opérateur → Contrôle (Override Manuel)
+    S9 -.->|Manual Override| C1
+    
+    %% Laboratoire → Qualité (Validation)
+    I4 -.->|GC/MS Results| Q5
+    
+    %% ==== LÉGENDE & METADONNÉES ====
+    
+    subgraph LEGENDE [LÉGENDE DES COULEURS]
+        L1[Source/Edge]:::source
+        L2[Process NiFi]:::process
+        L3[Stockage]:::storage
+        L4[Alerte/Sécurité]:::alert
+        L5[ML/IA]:::ml
+        L6[Contrôle Commande]:::control
+        L7[BI/Reporting]:::bi
+        L8[Intégration]:::integration
+    end
+    
+    subgraph STATS [STATISTIQUES SYSTÈME]
+        ST1[> 50 Flux NiFi]
+        ST2[> 100 Processeurs]
+        ST3[10+ Topics Kafka]
+        ST4[7 Bases de Données]
+        ST5[Temps Réel < 1s]
+        ST6[99.99% Disponibilité]
+    end
+
+    %% ==== NOTES TECHNIQUES ====
+    
+    NOTE1["Architecture Lambda (Batch + Stream):
+    • Hot Path: Kafka → ClickHouse (< 1s)
+    • Warm Path: Aggregation (1min/5min)
+    • Cold Path: Archivage (S3 Glacier)
+    
+    Sécurité:
+    • TLS/SSL End-to-End
+    • RBAC Granulaire
+    • Audit Logging Complet
+    
+    Scalabilité:
+    • Horizontal Scaling NiFi
+    • Kafka Partitioning
+    • ClickHouse Sharding"]
+    
+    NOTE2["Protocoles Implémentés:
+    1. Cycle Phénologique (Section 2)
+    2. Gestion VPD Dynamique (4.2)
+    3. Irrigation HPAS (5.1-5.3)
+    4. Bio-Stimulation (6.0)
+    5. Détection Pythium (3.2)
+    6. Ratio K:Ca (3.3)
+    7. Monitoring ΔT (4.1)
+    
+    Garanties:
+    • Exactly-Once Processing
+    • Zero Data Loss
+    • Real-time Alerts
+    • Full Traceability"]

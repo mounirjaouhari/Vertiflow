@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "VertiFlowCommand",
+  "namespace": "com.vertiflow.data",
+  "doc": "Schéma canonique des commandes de contrôle pour les actionneurs IoT (Algo A5/A11)",
+  "fields": [
+    { "name": "command_id", "type": "string", "doc": "UUID unique de la commande" },
+    { "name": "timestamp", "type": "string", "doc": "ISO8601 UTC de l'ordre" },
+    
+    { "name": "target_farm_id", "type": "string" },
+    { "name": "target_rack_id", "type": ["null", "string"], "default": null },
+    { "name": "target_module_id", "type": ["null", "string"], "default": null },
+    { "name": "target_device_id", "type": ["null", "string"], "default": null, "doc": "ID spécifique de l'actionneur (ex: PUMP-01)" },
+    
+    { "name": "command_type", "type": { "type": "enum", "name": "CommandType", "symbols": ["SET_POINT", "EMERGENCY_STOP", "RESET", "CALIBRATE", "MODE_SWITCH"] } },
+    { "name": "priority", "type": { "type": "enum", "name": "PriorityLevel", "symbols": ["LOW", "NORMAL", "HIGH", "CRITICAL"] } },
+    
+    { "name": "payload", "type": "string", "doc": "JSON stringifié contenant les paramètres (ex: {'target_ph': 6.0})" },
+    
+    { "name": "source_component", "type": "string", "doc": "Qui a donné l'ordre ? (ex: Algo_A5_RuleEngine)" },
+    { "name": "reason", "type": ["null", "string"], "default": null, "doc": "Justification pour l'audit (ex: 'Flood detected')" },
+    
+    { "name": "execution_deadline", "type": ["null", "string"], "default": null, "doc": "Date limite d'exécution" },
+    { "name": "ack_required", "type": "boolean", "default": true }
+  ]
+}

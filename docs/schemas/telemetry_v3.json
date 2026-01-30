@@ -1,0 +1,45 @@
+{
+  "type": "record",
+  "name": "VertiFlowTelemetry",
+  "namespace": "com.vertiflow.data",
+  "doc": "Schéma canonique des 153 colonnes du Golden Record VertiFlow v3",
+  "fields": [
+    { "name": "timestamp", "type": "string", "doc": "ISO8601 UTC" },
+    { "name": "farm_id", "type": "string" },
+    { "name": "parcel_id", "type": ["null", "string"], "default": null },
+    { "name": "rack_id", "type": ["null", "string"], "default": null },
+    { "name": "level_index", "type": ["null", "int"], "default": null },
+    { "name": "module_id", "type": ["null", "string"], "default": null },
+    { "name": "zone_id", "type": ["null", "string"], "default": null },
+    
+    { "name": "sensor_hardware_id", "type": "string" },
+    { "name": "data_source_type", "type": { "type": "enum", "name": "SourceType", "symbols": ["IoT", "API", "ML", "Lab"] } },
+    
+    { "name": "air_temp_internal", "type": ["null", "float"], "default": null },
+    { "name": "air_humidity", "type": ["null", "float"], "default": null },
+    { "name": "co2_level_ambient", "type": ["null", "int"], "default": null },
+    { "name": "vapor_pressure_deficit", "type": ["null", "float"], "default": null },
+    
+    { "name": "light_intensity_ppfd", "type": ["null", "float"], "default": null },
+    { "name": "light_dli_accumulated", "type": ["null", "float"], "default": null },
+    { "name": "light_photoperiod", "type": ["null", "float"], "default": null },
+    
+    { "name": "nutrient_n_total", "type": ["null", "float"], "default": null },
+    { "name": "nutrient_p_phosphorus", "type": ["null", "float"], "default": null },
+    { "name": "nutrient_k_potassium", "type": ["null", "float"], "default": null },
+    { "name": "water_ph", "type": ["null", "float"], "default": null },
+    { "name": "nutrient_solution_ec", "type": ["null", "float"], "default": null },
+    
+    { "name": "fresh_biomass_est", "type": ["null", "float"], "default": null },
+    { "name": "health_score", "type": ["null", "float"], "default": null },
+    
+    { "name": "pump_vibration_level", "type": ["null", "float"], "default": null },
+    { "name": "leak_detection_status", "type": ["null", "int"], "default": null },
+    { "name": "emergency_stop_status", "type": ["null", "int"], "default": null },
+    
+    { "name": "data_integrity_flag", "type": "int", "default": 0 },
+    { "name": "anomaly_confidence_score", "type": "float", "default": 0.0 },
+    { "name": "lineage_uuid", "type": ["null", "string"], "default": null },
+    { "name": "blockchain_hash", "type": ["null", "string"], "default": null }
+  ]
+}

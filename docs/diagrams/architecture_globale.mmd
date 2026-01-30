@@ -1,0 +1,58 @@
+---
+config:
+  layout: elk
+---
+flowchart TB
+ subgraph SOURCES["Sources - 153 Colonnes"]
+        IOT["Capteurs IoT - Colonnes 11-100"]
+        CAMERAS["Vision IA - Colonnes 41-70"]
+        APIS["APIs NASA/RTE - Colonnes 77-80"]
+  end
+ subgraph NIFI["Apache NiFi - Orchestration"]
+        N["Processeur - Normalisation"]
+  end
+ subgraph KAFKA["Apache Kafka - Transport"]
+        K["Topic - Telemetry Full"]
+  end
+ subgraph DB["Bases de Donnees"]
+        M[("MongoDB - Temps Reel")]
+        C[("ClickHouse - Historique")]
+  end
+ subgraph VIZ["Visualisation"]
+        P["Power BI - Dashboard"]
+  end
+    IOT L_IOT_N_0@==> N
+    CAMERAS L_CAMERAS_N_0@--> N
+    APIS ==> N
+    N L_N_K_0@-- JSON Standardise --> K
+    K L_K_M_0@-- Stream Temps Reel --> M
+    K L_K_C_0@-- Batch Insert --> C
+    K L_K_P_0@-- API Streaming --> P
+    M L_M_P_0@-- DirectQuery --> P
+    C L_C_P_0@-- DirectQuery --> P
+    M L_M_N_0@== Alerte ==> N
+    N L_N_IOT_0@-. Action .-> IOT
+
+     M:::Class_01
+     C:::Sky
+    classDef Sky stroke-width:1px, stroke-dasharray:none, stroke:#374D7C, fill:#E2EBFF, color:#374D7C
+    classDef Pine stroke-width:1px, stroke-dasharray:none, stroke:#254336, fill:#27654A, color:#FFFFFF
+    classDef Class_01 fill:#00C853
+    style C stroke:#000000,fill:#FFD600
+    linkStyle 0 stroke:#D50000,fill:none
+    linkStyle 2 stroke:#00C853,fill:none
+    linkStyle 3 stroke:#D50000,fill:none
+    linkStyle 6 stroke:#D50000,fill:none
+    linkStyle 9 stroke:#D50000,fill:none
+    linkStyle 10 stroke:#D50000,fill:none
+
+    L_IOT_N_0@{ animation: slow } 
+    L_CAMERAS_N_0@{ animation: slow } 
+    L_N_K_0@{ animation: slow } 
+    L_K_M_0@{ animation: fast } 
+    L_K_C_0@{ animation: slow } 
+    L_K_P_0@{ animation: fast } 
+    L_M_P_0@{ animation: fast } 
+    L_C_P_0@{ animation: slow } 
+    L_M_N_0@{ animation: slow } 
+    L_N_IOT_0@{ animation: slow }

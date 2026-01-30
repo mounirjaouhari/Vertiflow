@@ -1,0 +1,667 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "VertiFlow Telemetry Schema v3.0 Complete",
+  "description": "Schema complet pour la validation des donnees de telemetrie VertiFlow - 153 colonnes Golden Record",
+  "version": "3.0.0",
+  "namespace": "com.vertiflow.data",
+
+  "required": [
+    "timestamp",
+    "farm_id",
+    "sensor_hardware_id",
+    "data_source_type"
+  ],
+
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Horodatage ISO8601 UTC"
+    },
+
+    "farm_id": {
+      "type": "string",
+      "pattern": "^VERT-[A-Z]+-[0-9]+$",
+      "description": "Identifiant ferme (ex: VERT-MAROC-01)"
+    },
+
+    "parcel_id": {
+      "type": ["string", "null"],
+      "description": "Identifiant parcelle cadastrale"
+    },
+
+    "latitude": {
+      "type": ["number", "null"],
+      "minimum": -90,
+      "maximum": 90
+    },
+
+    "longitude": {
+      "type": ["number", "null"],
+      "minimum": -180,
+      "maximum": 180
+    },
+
+    "zone_id": {
+      "type": ["string", "null"],
+      "enum": ["ZONE_GERMINATION", "ZONE_CROISSANCE", "ZONE_FLORAISON", null]
+    },
+
+    "rack_id": {
+      "type": ["string", "null"],
+      "pattern": "^R[0-9]{2}$"
+    },
+
+    "level_index": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "maximum": 10
+    },
+
+    "module_id": {
+      "type": ["string", "null"]
+    },
+
+    "batch_id": {
+      "type": ["string", "null"]
+    },
+
+    "species_variety": {
+      "type": ["string", "null"]
+    },
+
+    "sensor_hardware_id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9-]+$",
+      "description": "ID materiel du capteur"
+    },
+
+    "data_source_type": {
+      "type": "string",
+      "enum": ["IoT", "API", "ML", "Lab"],
+      "description": "Type de source de donnees"
+    },
+
+    "air_temp_internal": {
+      "type": ["number", "null"],
+      "minimum": -10,
+      "maximum": 60,
+      "description": "Temperature air interne (C)"
+    },
+
+    "air_humidity": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Humidite relative (%)"
+    },
+
+    "co2_level_ambient": {
+      "type": ["integer", "null"],
+      "minimum": 200,
+      "maximum": 5000,
+      "description": "Niveau CO2 (ppm)"
+    },
+
+    "vapor_pressure_deficit": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 5,
+      "description": "VPD (kPa)"
+    },
+
+    "airflow_velocity": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Vitesse air (m/s)"
+    },
+
+    "air_pressure": {
+      "type": ["number", "null"],
+      "minimum": 900,
+      "maximum": 1100,
+      "description": "Pression atmospherique (hPa)"
+    },
+
+    "light_intensity_ppfd": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 2000,
+      "description": "Intensite lumineuse (umol/m2/s)"
+    },
+
+    "light_compensation_point": {
+      "type": ["number", "null"],
+      "description": "Point de compensation lumineuse"
+    },
+
+    "light_saturation_point": {
+      "type": ["number", "null"],
+      "description": "Point de saturation lumineuse"
+    },
+
+    "light_ratio_red_blue": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Ratio Rouge:Bleu"
+    },
+
+    "light_far_red_intensity": {
+      "type": ["number", "null"],
+      "description": "Intensite Far-Red 730nm"
+    },
+
+    "light_dli_accumulated": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 50,
+      "description": "DLI accumule (mol/m2/day)"
+    },
+
+    "light_photoperiod": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 24,
+      "description": "Photoperiode (heures)"
+    },
+
+    "quantum_yield_psii": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Rendement quantique PSII (Fv/Fm)"
+    },
+
+    "photosynthetic_rate_max": {
+      "type": ["number", "null"],
+      "description": "Taux photosynthetique max"
+    },
+
+    "light_use_efficiency": {
+      "type": ["number", "null"],
+      "description": "Efficacite utilisation lumiere"
+    },
+
+    "leaf_absorption_pct": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100
+    },
+
+    "spectral_recipe_id": {
+      "type": ["string", "null"],
+      "description": "ID recette spectrale"
+    },
+
+    "nutrient_n_total": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 500,
+      "description": "Azote total (ppm)"
+    },
+
+    "nutrient_p_phosphorus": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 200,
+      "description": "Phosphore (ppm)"
+    },
+
+    "nutrient_k_potassium": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 500,
+      "description": "Potassium (ppm)"
+    },
+
+    "nutrient_ca_calcium": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 300
+    },
+
+    "nutrient_mg_magnesium": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100
+    },
+
+    "nutrient_s_sulfur": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 200
+    },
+
+    "nutrient_fe_iron": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 20
+    },
+
+    "nutrient_mn_manganese": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 10
+    },
+
+    "nutrient_zn_zinc": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 5
+    },
+
+    "nutrient_cu_copper": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 2
+    },
+
+    "nutrient_b_boron": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 5
+    },
+
+    "nutrient_mo_molybdenum": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "nutrient_cl_chlorine": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100
+    },
+
+    "nutrient_ni_nickel": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "nutrient_solution_ec": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 5,
+      "description": "Conductivite electrique (mS/cm)"
+    },
+
+    "water_temp": {
+      "type": ["number", "null"],
+      "minimum": 5,
+      "maximum": 35,
+      "description": "Temperature eau (C)"
+    },
+
+    "water_ph": {
+      "type": ["number", "null"],
+      "minimum": 3,
+      "maximum": 10,
+      "description": "pH solution"
+    },
+
+    "dissolved_oxygen": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 20,
+      "description": "Oxygene dissous (mg/L)"
+    },
+
+    "water_turbidity": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Turbidite (NTU)"
+    },
+
+    "wue_current": {
+      "type": ["number", "null"],
+      "description": "Water Use Efficiency actuel"
+    },
+
+    "water_recycled_rate": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Taux recyclage eau (%)"
+    },
+
+    "coefficient_cultural_kc": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 2,
+      "description": "Coefficient cultural FAO"
+    },
+
+    "microbial_density": {
+      "type": ["number", "null"],
+      "description": "Densite microbienne (UFC/mL)"
+    },
+
+    "beneficial_microbes_ratio": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "root_fungal_pressure": {
+      "type": ["number", "null"]
+    },
+
+    "biofilm_thickness": {
+      "type": ["number", "null"],
+      "description": "Epaisseur biofilm (mm)"
+    },
+
+    "algae_growth_index": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "redox_potential": {
+      "type": ["number", "null"],
+      "description": "Potentiel redox (mV)"
+    },
+
+    "irrigation_line_pressure": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Pression irrigation (Bar)"
+    },
+
+    "leaching_fraction": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "fresh_biomass_est": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Biomasse fraiche estimee (g)"
+    },
+
+    "dry_biomass_est": {
+      "type": ["number", "null"],
+      "minimum": 0
+    },
+
+    "leaf_area_index_lai": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 10
+    },
+
+    "root_shoot_ratio": {
+      "type": ["number", "null"]
+    },
+
+    "relative_growth_rate": {
+      "type": ["number", "null"]
+    },
+
+    "net_assimilation_rate": {
+      "type": ["number", "null"]
+    },
+
+    "canopy_height": {
+      "type": ["number", "null"],
+      "description": "Hauteur canopee (cm)"
+    },
+
+    "harvest_index": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "days_since_planting": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+
+    "thermal_sum_accumulated": {
+      "type": ["number", "null"],
+      "description": "Somme thermique (degres-jours)"
+    },
+
+    "growth_stage": {
+      "type": ["string", "null"],
+      "enum": ["Semis", "Vegetatif", "Bouton", "Recolte", null]
+    },
+
+    "predicted_yield_kg_m2": {
+      "type": ["number", "null"]
+    },
+
+    "expected_harvest_date": {
+      "type": ["string", "null"],
+      "format": "date"
+    },
+
+    "biomass_accumulation_daily": {
+      "type": ["number", "null"]
+    },
+
+    "target_harvest_weight": {
+      "type": ["number", "null"]
+    },
+
+    "health_score": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Score sante (0-1)"
+    },
+
+    "chlorophyll_index_spad": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100
+    },
+
+    "stomatal_conductance": {
+      "type": ["number", "null"]
+    },
+
+    "anthocyanin_index": {
+      "type": ["number", "null"]
+    },
+
+    "tip_burn_risk": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "leaf_temp_delta": {
+      "type": ["number", "null"]
+    },
+
+    "essential_oil_yield": {
+      "type": ["number", "null"],
+      "description": "Rendement huile essentielle (%)"
+    },
+
+    "pump_vibration_level": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Niveau vibration pompe"
+    },
+
+    "fan_current_draw": {
+      "type": ["number", "null"],
+      "description": "Courant ventilateur (A)"
+    },
+
+    "led_driver_temp": {
+      "type": ["number", "null"],
+      "description": "Temperature driver LED (C)"
+    },
+
+    "filter_differential_pressure": {
+      "type": ["number", "null"]
+    },
+
+    "ups_battery_health": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100
+    },
+
+    "leak_detection_status": {
+      "type": ["integer", "null"],
+      "enum": [0, 1, null],
+      "description": "Detection fuite (0=OK, 1=ALERTE)"
+    },
+
+    "emergency_stop_status": {
+      "type": ["integer", "null"],
+      "enum": [0, 1, null],
+      "description": "Arret urgence (0=Normal, 1=Active)"
+    },
+
+    "network_latency_ms": {
+      "type": ["integer", "null"]
+    },
+
+    "sensor_calibration_offset": {
+      "type": ["number", "null"]
+    },
+
+    "module_integrity_score": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "energy_price_kwh": {
+      "type": ["number", "null"],
+      "description": "Prix energie (MAD/kWh)"
+    },
+
+    "market_price_kg": {
+      "type": ["number", "null"],
+      "description": "Prix marche (MAD/kg)"
+    },
+
+    "lease_index_value": {
+      "type": ["number", "null"]
+    },
+
+    "carbon_intensity_g_co2_kwh": {
+      "type": ["number", "null"]
+    },
+
+    "renewable_energy_pct": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100
+    },
+
+    "ext_temp_nasa": {
+      "type": ["number", "null"],
+      "description": "Temperature externe NASA POWER"
+    },
+
+    "ext_humidity_nasa": {
+      "type": ["number", "null"]
+    },
+
+    "ext_solar_radiation": {
+      "type": ["number", "null"]
+    },
+
+    "ext_temp_openmeteo": {
+      "type": ["number", "null"],
+      "description": "Temperature externe Open-Meteo"
+    },
+
+    "ext_humidity_openmeteo": {
+      "type": ["number", "null"]
+    },
+
+    "ext_uv_index": {
+      "type": ["number", "null"]
+    },
+
+    "ext_evapotranspiration": {
+      "type": ["number", "null"],
+      "description": "ET0 FAO (mm/day)"
+    },
+
+    "ai_decision_mode": {
+      "type": ["string", "null"],
+      "enum": ["MANUAL", "ASSISTED", "AUTONOMOUS", null]
+    },
+
+    "anomaly_confidence_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "default": 0
+    },
+
+    "predicted_energy_need_24h": {
+      "type": ["number", "null"]
+    },
+
+    "risk_pest_outbreak": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "quality_grade_prediction": {
+      "type": ["string", "null"],
+      "enum": ["Premium", "Standard", "Rejet", null]
+    },
+
+    "ref_n_target": {
+      "type": ["number", "null"]
+    },
+
+    "ref_p_target": {
+      "type": ["number", "null"]
+    },
+
+    "ref_k_target": {
+      "type": ["number", "null"]
+    },
+
+    "ref_temp_opt": {
+      "type": ["number", "null"]
+    },
+
+    "ref_humidity_opt": {
+      "type": ["number", "null"]
+    },
+
+    "data_integrity_flag": {
+      "type": "integer",
+      "enum": [0, 1, 2],
+      "default": 0,
+      "description": "0=OK, 1=Warning, 2=Error"
+    },
+
+    "lineage_uuid": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "UUID tracabilite NiFi"
+    },
+
+    "blockchain_hash": {
+      "type": ["string", "null"],
+      "pattern": "^[a-fA-F0-9]{64}$",
+      "description": "Hash SHA-256 pour audit"
+    }
+  },
+
+  "additionalProperties": true
+}

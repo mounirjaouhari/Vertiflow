@@ -1,0 +1,71 @@
+# ============================================================================
+# VERTIFLOW - ACL Mosquitto (Access Control List)
+# ============================================================================
+# Définit les permissions de lecture/écriture par utilisateur et topic
+# ============================================================================
+
+# =============================================================================
+# Utilisateur Admin - Accès complet
+# =============================================================================
+user vertiflow_admin
+topic readwrite #
+topic readwrite $SYS/#
+
+# =============================================================================
+# Utilisateur NiFi - Lecture telemetry, écriture commands
+# =============================================================================
+user nifi_connector
+topic read vertiflow/+/+/sensor/+/telemetry
+topic read vertiflow/+/+/sensor/+/status
+topic write vertiflow/+/+/actuator/+/command
+topic write vertiflow/+/+/alert/#
+topic read $SYS/broker/#
+
+# =============================================================================
+# Utilisateur Capteurs IoT - Écriture telemetry uniquement
+# =============================================================================
+user iot_sensors
+topic write vertiflow/+/+/sensor/+/telemetry
+topic write vertiflow/+/+/sensor/+/status
+topic read vertiflow/+/+/actuator/+/command
+
+# =============================================================================
+# Utilisateur Actuateurs - Lecture commands, écriture status
+# =============================================================================
+user iot_actuators
+topic read vertiflow/+/+/actuator/+/command
+topic write vertiflow/+/+/actuator/+/status
+topic write vertiflow/+/+/actuator/+/feedback
+
+# =============================================================================
+# Utilisateur Monitoring - Lecture seule
+# =============================================================================
+user monitoring
+topic read vertiflow/#
+topic read $SYS/#
+
+# =============================================================================
+# Utilisateur Stream Processor - Lecture/écriture telemetry
+# =============================================================================
+user stream_processor
+topic read vertiflow/+/+/sensor/+/telemetry
+topic write vertiflow/processed/#
+topic write vertiflow/alerts/#
+
+# =============================================================================
+# Utilisateur ML Inference - Lecture telemetry, écriture predictions
+# =============================================================================
+user ml_inference
+topic read vertiflow/+/+/sensor/+/telemetry
+topic read vertiflow/processed/#
+topic write vertiflow/predictions/#
+topic write vertiflow/recommendations/#
+
+# =============================================================================
+# Pattern Topics VertiFlow
+# =============================================================================
+# vertiflow/{farm_id}/{zone_id}/sensor/{sensor_id}/telemetry
+# vertiflow/{farm_id}/{zone_id}/actuator/{actuator_id}/command
+# vertiflow/{farm_id}/{zone_id}/alert/{alert_type}
+# vertiflow/processed/{farm_id}/aggregated
+# vertiflow/predictions/{farm_id}/{model_type}

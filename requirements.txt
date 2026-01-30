@@ -1,0 +1,88 @@
+# ============================================================================
+# PROJET VERTIFLOW - Agriculture Verticale Intelligente
+# ============================================================================
+# Date de création    : 31/12/2025
+# Équipe              : VertiFlow Core Team
+#
+# Membres:
+#   🧙‍♂️ @Mounir       - Architecte & Scientifique
+#   🏗️ @Imrane       - DevOps & Infrastructure
+#   🐍 @Mouhammed    - Data Engineer & Analyste ETL
+#   🧬 @Asama        - Biologiste & Domain Expert
+#   ⚖️ @MrZakaria    - Encadrant & Architecte Data
+#
+# ----------------------------------------------------------------------------
+# FICHIER: requirements.txt
+# DESCRIPTION: Liste consolidée des dépendances Python pour Cloud Citadel.
+#              Optimisé pour Python 3.13+ (Correctif kafka-python-ng).
+#              Optimisé pour Cloud Run/VM (tensorflow-cpu, mlflow).
+#
+# Développé par        : @Imrane
+# Ticket(s) associé(s): TICKET-004, TICKET-025, TICKET-026, TICKET-132
+# ----------------------------------------------------------------------------
+# © 2025 VertiFlow Core Team
+# Initiative Nationale Marocaine JobInTech - YNOV Maroc Campus
+# ============================================================================
+
+# --- 1. TRAITEMENT DE DONNÉES & CALCUL (CORE) ---
+# Versions récentes indispensables pour le support natif de Python 3.13
+pandas>=2.2.3
+numpy>=2.1.0
+scipy>=1.14.0
+
+# --- 2. CLIENTS DE BASES DE DONNÉES (STORAGE LAYER) ---
+# ClickHouse : Stockage analytique (Télémétrie capteurs - 153 colonnes)
+clickhouse-driver>=0.2.9
+# MongoDB : Stockage documentaire (Configurations, Recettes & Logs)
+pymongo>=4.9.0
+
+# --- 3. FLUX DE MESSAGERIE & IOT (INGESTION LAYER) ---
+# MQTT : Protocole de communication pour les capteurs en périphérie (Edge)
+paho-mqtt>=2.1.0
+# Kafka : /!\ UTILISATION DE KAFKA-PYTHON-NG POUR COMPATIBILITÉ PYTHON 3.13 /!\
+# Ce module remplace kafka-python et corrige l'erreur 'six.moves'
+kafka-python-ng>=2.2.3
+# Alternative haute performance pour les connecteurs IA complexes
+confluent-kafka>=2.5.0
+
+# --- 4. INTELLIGENCE ARTIFICIELLE & ANALYTIQUE (AI LAYER) ---
+# Support pour les algorithmes A9 (Prédiction), A10 (Qualité) et A11 (Optimisation)
+scikit-learn>=1.5.0
+joblib>=1.4.0
+statsmodels>=0.14.0
+
+# [OPTIMISATION CLOUD] Utilisation de la version CPU-only.
+# La VM Google Cloud standard n'a pas de GPU, cela économise ~500 Mo d'espace.
+tensorflow-cpu>=2.15.0
+
+# --- 5. MLOPS & GOUVERNANCE (NOUVEAU - TICKET-132) ---
+# Indispensable pour le tracking des expériences et le registre de modèles
+mlflow>=2.9.2
+
+# --- 6. MONITORING & OBSERVABILITÉ (ZONE 4) ---
+# Client pour l'exportation de métriques personnalisées vers Prometheus
+prometheus-client>=0.21.0
+
+# --- 7. UTILITAIRES, API & CONFIGURATION ---
+# Appels API (NASA Power, OpenWeather, Marchés énergétiques)
+requests>=2.32.0
+# Client HTTP asynchrone pour les fetchers de données externes
+aiohttp>=3.9.0
+# Parsing des fichiers de configuration YAML du projet
+pyyaml>=6.0.2
+# Gestion des variables d'environnement (Fichier .env)
+python-dotenv>=1.0.1
+# Validation des schémas de données JSON (Validation Zone 3)
+jsonschema>=4.23.0
+# Parsing HTML pour les scrapers (ONEE, RNM Prices)
+beautifulsoup4>=4.12.0
+lxml>=5.1.0
+
+# --- 8. LOGGING & DÉBOGAGE (TRAÇABILITÉ) ---
+# Logs structurés pour injection dans la stack Grafana/Loki
+structlog>=24.4.0
+colorama>=0.4.6
+
+# ============================================================================
+# FIN DU FICHIER - VertiFlow Infrastructure System
+# ============================================================================

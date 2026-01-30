@@ -1,0 +1,56 @@
+# ============================================================================
+# VERTIFLOW - Stream Processor Docker Image
+# ============================================================================
+
+FROM python:3.11-slim
+
+LABEL maintainer="VertiFlow Team <team@vertiflow.ma>"
+LABEL version="1.0.0"
+LABEL description="VertiFlow Stream Processor - Kafka to ClickHouse pipeline"
+
+# Arguments
+ARG VERSION=dev
+ENV APP_VERSION=$VERSION
+
+# Environment
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r vertiflow && useradd -r -g vertiflow vertiflow
+
+# Working directory
+WORKDIR /app
+
+# Copy requirements first for caching
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY cloud_citadel/ ./cloud_citadel/
+COPY scripts/ ./scripts/
+COPY config/ ./config/
+
+# Create directories
+RUN mkdir -p /app/logs /app/data && \
+    chown -R vertiflow:vertiflow /app
+
+# Switch to non-root user
+USER vertiflow
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Expose metrics port
+EXPOSE 8080
+
+# Entry point
+ENTRYPOINT ["python", "-m", "cloud_citadel.connectors.stream_processor"]

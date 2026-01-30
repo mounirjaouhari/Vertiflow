@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<!-- ========================================================================
+     VERTIFLOW - Configuration Utilisateurs ClickHouse
+     ======================================================================== -->
+<clickhouse>
+    <users>
+        <!-- Utilisateur Admin -->
+        <vertiflow_admin>
+            <password_sha256_hex>REPLACE_WITH_SHA256_HASH</password_sha256_hex>
+            <networks>
+                <ip>::/0</ip>
+            </networks>
+            <profile>default</profile>
+            <quota>default</quota>
+            <access_management>1</access_management>
+        </vertiflow_admin>
+
+        <!-- Utilisateur Application (lecture/écriture limité) -->
+        <vertiflow_app>
+            <password_sha256_hex>REPLACE_WITH_SHA256_HASH</password_sha256_hex>
+            <networks>
+                <ip>10.0.0.0/8</ip>
+                <ip>172.16.0.0/12</ip>
+                <ip>192.168.0.0/16</ip>
+            </networks>
+            <profile>app_profile</profile>
+            <quota>app_quota</quota>
+            <allow_databases>
+                <database>vertiflow</database>
+            </allow_databases>
+        </vertiflow_app>
+
+        <!-- Utilisateur Lecture seule (PowerBI, Grafana) -->
+        <vertiflow_readonly>
+            <password_sha256_hex>REPLACE_WITH_SHA256_HASH</password_sha256_hex>
+            <networks>
+                <ip>::/0</ip>
+            </networks>
+            <profile>readonly_profile</profile>
+            <quota>readonly_quota</quota>
+            <readonly>1</readonly>
+            <allow_databases>
+                <database>vertiflow</database>
+            </allow_databases>
+        </vertiflow_readonly>
+
+        <!-- Utilisateur NiFi (insert only) -->
+        <nifi_writer>
+            <password_sha256_hex>REPLACE_WITH_SHA256_HASH</password_sha256_hex>
+            <networks>
+                <ip>172.16.0.0/12</ip>
+            </networks>
+            <profile>writer_profile</profile>
+            <quota>writer_quota</quota>
+            <allow_databases>
+                <database>vertiflow</database>
+            </allow_databases>
+        </nifi_writer>
+    </users>
+
+    <profiles>
+        <!-- Profil par défaut -->
+        <default>
+            <max_memory_usage>10000000000</max_memory_usage>
+            <max_execution_time>300</max_execution_time>
+            <max_rows_to_read>1000000000</max_rows_to_read>
+        </default>
+
+        <!-- Profil Application -->
+        <app_profile>
+            <max_memory_usage>5000000000</max_memory_usage>
+            <max_execution_time>60</max_execution_time>
+            <max_rows_to_read>100000000</max_rows_to_read>
+        </app_profile>
+
+        <!-- Profil Lecture seule -->
+        <readonly_profile>
+            <max_memory_usage>2000000000</max_memory_usage>
+            <max_execution_time>30</max_execution_time>
+            <max_rows_to_read>10000000</max_rows_to_read>
+            <readonly>1</readonly>
+        </readonly_profile>
+
+        <!-- Profil Writer (NiFi) -->
+        <writer_profile>
+            <max_memory_usage>1000000000</max_memory_usage>
+            <max_execution_time>120</max_execution_time>
+            <max_insert_block_size>1048576</max_insert_block_size>
+        </writer_profile>
+    </profiles>
+
+    <quotas>
+        <default>
+            <interval>
+                <duration>3600</duration>
+                <queries>0</queries>
+                <errors>0</errors>
+                <result_rows>0</result_rows>
+                <read_rows>0</read_rows>
+                <execution_time>0</execution_time>
+            </interval>
+        </default>
+
+        <app_quota>
+            <interval>
+                <duration>3600</duration>
+                <queries>10000</queries>
+                <errors>100</errors>
+                <result_rows>100000000</result_rows>
+                <read_rows>1000000000</read_rows>
+                <execution_time>3600</execution_time>
+            </interval>
+        </app_quota>
+
+        <readonly_quota>
+            <interval>
+                <duration>3600</duration>
+                <queries>1000</queries>
+                <errors>50</errors>
+                <result_rows>10000000</result_rows>
+                <read_rows>100000000</read_rows>
+                <execution_time>1800</execution_time>
+            </interval>
+        </readonly_quota>
+
+        <writer_quota>
+            <interval>
+                <duration>3600</duration>
+                <queries>100000</queries>
+                <errors>1000</errors>
+                <result_rows>0</result_rows>
+                <read_rows>0</read_rows>
+                <execution_time>7200</execution_time>
+            </interval>
+        </writer_quota>
+    </quotas>
+</clickhouse>

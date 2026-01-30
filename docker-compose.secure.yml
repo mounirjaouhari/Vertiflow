@@ -1,0 +1,148 @@
+# ============================================================================
+# VERTIFLOW - Docker Compose Sécurisé (Production)
+# ============================================================================
+# Configuration avec TLS/SSL, authentification et secrets
+# Utiliser avec: docker-compose -f docker-compose.yml -f docker-compose.secure.yml up
+# ============================================================================
+
+services:
+  # =========================================================================
+  # Zookeeper avec authentification SASL
+  # =========================================================================
+  zookeeper:
+    environment:
+      ZOOKEEPER_AUTH_PROVIDER_SASL: org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+      KAFKA_OPTS: >-
+        -Djava.security.auth.login.config=/etc/kafka/secrets/zookeeper_jaas.conf
+    volumes:
+      - ./security/kafka:/etc/kafka/secrets:ro
+
+  # =========================================================================
+  # Kafka avec SASL_SSL
+  # =========================================================================
+  kafka:
+    environment:
+      # Sécurité SASL_SSL
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:SASL_SSL,LISTENER_DOCKER_EXTERNAL:SASL_SSL
+      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_SSL
+
+      # Configuration SSL
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.keystore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: keystore_creds
+      KAFKA_SSL_KEY_CREDENTIALS: key_creds
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: truststore_creds
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+      KAFKA_SSL_CLIENT_AUTH: required
+
+      # Configuration SASL
+      KAFKA_SASL_ENABLED_MECHANISMS: SCRAM-SHA-512
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SCRAM-SHA-512
+      KAFKA_OPTS: >-
+        -Djava.security.auth.login.config=/etc/kafka/secrets/kafka_jaas.conf
+
+      # Autorisation ACL
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+      KAFKA_SUPER_USERS: User:admin
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "false"
+    volumes:
+      - ./security/certs:/etc/kafka/secrets:ro
+      - ./security/kafka:/etc/kafka/jaas:ro
+
+  # =========================================================================
+  # ClickHouse avec TLS et authentification
+  # =========================================================================
+  clickhouse:
+    environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-vertiflow_admin}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - ./security/certs/clickhouse.crt:/etc/clickhouse-server/server.crt:ro
+      - ./security/certs/clickhouse.key:/etc/clickhouse-server/server.key:ro
+      - ./security/certs/ca.crt:/etc/clickhouse-server/ca.crt:ro
+      - ./security/clickhouse/users.xml:/etc/clickhouse-server/users.d/users.xml:ro
+      - ./security/clickhouse/config.xml:/etc/clickhouse-server/config.d/ssl.xml:ro
+
+  # =========================================================================
+  # MongoDB avec authentification et TLS
+  # =========================================================================
+  mongodb:
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USER:-vertiflow_root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+    command: >
+      mongod
+      --auth
+      --tlsMode requireTLS
+      --tlsCertificateKeyFile /etc/ssl/mongodb.pem
+      --tlsCAFile /etc/ssl/ca.crt
+      --bind_ip_all
+    volumes:
+      - ./security/certs/mongodb.pem:/etc/ssl/mongodb.pem:ro
+      - ./security/certs/ca.crt:/etc/ssl/ca.crt:ro
+
+  # =========================================================================
+  # Mosquitto avec TLS et authentification
+  # =========================================================================
+  mosquitto:
+    ports:
+      - "8883:8883"  # TLS port
+      - "9001:9001"  # WebSocket
+    volumes:
+      - ./security/certs/ca.crt:/mosquitto/certs/ca.crt:ro
+      - ./security/certs/mosquitto.crt:/mosquitto/certs/server.crt:ro
+      - ./security/certs/mosquitto.key:/mosquitto/certs/server.key:ro
+      - ./security/mosquitto/mosquitto-secure.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./security/mosquitto/passwd:/mosquitto/config/passwd:ro
+      - ./security/mosquitto/acl:/mosquitto/config/acl:ro
+
+  # =========================================================================
+  # NiFi avec TLS
+  # =========================================================================
+  nifi:
+    environment:
+      - NIFI_SECURITY_KEYSTORE=/opt/nifi/nifi-current/conf/keystore.p12
+      - NIFI_SECURITY_KEYSTORETYPE=PKCS12
+      - NIFI_SECURITY_KEYSTOREPASSWD=${NIFI_KEYSTORE_PASSWORD}
+      - NIFI_SECURITY_TRUSTSTORE=/opt/nifi/nifi-current/conf/truststore.jks
+      - NIFI_SECURITY_TRUSTSTORETYPE=JKS
+      - NIFI_SECURITY_TRUSTSTOREPASSWD=${NIFI_TRUSTSTORE_PASSWORD}
+      - NIFI_SECURITY_NEEDCLIENTAUTH=false
+      - NIFI_WEB_HTTPS_HOST=0.0.0.0
+      - NIFI_WEB_HTTPS_PORT=8443
+    volumes:
+      - ./security/certs/nifi.p12:/opt/nifi/nifi-current/conf/keystore.p12:ro
+      - ./security/certs/kafka.truststore.jks:/opt/nifi/nifi-current/conf/truststore.jks:ro
+
+  # =========================================================================
+  # HashiCorp Vault (Gestionnaire de secrets)
+  # =========================================================================
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:-vertiflow-dev-token}
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault-data:/vault/data
+      - ./security/vault:/vault/config:ro
+    networks:
+      - vertiflow-network
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  vertiflow-network:
+    external: true
+    # NOTE: Nom spécifique retiré pour compatibilité Cloud automatique
+
+volumes:
+  vault-data:

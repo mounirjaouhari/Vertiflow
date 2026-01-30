@@ -1,0 +1,259 @@
+# ============================================================================
+# VERTIFLOW - Règles d'Alertes Prometheus
+# ============================================================================
+
+groups:
+  # ===========================================================================
+  # Alertes Infrastructure
+  # ===========================================================================
+  - name: infrastructure
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 5 minutes."
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85%."
+
+      - alert: DiskSpaceLow
+        expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk usage is above 80% on {{ $labels.mountpoint }}."
+
+  # ===========================================================================
+  # Alertes Kafka
+  # ===========================================================================
+  - name: kafka
+    rules:
+      - alert: KafkaConsumerLag
+        expr: kafka_consumer_group_lag > 10000
+        for: 5m
+        labels:
+          severity: warning
+          category: messaging
+        annotations:
+          summary: "High consumer lag on {{ $labels.topic }}"
+          description: "Consumer group {{ $labels.group }} has a lag of {{ $value }} messages."
+
+      - alert: KafkaBrokerDown
+        expr: kafka_brokers < 1
+        for: 1m
+        labels:
+          severity: critical
+          category: messaging
+        annotations:
+          summary: "Kafka broker is down"
+          description: "No Kafka brokers available."
+
+      - alert: KafkaUnderReplicatedPartitions
+        expr: kafka_server_replicamanager_underreplicatedpartitions > 0
+        for: 5m
+        labels:
+          severity: warning
+          category: messaging
+        annotations:
+          summary: "Under-replicated partitions in Kafka"
+          description: "{{ $value }} partitions are under-replicated."
+
+  # ===========================================================================
+  # Alertes ClickHouse
+  # ===========================================================================
+  - name: clickhouse
+    rules:
+      - alert: ClickHouseQuerySlow
+        expr: histogram_quantile(0.99, rate(clickhouse_query_duration_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Slow ClickHouse queries"
+          description: "P99 query latency is above 5 seconds."
+
+      - alert: ClickHouseInsertErrors
+        expr: rate(clickhouse_insert_exceptions_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "ClickHouse insert errors"
+          description: "Insert errors detected in ClickHouse."
+
+      - alert: ClickHouseReplicaLag
+        expr: clickhouse_replica_queue_size > 100
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "ClickHouse replica lag"
+          description: "Replica queue size is {{ $value }}."
+
+  # ===========================================================================
+  # Alertes Pipeline de Données
+  # ===========================================================================
+  - name: data_pipeline
+    rules:
+      - alert: DataIngestionStopped
+        expr: rate(telemetry_messages_processed_total[5m]) == 0
+        for: 5m
+        labels:
+          severity: critical
+          category: pipeline
+        annotations:
+          summary: "Data ingestion has stopped"
+          description: "No telemetry messages processed in the last 5 minutes."
+
+      - alert: HighValidationErrorRate
+        expr: rate(validation_errors_total[5m]) / rate(telemetry_messages_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          category: pipeline
+        annotations:
+          summary: "High validation error rate"
+          description: "More than 5% of messages are failing validation."
+
+      - alert: EndToEndLatencyHigh
+        expr: histogram_quantile(0.99, rate(pipeline_latency_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          category: pipeline
+        annotations:
+          summary: "High end-to-end latency"
+          description: "P99 pipeline latency is above 5 seconds ({{ $value }}s)."
+
+  # ===========================================================================
+  # Alertes ML
+  # ===========================================================================
+  - name: ml_models
+    rules:
+      - alert: ModelPredictionErrors
+        expr: rate(ml_prediction_errors_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          category: ml
+        annotations:
+          summary: "ML model prediction errors"
+          description: "Model {{ $labels.model_name }} is generating errors."
+
+      - alert: ModelDriftDetected
+        expr: ml_model_drift_score > 0.1
+        for: 15m
+        labels:
+          severity: warning
+          category: ml
+        annotations:
+          summary: "Model drift detected"
+          description: "Model {{ $labels.model_name }} drift score is {{ $value }}. Consider retraining."
+
+      - alert: ModelLatencyHigh
+        expr: histogram_quantile(0.99, rate(ml_inference_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          category: ml
+        annotations:
+          summary: "High ML inference latency"
+          description: "P99 inference latency for {{ $labels.model_name }} is above 1 second."
+
+  # ===========================================================================
+  # Alertes Environnementales (Agriculture)
+  # ===========================================================================
+  - name: environment
+    rules:
+      - alert: TemperatureOutOfRange
+        expr: abs(sensor_temperature_celsius - target_temperature_celsius) > 5
+        for: 10m
+        labels:
+          severity: warning
+          category: environment
+        annotations:
+          summary: "Temperature out of range in {{ $labels.zone_id }}"
+          description: "Temperature deviation of {{ $value }}°C from target in farm {{ $labels.farm_id }}."
+
+      - alert: HumidityOutOfRange
+        expr: abs(sensor_humidity_percent - target_humidity_percent) > 15
+        for: 10m
+        labels:
+          severity: warning
+          category: environment
+        annotations:
+          summary: "Humidity out of range in {{ $labels.zone_id }}"
+          description: "Humidity deviation of {{ $value }}% from target."
+
+      - alert: CO2LevelCritical
+        expr: sensor_co2_ppm > 2000
+        for: 5m
+        labels:
+          severity: critical
+          category: environment
+        annotations:
+          summary: "Critical CO2 level in {{ $labels.zone_id }}"
+          description: "CO2 level is {{ $value }} ppm, above safe threshold."
+
+      - alert: SensorOffline
+        expr: time() - sensor_last_seen_timestamp > 300
+        for: 5m
+        labels:
+          severity: warning
+          category: equipment
+        annotations:
+          summary: "Sensor {{ $labels.sensor_id }} is offline"
+          description: "No data received from sensor for more than 5 minutes."
+
+  # ===========================================================================
+  # Alertes Business
+  # ===========================================================================
+  - name: business
+    rules:
+      - alert: YieldPredictionLow
+        expr: predicted_yield_grams < target_yield_grams * 0.8
+        for: 1h
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Low yield prediction for {{ $labels.farm_id }}"
+          description: "Predicted yield is 20% below target."
+
+      - alert: QualityScoreDeclining
+        expr: avg_over_time(quality_score[1d]) < avg_over_time(quality_score[7d]) * 0.9
+        for: 1h
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Quality score declining"
+          description: "Daily quality score is 10% below weekly average."

@@ -1,0 +1,80 @@
+# ============================================================================
+# PROJET VERTIFLOW - Agriculture Verticale Intelligente
+# ============================================================================
+# Date de création    : 25/12/2025
+# Équipe              : VertiFlow Core Team
+#
+# Membres:
+#   🧙‍♂️ @Mounir       - Architecte & Scientifique
+#   🏗️ @Imrane       - DevOps & Infrastructure
+#   🐍 @Mouhammed    - Data Engineer & Analyste ETL
+#   🧬 @Asama        - Biologiste & Domain Expert
+#   ⚖️ @MrZakaria    - Encadrant & Architecte Data
+#
+# ----------------------------------------------------------------------------
+# FICHIER: nifi_pipeline_dev.yaml
+# DESCRIPTION: Configuration NiFi pour l'environnement de DÉVELOPPEMENT
+#              Paramètres souples, logs verbeux, mocks activés.
+#
+# Développé par        : @Mouhammed
+# Ticket(s) associé(s): TICKET-010
+# Sprint              : Semaine 2 - Phase ETL
+#
+# ----------------------------------------------------------------------------
+# © 2025 VertiFlow Core Team
+# Initiative Nationale Marocaine JobInTech - YNOV Maroc Campus
+# ============================================================================
+
+environment: development
+version: 1.0.0-dev
+
+# --- Z1: COLLECTION (Ingestion) ---
+mqtt:
+  broker_uri: tcp://mosquitto:1883  # Interne Docker
+  client_id: nifi_dev_consumer
+  topic_filter: vertiflow/telemetry/#
+  qos: 0                            # QoS 0 pour la vitesse en dev
+  max_queue_size: 100
+
+api_nasa:
+  url: https://power.larc.nasa.gov/api/temporal/daily/point
+  mock_enabled: false               # Mettre à true pour simuler sans internet
+  scheduling: "5 min"               # Fréquence rapide pour tester
+
+# --- Z2: ENRICHISSEMENT ---
+enrichment:
+  cache_service: "DistributedMapCacheClientService"
+  lookup_db: "MongoDB"
+  farm_id_default: "VERT-DEV-01"    # ID de ferme par défaut
+
+# --- Z3: QUALITÉ & TRAÇABILITÉ ---
+validation:
+  schema_path: /opt/nifi/schemas/telemetry_v3.json
+  strict_mode: false                # Ne rejette pas les champs inconnus
+  z_score_threshold: 5.0            # Seuil large pour accepter les tests manuels
+
+# --- Z3.5: BLOCKCHAIN HASH (Intégrité des données) ---
+blockchain:
+  enabled: true
+  processor_script: /opt/nifi/scripts/blockchain_hash_processor.py
+  hash_algorithm: SHA-256
+  hmac_enabled: true                # Active audit_trail_signature
+  # Position: APRÈS validation, AVANT publication Kafka/ClickHouse
+
+# --- Z4: PUBLICATION ---
+kafka:
+  bootstrap_servers: kafka:29092    # Port interne Docker
+  topic_name: basil_telemetry_dev
+  delivery_guarantee: "1"           # Leader only (Rapide)
+  compression: "none"               # Pas de compression pour debugger
+
+clickhouse:
+  connection_url: jdbc:clickhouse://clickhouse:8123/vertiflow
+  batch_size: 10                    # Petits lots pour voir les données vite
+  table_name: basil_ultimate_realtime
+
+# --- GESTION ERREURS ---
+dlq:
+  enabled: true
+  path: /opt/nifi/data/dlq_dev
+  auto_retry: true                  # Réessaie automatiquement en dev

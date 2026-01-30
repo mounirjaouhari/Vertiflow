@@ -1,0 +1,107 @@
+🚀 Pipeline ETL NiFi - Architecture VertiFlow
+
+Ce document détaille la configuration des processeurs et des services de contrôle pour le flux de données de l'agriculture verticale.
+
+🛠 Services de Contrôle (Controller Services)
+
+Avant de créer les processeurs, configurez ces services globaux :
+
+DBCPConnectionPool (ClickHouse) :
+
+Database Connection URL: jdbc:clickhouse://clickhouse:8123/vertiflow
+
+Database Driver Class Name: com.clickhouse.jdbc.ClickHouseDriver
+
+Database Driver Location(s): /opt/nifi/nifi-current/drivers/clickhouse-jdbc.jar
+
+JsonTreeReader : Pour parser les messages MQTT entrants.
+
+JsonRecordSetWriter : Pour formater les sorties vers Kafka et ClickHouse.
+
+MongoDBControllerService :
+
+Mongo URI: mongodb://mongodb:27017
+
+Database Name: vertiflow
+
+🌊 Flux de Données par Zones
+
+Zone 1 : Ingestion & Extraction (MQTT)
+
+ConsumeMQTT :
+
+Broker URI: tcp://mosquitto:1883
+
+Topic Filter: v1/sensors/+/telemetry
+
+Rôle : Récupère les données brutes des capteurs ESP32.
+
+Zone 2 : Transformation & Enrichissement (Fusion)
+
+UpdateRecord :
+
+Record Reader/Writer: JSON
+
+Opération : Ajout d'un ingestion_timestamp et normalisation des noms de variables (ex: temp -> air_temperature).
+
+LookupRecord (MongoDB) :
+
+Configuration : Utilise la collection system_registry.
+
+Rôle : Ajoute les métadonnées de la tour (tower_id, location) en fonction du sensor_id présent dans le message.
+
+Zone 3 : Validation Biologique (Le "Cerveau")
+
+LookupRecord (Recipes) :
+
+Configuration : Utilise la collection crop_recipes.
+
+Rôle : Récupère les seuils min et max pour la phase actuelle de la plante.
+
+ValidateRecord :
+
+Schema Registry : Compare la valeur du capteur aux seuils récupérés.
+
+Sortie :
+
+Success -> Vers la publication.
+
+Invalid -> Vers un processeur PublishKafka (Topic: alerts_validation) pour notifier @Asama.
+
+Zone 4 : Publication & Persistance
+
+PublishKafka_2_6 :
+
+Topic Name: basil_telemetry_full
+
+Rôle : Diffusion en temps réel pour le dashboard Grafana.
+
+PutDatabaseRecord (ClickHouse) :
+
+Record Reader: JSON
+
+Table Name: basil_ultimate_realtime
+
+Rôle : Stockage historique pour l'analyse de données à long terme.
+
+📊 Schéma de câblage logique
+
+[ConsumeMQTT] 
+      │
+      ▼ (success)
+[UpdateRecord] (Enrichissement Temporel)
+      │
+      ▼ (success)
+[LookupRecord] (Enrichissement via MongoDB Configs)
+      │
+      ▼ (success)
+[LookupRecord] (Récupération Seuils Biologiques)
+      │
+      ▼ (success)
+[ValidateRecord] ─── (invalid) ──▶ [PublishKafka] (Topic: alerts)
+      │
+      ▼ (valid)
+   ┌──┴───────────┐
+   ▼              ▼
+[PublishKafka]  [PutDatabaseRecord]
+(Topic: final)  (ClickHouse)

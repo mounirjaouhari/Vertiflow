@@ -1,0 +1,61 @@
+flowchart TB
+ subgraph G1["Groupe 1 : COLLECTION & NORMALISATION"]
+        P2["ConvertRecord - Binaire to JSON"]
+        P1["ConsumeMQTT - Capteurs IoT"]
+        P4["JoltTransformJSON - Standardisation"]
+        P3["InvokeHTTP - NASA/RTE API"]
+        P6["ConvertRecord - CSV to JSON"]
+        P5["GetFile - Labo CSV"]
+  end
+ subgraph G2["Groupe 2 : FUSION & ENRICHISSEMENT"]
+        P7["MergeContent - Fusion des sources"]
+        P8["UpdateAttribute - Ajout Contexte"]
+        P9["CalculateRecord - Calculs Dérivés"]
+  end
+ subgraph G3["Groupe 3 : TRAÇABILITÉ & VALIDATION"]
+        P10["ValidateRecord - Vérification Schéma"]
+        P11["GenerateUUID - Création UUID"]
+        P13@{ label: "UpdateAttribute - Flag d'Erreur" }
+        P12["CryptographicHash - Hash SHA-256"]
+  end
+ subgraph G4["Groupe 4 : ROUTAGE & PUBLICATION"]
+        P14["RouteOnAttribute - Filtrage"]
+        P15["PublishKafka - Vers Topic"]
+        P16["PostSlack - Notification"]
+  end
+    P1 L_P1_P2_0@-- Raw Binary --> P2
+    P3 -- JSON Response --> P4
+    P5 -- CSV --> P6
+    P2 L_P2_P7_0@--> P7
+    P4 --> P7
+    P6 --> P7
+    P7 --> P8
+    P8 --> P9
+    P9 L_P9_P10_0@--> P10
+    P10 L_P10_P11_0@-- Valid --> P11
+    P10 L_P10_P13_0@-- Invalid --> P13
+    P11 L_P11_P12_0@--> P12
+    P12 L_P12_P14_0@--> P14
+    P13 L_P13_P14_0@--> P14
+    P14 L_P14_P15_0@-- Stream Principal --> P15
+    P14 L_P14_P16_0@-- Alerte Critique --> P16
+    P2 -. Failure .-> DLQ@{ label: "Log d'Erreurs Local" }
+    P15 -. Failure .-> DLQ
+
+    P13@{ shape: rect}
+    DLQ@{ shape: rect}
+    style G1 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style G2 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style G3 fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    style G4 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+
+    L_P1_P2_0@{ animation: slow } 
+    L_P2_P7_0@{ animation: slow } 
+    L_P9_P10_0@{ animation: slow } 
+    L_P10_P11_0@{ animation: slow } 
+    L_P10_P13_0@{ animation: slow } 
+    L_P11_P12_0@{ animation: slow } 
+    L_P12_P14_0@{ animation: slow } 
+    L_P13_P14_0@{ animation: slow } 
+    L_P14_P15_0@{ animation: slow } 
+    L_P14_P16_0@{ animation: slow }

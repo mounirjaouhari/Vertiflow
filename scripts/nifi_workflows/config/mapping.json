@@ -1,0 +1,152 @@
+[
+  {
+    "operation": "shift",
+    "spec": {
+      "timestamp": "timestamp",
+      "event_time": "timestamp",
+      "time": "timestamp",
+
+      "farm_id": "farm_id",
+      "farmId": "farm_id",
+      "farm": "farm_id",
+
+      "parcel_id": "parcel_id",
+      "parcelId": "parcel_id",
+
+      "rack_id": "rack_id",
+      "rackId": "rack_id",
+      "rack": "rack_id",
+
+      "level_index": "level_index",
+      "levelIndex": "level_index",
+      "level": "level_index",
+
+      "module_id": "module_id",
+      "moduleId": "module_id",
+
+      "zone_id": "zone_id",
+      "zoneId": "zone_id",
+      "zone": "zone_id",
+
+      "sensor_hardware_id": "sensor_hardware_id",
+      "sensorId": "sensor_hardware_id",
+      "sensor_id": "sensor_hardware_id",
+      "hardwareId": "sensor_hardware_id",
+
+      "data_source_type": "data_source_type",
+      "sourceType": "data_source_type",
+      "source": "data_source_type",
+
+      "air_temp_internal": "air_temp_internal",
+      "airTempInternal": "air_temp_internal",
+      "temp_air": "air_temp_internal",
+      "temperature": "air_temp_internal",
+      "temp": "air_temp_internal",
+      "air_temperature": "air_temp_internal",
+
+      "air_humidity": "air_humidity",
+      "airHumidity": "air_humidity",
+      "humidity": "air_humidity",
+      "rh": "air_humidity",
+      "relative_humidity": "air_humidity",
+
+      "co2_level_ambient": "co2_level_ambient",
+      "co2LevelAmbient": "co2_level_ambient",
+      "co2": "co2_level_ambient",
+      "co2_level": "co2_level_ambient",
+      "carbon_dioxide": "co2_level_ambient",
+
+      "vapor_pressure_deficit": "vapor_pressure_deficit",
+      "vaporPressureDeficit": "vapor_pressure_deficit",
+      "vpd": "vapor_pressure_deficit",
+      "VPD": "vapor_pressure_deficit",
+
+      "light_intensity_ppfd": "light_intensity_ppfd",
+      "lightIntensityPpfd": "light_intensity_ppfd",
+      "ppfd": "light_intensity_ppfd",
+      "PPFD": "light_intensity_ppfd",
+      "light_intensity": "light_intensity_ppfd",
+      "par": "light_intensity_ppfd",
+
+      "light_dli_accumulated": "light_dli_accumulated",
+      "lightDliAccumulated": "light_dli_accumulated",
+      "dli": "light_dli_accumulated",
+      "DLI": "light_dli_accumulated",
+
+      "light_photoperiod": "light_photoperiod",
+      "lightPhotoperiod": "light_photoperiod",
+      "photoperiod": "light_photoperiod",
+
+      "nutrient_n_total": "nutrient_n_total",
+      "nutrientNTotal": "nutrient_n_total",
+      "nitrogen": "nutrient_n_total",
+      "n_total": "nutrient_n_total",
+
+      "nutrient_p_phosphorus": "nutrient_p_phosphorus",
+      "nutrientPPhosphorus": "nutrient_p_phosphorus",
+      "phosphorus": "nutrient_p_phosphorus",
+      "p_phosphorus": "nutrient_p_phosphorus",
+
+      "nutrient_k_potassium": "nutrient_k_potassium",
+      "nutrientKPotassium": "nutrient_k_potassium",
+      "potassium": "nutrient_k_potassium",
+      "k_potassium": "nutrient_k_potassium",
+
+      "water_ph": "water_ph",
+      "waterPh": "water_ph",
+      "ph": "water_ph",
+      "pH": "water_ph",
+
+      "nutrient_solution_ec": "nutrient_solution_ec",
+      "nutrientSolutionEc": "nutrient_solution_ec",
+      "ec": "nutrient_solution_ec",
+      "EC": "nutrient_solution_ec",
+      "electrical_conductivity": "nutrient_solution_ec",
+
+      "fresh_biomass_est": "fresh_biomass_est",
+      "freshBiomassEst": "fresh_biomass_est",
+      "biomass": "fresh_biomass_est",
+      "fresh_weight": "fresh_biomass_est",
+
+      "health_score": "health_score",
+      "healthScore": "health_score",
+      "plant_health": "health_score",
+
+      "pump_vibration_level": "pump_vibration_level",
+      "pumpVibrationLevel": "pump_vibration_level",
+      "vibration": "pump_vibration_level",
+
+      "leak_detection_status": "leak_detection_status",
+      "leakDetectionStatus": "leak_detection_status",
+      "leak_status": "leak_detection_status",
+
+      "emergency_stop_status": "emergency_stop_status",
+      "emergencyStopStatus": "emergency_stop_status",
+      "e_stop": "emergency_stop_status",
+
+      "data_integrity_flag": "data_integrity_flag",
+      "dataIntegrityFlag": "data_integrity_flag",
+      "integrity_flag": "data_integrity_flag",
+
+      "anomaly_confidence_score": "anomaly_confidence_score",
+      "anomalyConfidenceScore": "anomaly_confidence_score",
+      "anomaly_score": "anomaly_confidence_score",
+
+      "lineage_uuid": "lineage_uuid",
+      "lineageUuid": "lineage_uuid",
+      "lineage_id": "lineage_uuid",
+
+      "blockchain_hash": "blockchain_hash",
+      "blockchainHash": "blockchain_hash",
+      "hash": "blockchain_hash"
+    }
+  },
+  {
+    "operation": "default",
+    "spec": {
+      "data_source_type": "IoT",
+      "data_integrity_flag": 0,
+      "anomaly_confidence_score": 0.0
+    }
+  }
+]

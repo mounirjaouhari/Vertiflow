@@ -1,0 +1,368 @@
+# ============================================================================
+# PROJET VERTIFLOW - Agriculture Verticale Intelligente
+# ============================================================================
+# Date de creation    : 25/12/2025
+# Mise a jour         : 04/01/2026
+# Equipe              : VertiFlow Core Team
+#
+# Membres:
+#   @Mounir       - Architecte & Scientifique
+#   @Imrane       - DevOps & Infrastructure
+#   @Mouhammed    - Data Engineer & Analyste ETL
+#   @Asama        - Biologiste & Domain Expert
+#   @MrZakaria    - Encadrant & Architecte Data
+#
+# ----------------------------------------------------------------------------
+# FICHIER: agronomic_parameters.yaml
+# DESCRIPTION: Parametres de calibration biologique et agronomique complets
+#              Utilises par les algorithmes IA (Cortex, Oracle, Simulator)
+#
+# Sources scientifiques:
+#   - Cornell University CEA Program
+#   - FAO Irrigation Paper 56
+#   - Fluence by OSRAM Photomorphogenesis Guide
+#   - Wageningen University LED Research
+#
+# Developpe par       : @Asama, @Mounir
+# Ticket(s) associe(s): TICKET-031, TICKET-059
+# Sprint              : Semaine 6 - Calibration Complete
+#
+# ----------------------------------------------------------------------------
+# 2025-2026 VertiFlow Core Team
+# Initiative Nationale Marocaine JobInTech - YNOV Maroc Campus
+# ============================================================================
+
+# ============================================================================
+# CULTURES SUPPORTEES
+# ============================================================================
+crops:
+  # --------------------------------------------------------------------------
+  # BASILIC GENOVESE (Culture principale)
+  # --------------------------------------------------------------------------
+  basil_genovese:
+    scientific_name: "Ocimum basilicum 'Genovese'"
+    family: Lamiaceae
+    growth_cycle_days: 35
+
+    # Parametres environnementaux
+    optimal_ranges:
+      temperature_c:
+        min: 20
+        max: 28
+        optimal: 24
+        night_drop: 4
+        damage_low: 10
+        damage_high: 35
+
+      humidity_pct:
+        min: 50
+        max: 75
+        optimal: 62
+
+      co2_ppm:
+        min: 400
+        max: 1200
+        optimal: 900
+        saturation: 1500
+
+      par_umol:
+        min: 200
+        max: 500
+        optimal: 380
+
+      ph:
+        min: 5.5
+        max: 6.5
+        optimal: 6.0
+
+      ec_ms:
+        min: 1.2
+        max: 2.2
+        optimal: 1.6
+
+    # Cibles VPD par stade (kPa)
+    vpd_targets:
+      germination: 0.5
+      seedling: 0.6
+      vegetative: 0.9
+      finishing: 1.1
+
+    # Photoperiode par stade (heures)
+    photoperiod:
+      germination: 18
+      seedling: 18
+      vegetative: 16
+      finishing: 14
+
+    # DLI cible par stade (mol/m2/day)
+    dli_targets:
+      germination: 8
+      seedling: 12
+      vegetative: 18
+      finishing: 22
+
+    # Spectre LED optimal
+    spectrum:
+      germination:
+        blue_pct: 35
+        red_pct: 45
+        far_red_pct: 5
+        white_pct: 15
+        ratio_rb: 1.3
+      vegetative:
+        blue_pct: 25
+        red_pct: 55
+        far_red_pct: 8
+        white_pct: 12
+        ratio_rb: 2.2
+      finishing:
+        blue_pct: 30
+        red_pct: 50
+        far_red_pct: 5
+        white_pct: 15
+        ratio_rb: 1.67
+
+    # Nutrition par stade (ppm)
+    nutrition:
+      seedling:
+        N: 100
+        P: 30
+        K: 120
+        Ca: 80
+        Mg: 25
+        S: 30
+        ec_target: 1.0
+      vegetative:
+        N: 160
+        P: 55
+        K: 210
+        Ca: 120
+        Mg: 42
+        S: 55
+        ec_target: 1.6
+      finishing:
+        N: 95
+        P: 42
+        K: 175
+        Ca: 105
+        Mg: 36
+        S: 42
+        ec_target: 1.2
+
+    # Micronutriments (ppm)
+    micronutrients:
+      Fe: 3.0
+      Mn: 0.7
+      Zn: 0.4
+      Cu: 0.08
+      B: 0.5
+      Mo: 0.08
+
+    # Metriques de qualite cibles
+    quality_targets:
+      fresh_weight_g: 80
+      essential_oil_pct: 0.8
+      chlorophyll_spad: 42
+      brix_degree: 6
+      shelf_life_days: 10
+
+    # Coefficients FAO Kc
+    fao_kc:
+      initial: 0.35
+      development: 0.70
+      mid_season: 1.05
+      late_season: 0.90
+
+  # --------------------------------------------------------------------------
+  # LAITUE BUTTERHEAD
+  # --------------------------------------------------------------------------
+  lettuce_butterhead:
+    scientific_name: "Lactuca sativa var. capitata"
+    family: Asteraceae
+    growth_cycle_days: 42
+
+    optimal_ranges:
+      temperature_c:
+        min: 15
+        max: 22
+        optimal: 18
+        night_drop: 5
+        damage_low: 5
+        damage_high: 30
+
+      humidity_pct:
+        min: 55
+        max: 75
+        optimal: 65
+
+      co2_ppm:
+        min: 400
+        max: 1000
+        optimal: 800
+
+      par_umol:
+        min: 150
+        max: 350
+        optimal: 280
+
+      ph:
+        min: 5.8
+        max: 6.5
+        optimal: 6.1
+
+      ec_ms:
+        min: 1.0
+        max: 1.8
+        optimal: 1.4
+
+    vpd_targets:
+      seedling: 0.5
+      vegetative: 0.8
+      finishing: 0.9
+
+    photoperiod:
+      seedling: 18
+      vegetative: 16
+      finishing: 16
+
+    dli_targets:
+      seedling: 10
+      vegetative: 15
+      finishing: 17
+
+    spectrum:
+      vegetative:
+        blue_pct: 20
+        red_pct: 60
+        far_red_pct: 5
+        white_pct: 15
+        ratio_rb: 3.0
+
+    nutrition:
+      vegetative:
+        N: 140
+        P: 48
+        K: 190
+        Ca: 130
+        Mg: 42
+        S: 48
+        ec_target: 1.4
+
+    quality_targets:
+      head_weight_g: 200
+      leaf_count: 25
+      nitrate_max_mg_kg: 2500
+      tip_burn_risk: low
+
+    fao_kc:
+      initial: 0.45
+      development: 0.60
+      mid_season: 1.00
+      late_season: 0.95
+
+# ============================================================================
+# PARAMETRES GLOBAUX DE LA FERME
+# ============================================================================
+farm_settings:
+  location:
+    name: "Casablanca"
+    latitude: 33.5731
+    longitude: -7.5898
+    timezone: "Africa/Casablanca"
+    elevation_m: 50
+
+  # Tarification energie (ONEE Maroc)
+  energy:
+    currency: MAD
+    peak_hours: "07:00-23:00"
+    off_peak_hours: "23:00-07:00"
+    peak_rate_kwh: 1.2
+    off_peak_rate_kwh: 0.8
+
+  # Seuils d'alerte
+  alerts:
+    temperature:
+      warning_deviation: 3  # degres
+      critical_deviation: 5
+    humidity:
+      warning_deviation: 10  # %
+      critical_deviation: 15
+    ec:
+      warning_deviation: 0.3  # mS/cm
+      critical_deviation: 0.5
+    ph:
+      warning_deviation: 0.3
+      critical_deviation: 0.5
+    vpd:
+      warning_deviation: 0.2  # kPa
+      critical_deviation: 0.4
+
+# ============================================================================
+# FORMULES BIOPHYSIQUES
+# ============================================================================
+biophysics:
+  # Formule de Tetens pour pression de vapeur saturante
+  # es = 0.6108 * exp((17.27 * T) / (T + 237.3))
+  tetens:
+    a: 17.27
+    b: 237.3
+    e0: 0.6108
+
+  # Calcul VPD
+  # VPD = es * (1 - RH/100)
+  vpd:
+    formula: "es * (1 - RH/100)"
+    units: "kPa"
+
+  # Calcul DLI
+  # DLI = PPFD * photoperiod * 3600 / 1000000
+  dli:
+    formula: "PPFD * hours * 0.0036"
+    units: "mol/m2/day"
+
+  # Modele Farquhar simplifie (photosynthese)
+  farquhar:
+    Vcmax: 100  # umol/m2/s (vitesse max carboxylation)
+    Jmax: 150   # umol/m2/s (transport electrons max)
+    Km_co2: 400 # ppm (constante Michaelis)
+
+  # Penman-Monteith (evapotranspiration)
+  penman_monteith:
+    psychrometric_constant: 0.066  # kPa/C
+    stefan_boltzmann: 4.903e-9     # MJ/K4/m2/day
+
+# ============================================================================
+# PARAMETRES ML (Modeles d'apprentissage)
+# ============================================================================
+ml_parameters:
+  oracle_yield:
+    features:
+      - temp_mean_24h
+      - par_mean_24h
+      - humidity_mean_24h
+      - co2_mean_24h
+      - ec_mean_24h
+      - vpd_mean_24h
+    target: yield_g
+    model_type: RandomForestRegressor
+    retrain_threshold_rmse: 5.0  # g
+
+  quality_classifier:
+    features:
+      - air_temp_internal
+      - vapor_pressure_deficit
+      - light_dli_accumulated
+      - nutrient_solution_ec
+      - days_since_planting
+    classes:
+      - PREMIUM
+      - STANDARD
+      - REJECT
+    model_type: RandomForestClassifier
+    retrain_threshold_f1: 0.90
+
+  harvest_lstm:
+    sequence_length: 14  # jours
+    features_per_step: 5
+    target: days_until_harvest
+    mae_threshold: 2.5  # jours

@@ -1,0 +1,82 @@
+# ============================================================================
+# PROJET VERTIFLOW - Agriculture Verticale Intelligente
+# ============================================================================
+# Date de création    : 25/12/2025
+# Équipe              : VertiFlow Core Team
+#
+# Membres:
+#   🧙‍♂️ @Mounir       - Architecte & Scientifique
+#   🏗️ @Imrane       - DevOps & Infrastructure
+#   🐍 @Mouhammed    - Data Engineer & Analyste ETL
+#   🧬 @Asama        - Biologiste & Domain Expert
+#   ⚖️ @MrZakaria    - Encadrant & Architecte Data
+#
+# ----------------------------------------------------------------------------
+# FICHIER: nifi_pipeline_prod.yaml
+# DESCRIPTION: Configuration NiFi pour l'environnement de PRODUCTION
+#              Haute disponibilité, sécurité stricte, compression activée.
+#
+# Développé par        : @Mouhammed
+# Ticket(s) associé(s): TICKET-011
+# Sprint              : Semaine 2 - Phase ETL
+#
+# ----------------------------------------------------------------------------
+# © 2025 VertiFlow Core Team
+# Initiative Nationale Marocaine JobInTech - YNOV Maroc Campus
+# ============================================================================
+
+environment: production
+version: 1.0.0-release
+
+# --- Z1: COLLECTION (Ingestion) ---
+mqtt:
+  broker_uri: tcp://mosquitto:1883  # Pourrait être ssl:// en prod réelle
+  client_id: nifi_prod_consumer_v1
+  topic_filter: vertiflow/telemetry/#
+  qos: 1                            # QoS 1 (At least once) garanti
+  max_queue_size: 10000             # Buffer large pour les pics de charge
+
+api_nasa:
+  url: https://power.larc.nasa.gov/api/temporal/daily/point
+  mock_enabled: false
+  scheduling: "1 hour"              # Respect des quotas API
+
+# --- Z2: ENRICHISSEMENT ---
+enrichment:
+  cache_service: "DistributedMapCacheClientService"
+  lookup_db: "ClickHouse_Dict"      # Dictionnaires ClickHouse plus rapides
+  farm_id_default: "VERT-MAROC-01"
+
+# --- Z3: QUALITÉ & TRAÇABILITÉ ---
+validation:
+  schema_path: /opt/nifi/schemas/telemetry_v3.json
+  strict_mode: true                 # REJETTE tout ce qui n'est pas conforme
+  z_score_threshold: 3.0            # Seuil scientifique strict (99.7%)
+
+# --- Z3.5: BLOCKCHAIN HASH (Intégrité des données) ---
+blockchain:
+  enabled: true
+  processor_script: /opt/nifi/scripts/blockchain_hash_processor.py
+  hash_algorithm: SHA-256
+  hmac_enabled: true                # Active audit_trail_signature
+  # Position: APRÈS validation, AVANT publication Kafka/ClickHouse
+
+# --- Z4: PUBLICATION ---
+kafka:
+  bootstrap_servers: kafka:29092
+  topic_name: basil_telemetry_full
+  delivery_guarantee: "all"         # Tous les réplicas doivent confirmer (acks=all)
+  compression: "snappy"             # Compression pour économiser la bande passante
+  retries: 5                        # Insiste en cas de panne réseau
+
+clickhouse:
+  connection_url: jdbc:clickhouse://clickhouse:8123/vertiflow
+  batch_size: 1000                  # Gros lots pour performance d'écriture
+  table_name: basil_ultimate_realtime
+
+# --- GESTION ERREURS ---
+dlq:
+  enabled: true
+  path: /opt/nifi/data/dlq_prod
+  auto_retry: false                 # Pas de retry auto, alerte humaine requise
+  alert_webhook: https://hooks.slack.com/services/VERTIFLOW/ALERTS

@@ -1,0 +1,104 @@
+# ============================================================================
+# VERTIFLOW - Kubernetes Namespace & RBAC
+# ============================================================================
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vertiflow
+  labels:
+    app.kubernetes.io/name: vertiflow
+    app.kubernetes.io/component: platform
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vertiflow-staging
+  labels:
+    app.kubernetes.io/name: vertiflow
+    environment: staging
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vertiflow-production
+  labels:
+    app.kubernetes.io/name: vertiflow
+    environment: production
+
+---
+# Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vertiflow-sa
+  namespace: vertiflow
+  labels:
+    app.kubernetes.io/name: vertiflow
+
+---
+# Role for application
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vertiflow-role
+  namespace: vertiflow
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+
+---
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vertiflow-rolebinding
+  namespace: vertiflow
+subjects:
+  - kind: ServiceAccount
+    name: vertiflow-sa
+    namespace: vertiflow
+roleRef:
+  kind: Role
+  name: vertiflow-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Resource Quotas
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: vertiflow-quota
+  namespace: vertiflow
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    limits.cpu: "40"
+    limits.memory: 80Gi
+    persistentvolumeclaims: "20"
+    pods: "50"
+
+---
+# LimitRange
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: vertiflow-limits
+  namespace: vertiflow
+spec:
+  limits:
+    - default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+      type: Container

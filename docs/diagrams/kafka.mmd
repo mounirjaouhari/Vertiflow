@@ -1,0 +1,25 @@
+graph TD
+    %% SECTION 1 : LE PRODUCTEUR (NiFi)
+    subgraph E ["1. LE PRODUCTEUR (NiFi)"]
+        style E fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+        
+        P[Processeur NiFi] -->|Produce| K[Topic Kafka]
+    end
+
+    %% SECTION 2 : LE BROKER (Kafka)
+    subgraph B ["2. LE BROKER (Kafka)"]
+        style B fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+        
+        K -->|Partition| P1[Partition 0]
+        K -->|Partition| P2[Partition 1]
+        K -->|Partition| P3[Partition 2]
+    end
+
+    %% SECTION 3 : LES CONSOMMATEURS
+    subgraph C ["3. LES CONSOMMATEURS"]
+        style C fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+        
+        P1 -->|Consume| C1[Consumer MongoDB]
+        P2 -->|Consume| C2[Consumer ClickHouse]
+        P3 -->|Consume| C3[Consumer Power BI]
+    end

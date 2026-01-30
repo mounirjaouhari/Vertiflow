@@ -1,0 +1,380 @@
+# ============================================================================
+# PROJET VERTIFLOW - Agriculture Verticale Intelligente
+# ============================================================================
+# Date de création    : 25/12/2025
+# Équipe              : VertiFlow Core Team
+#
+# Membres:
+#   🧙‍♂️ @Mounir       - Architecte & Scientifique
+#   🏗️ @Imrane       - DevOps & Infrastructure
+#   🐍 @Mouhammed    - Data Engineer & Analyste ETL
+#   🧬 @Asama        - Biologiste & Domain Expert
+#   ⚖️ @MrZakaria    - Encadrant & Architecte Data
+#
+# ----------------------------------------------------------------------------
+# FICHIER: external_data_sources.yaml
+# DESCRIPTION: Registre centralisé des sources de données externes (APIs, Open Data)
+#              Utilisé par NiFi (Zone 1) pour l'enrichissement contextuel.
+#
+# Développé par        : @Mouhammed
+# Ticket(s) associé(s): TICKET-050
+# Sprint              : Semaine 5 - Phase External Data
+#
+# ----------------------------------------------------------------------------
+# © 2025 VertiFlow Core Team
+# Initiative Nationale Marocaine JobInTech - YNOV Maroc Campus
+# ============================================================================
+
+sources:
+  # --- DOMAINE ENVIRONNEMENTAL (MÉTÉO & CLIMAT) ---
+  - name: NASA_POWER
+    description: Données météorologiques et solaires pour l'agriculture
+    provider: NASA Langley Research Center
+    url: https://power.larc.nasa.gov/api
+    method: GET
+    format: JSON
+    priority: CRITICAL
+    update_frequency: 1h
+    parameters:
+      - T2M (Temperature at 2 Meters)
+      - RH2M (Relative Humidity at 2 Meters)
+      - ALLSKY_SFC_SW_DWN (All Sky Surface Shortwave Downward Irradiance)
+      - PRECTOTCORR (Precipitation Corrected)
+    target_columns: [ext_temp_nasa, ext_humidity_nasa, ext_solar_radiation]
+
+  - name: OPENWEATHER_MAP
+    description: Prévisions météorologiques à court terme (7 jours)
+    provider: OpenWeather
+    url: https://api.openweathermap.org/data/3.0/onecall
+    method: GET
+    format: JSON
+    priority: HIGH
+    update_frequency: 3h
+    parameters:
+      - lat: 33.5731
+      - lon: -7.5898
+      - exclude: minutely
+    target_columns: [forecast_temp, forecast_rain_prob]
+
+  # --- DOMAINE ÉNERGIE & CARBONE ---
+  - name: RTE_ECO2MIX
+    description: Données temps réel du réseau électrique français (Proxy pour tests)
+    provider: RTE France
+    url: https://digital.iservices.rte-france.com/token/oauth/
+    method: OAUTH2
+    format: JSON
+    priority: CRITICAL
+    update_frequency: 15min
+    parameters:
+      - production_type
+      - spot_price
+    target_columns: [energy_price_kwh, renewable_energy_pct]
+
+  - name: ELECTRICITY_MAPS
+    description: Intensité carbone de l'électricité en temps réel
+    provider: Electricity Maps
+    url: https://api.electricitymap.org/v3/carbon-intensity/latest
+    method: GET
+    format: JSON
+    priority: MEDIUM
+    update_frequency: 1h
+    target_columns: [carbon_intensity_g_co2_kwh]
+
+  # --- DOMAINE LÉGAL & FONCIER ---
+  - name: ETALAB_CADASTRE
+    description: API du Cadastre Français (Référence Parcellaire)
+    provider: Etalab
+    url: https://apicarto.ign.fr/api/cadastre/parcelle
+    method: GET
+    format: GeoJSON
+    priority: LOW
+    update_frequency: static
+    target_columns: [parcel_id, surface_m2]
+
+  - name: INSEE_FERMAGES
+    description: Indice National des Fermages (Bail Rural)
+    provider: INSEE
+    url: https://api.insee.fr/series/BDM/V1/data/SERIES_INDICE_FERMAGES
+    method: GET
+    format: XML
+    priority: MEDIUM
+    update_frequency: yearly
+    target_columns: [lease_index_value]
+
+  # --- DOMAINE ÉCONOMIE & MARCHÉ ---
+  - name: RNM_PRICES
+    description: Réseau des Nouvelles des Marchés (Prix Fruits & Légumes)
+    provider: France AgriMer
+    url: https://rnm.franceagrimer.fr/prix
+    method: SCRAPING
+    format: HTML/CSV
+    priority: HIGH
+    update_frequency: daily
+    target_columns: [market_price_kg]
+
+  # ============================================================================
+  # NOUVELLES SOURCES AJOUTÉES - 04/01/2026
+  # ============================================================================
+
+  # --- MÉTÉO GRATUITE (Alternative sans clé API) ---
+  - name: OPEN_METEO
+    description: API météo gratuite sans authentification - Alternative OpenWeather
+    provider: Open-Meteo (Open Source)
+    url: https://api.open-meteo.com/v1/forecast
+    method: GET
+    format: JSON
+    priority: CRITICAL
+    update_frequency: 1h
+    auth_required: false
+    parameters:
+      latitude: 33.5731
+      longitude: -7.5898
+      hourly:
+        - temperature_2m
+        - relative_humidity_2m
+        - rain
+        - surface_pressure
+        - wind_speed_10m
+        - uv_index
+        - soil_temperature_0cm
+        - soil_moisture_0_to_1cm
+      daily:
+        - sunrise
+        - sunset
+        - uv_index_max
+        - precipitation_sum
+        - et0_fao_evapotranspiration
+      timezone: Africa/Casablanca
+    target_columns:
+      - ext_temp_openmeteo
+      - ext_humidity_openmeteo
+      - ext_uv_index
+      - ext_wind_speed
+      - ext_pressure
+      - ext_soil_temp
+      - ext_evapotranspiration
+    notes: |
+      GRATUIT et sans limite de requêtes raisonnable.
+      Données horaires et journalières disponibles.
+      Inclut évapotranspiration FAO (ET0) pour calcul besoins eau.
+
+  - name: OPEN_METEO_HISTORICAL
+    description: Données météo historiques (1940-présent)
+    provider: Open-Meteo (Open Source)
+    url: https://archive-api.open-meteo.com/v1/archive
+    method: GET
+    format: JSON
+    priority: HIGH
+    update_frequency: daily
+    auth_required: false
+    parameters:
+      latitude: 33.5731
+      longitude: -7.5898
+      start_date: "2024-01-01"
+      end_date: "2025-12-31"
+      daily:
+        - temperature_2m_max
+        - temperature_2m_min
+        - precipitation_sum
+        - et0_fao_evapotranspiration
+    target_columns: [historical_temp_max, historical_temp_min, historical_precip]
+
+  # --- DONNÉES AGRONOMIQUES ---
+  - name: FAO_AQUASTAT
+    description: Coefficients culturaux (Kc) et besoins en eau des cultures
+    provider: FAO (Organisation des Nations Unies)
+    url: https://www.fao.org/aquastat/statistics/query/index.html
+    method: GET
+    format: CSV/JSON
+    priority: HIGH
+    update_frequency: static
+    target_columns:
+      - coefficient_cultural_kc
+      - water_requirement_mm
+      - crop_water_productivity
+    reference_document: FAO Irrigation and Drainage Paper 56
+    notes: |
+      Coefficients Kc par stade de croissance:
+      - Initial (Kc_ini): 0.3-0.5
+      - Mid-season (Kc_mid): 0.9-1.15
+      - Late (Kc_end): 0.7-0.95
+
+  - name: OPENFARM_API
+    description: Base de données communautaire de cultures
+    provider: OpenFarm (Open Source)
+    url: https://openfarm.cc/api/v1/crops
+    method: GET
+    format: JSON
+    priority: MEDIUM
+    update_frequency: weekly
+    auth_required: false
+    target_columns:
+      - growing_degree_days
+      - sun_requirements
+      - spread_cm
+      - row_spacing_cm
+    crops_of_interest:
+      - basil
+      - lettuce
+      - spinach
+      - arugula
+
+  # --- DONNÉES SPECTRALES LED ---
+  - name: FLUENCE_SPECTRAL_DATA
+    description: Spectres LED optimaux par culture (recherche Fluence/OSRAM)
+    provider: Fluence by OSRAM
+    url: https://fluence.science/science/photomorphogenesis-guide
+    method: FILE
+    format: CSV/PDF
+    priority: HIGH
+    update_frequency: static
+    target_columns:
+      - light_ratio_red_blue
+      - light_far_red_intensity
+      - spectrum_blue_450nm_pct
+      - spectrum_red_660nm_pct
+    reference_papers:
+      - "Optimizing LED lighting for basil production"
+      - "Photomorphogenesis and secondary metabolites"
+
+  - name: APOGEE_CALIBRATION
+    description: Données de calibration capteurs PAR/PPFD
+    provider: Apogee Instruments
+    url: https://www.apogeeinstruments.com/conversion-ppfd
+    method: FILE
+    format: CSV
+    priority: MEDIUM
+    update_frequency: static
+    target_columns:
+      - sensor_calibration_offset
+      - ppfd_conversion_factor
+
+  # --- DONNÉES NUTRITION HYDROPONIQUE ---
+  - name: CORNELL_CEA_RECIPES
+    description: Recettes nutritives validées scientifiquement
+    provider: Cornell University - Controlled Environment Agriculture
+    url: https://cea.cals.cornell.edu/resources
+    method: FILE
+    format: CSV/PDF
+    priority: CRITICAL
+    update_frequency: static
+    target_columns:
+      - ref_n_target
+      - ref_p_target
+      - ref_k_target
+      - ref_ca_target
+      - ref_mg_target
+      - ref_ec_target
+      - ref_ph_target
+    recipes_available:
+      - Leafy Greens General
+      - Basil Specific
+      - Lettuce Butterhead
+      - Herbs Mediterranean
+
+  - name: HYDROBUDDY_FORMULAS
+    description: Calculateur solutions nutritives open source
+    provider: HydroBuddy (Open Source)
+    url: https://github.com/danielfppps/hydrobuddy
+    method: FILE
+    format: JSON
+    priority: HIGH
+    update_frequency: static
+    target_columns:
+      - nutrient_n_total
+      - nutrient_p_phosphorus
+      - nutrient_k_potassium
+      - nutrient_solution_ec
+
+  # --- DONNÉES ÉNERGIE MAROC ---
+  - name: ONEE_TARIFS
+    description: Tarifs électricité ONEE Maroc
+    provider: Office National de l'Électricité (Maroc)
+    url: https://www.one.org.ma/FR/pages/tarifs.asp
+    method: SCRAPING
+    format: HTML
+    priority: HIGH
+    update_frequency: monthly
+    target_columns:
+      - energy_price_kwh
+      - peak_hours_tariff
+      - off_peak_tariff
+    tariff_structure:
+      heures_pleines: "07h-23h"
+      heures_creuses: "23h-07h"
+      prix_hp_dh_kwh: 1.2
+      prix_hc_dh_kwh: 0.8
+    notes: |
+      Tarifs industriels Moyenne Tension.
+      Conversion: 1 MAD ≈ 0.09 EUR
+
+  - name: CARBON_INTERFACE
+    description: Empreinte carbone électricité par région
+    provider: Carbon Interface
+    url: https://www.carboninterface.com/api/v1/estimates
+    method: POST
+    format: JSON
+    priority: MEDIUM
+    update_frequency: 1h
+    auth_required: true
+    free_tier: 200 requests/month
+    target_columns:
+      - carbon_intensity_g_co2_kwh
+      - carbon_footprint_per_kg
+
+  # --- DONNÉES QUALITÉ AIR ---
+  - name: OPENAQ
+    description: Données qualité air open source mondiales
+    provider: OpenAQ
+    url: https://api.openaq.org/v2/measurements
+    method: GET
+    format: JSON
+    priority: LOW
+    update_frequency: 1h
+    auth_required: false
+    parameters:
+      coordinates: "33.5731,-7.5898"
+      radius: 25000
+      parameter:
+        - pm25
+        - pm10
+        - co2
+        - no2
+    target_columns:
+      - ext_air_quality_pm25
+      - ext_air_quality_pm10
+
+  # --- DONNÉES MARCHÉ AGRICOLE ---
+  - name: FAO_FPMA
+    description: Système de suivi des prix alimentaires FAO
+    provider: FAO Food Price Monitoring
+    url: https://fpma.fao.org/giews/fpmat4
+    method: GET
+    format: CSV/JSON
+    priority: MEDIUM
+    update_frequency: weekly
+    target_columns:
+      - market_price_kg
+      - price_volatility_index
+    markets:
+      - Morocco_Casablanca
+      - Morocco_Rabat
+      - France_Rungis
+
+  # --- DONNÉES RECHERCHE SCIENTIFIQUE ---
+  - name: WAGENINGEN_LED_RESEARCH
+    description: Publications recherche LED horticulture
+    provider: Wageningen University & Research
+    url: https://www.wur.nl/en/research-results/research-institutes/plant-research
+    method: FILE
+    format: PDF/Data
+    priority: MEDIUM
+    update_frequency: quarterly
+    target_columns:
+      - optimal_dli_mol_m2_day
+      - photoperiod_hours
+      - spectrum_optimization
+    key_findings:
+      basil_dli_optimal: 17
+      basil_photoperiod: 16
+      red_blue_ratio: "3:1 to 4:1"

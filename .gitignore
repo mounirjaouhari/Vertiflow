@@ -1,0 +1,128 @@
+# ============================================================================
+# PROJET VERTIFLOW - Agriculture Verticale Intelligente
+# ============================================================================
+# Date de création    : 25/12/2025
+# Équipe              : VertiFlow Core Team
+#
+# Membres:
+#   🧙‍♂️ @Mounir      - Architecte & Scientifique
+#   🏗️ @Imrane      - DevOps & Infrastructure
+#   🐍 @Mouhammed   - Data Engineer & Analyste ETL
+#   🧬 @Asama       - Biologiste & Domain Expert
+#   ⚖️ @MrZakaria   - Encadrant & Architecte Data
+#
+# ----------------------------------------------------------------------------
+# FICHIER: .gitignore
+# DESCRIPTION: Git ignore patterns for VertiFlow project
+#
+# Développé par       : @Imrane
+# Ticket(s) associé(s): TICKET-004
+# Sprint              : Semaine 1
+#
+# ----------------------------------------------------------------------------
+# © 2025 VertiFlow Core Team
+# Initiative Nationale Marocaine JobInTech - YNOV Maroc Campus
+# ============================================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data files (large datasets)
+data/external/
+data/processed/
+*.csv
+*.parquet
+*.h5
+
+# Logs
+*.log
+logs/
+dlq/
+
+# Environment variables
+.env
+.env.local
+
+# Docker volumes
+volumes/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+tmpclaude-*
+nul
+
+# NiFi
+nifi_data/
+nifi_exchange/output/
+
+# Screenshots and debug images
+scripts/nifi_workflows/erreurs/
+*.PNG
+*.png
+
+# =============================================================================
+# ADDITIONS FROM REORGANIZATION PLAN (04/01/2026)
+# =============================================================================
+
+# Donnees volumineuses
+DATASET SOURCES/
+data_ingestion/
+*.rar
+*.zip
+
+# Environnement virtuel
+.venv/
+.pytest_cache/
+
+# Modeles entraines (grands fichiers binaires)
+models/*.h5
+models/*.pkl
+models/*.joblib
+
+# Secrets et certificats
+*.pem
+*.key
+
+# Archives et backups
+backup/
+*.bak

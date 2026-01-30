@@ -1,0 +1,169 @@
+# ============================================================================
+# VERTIFLOW - Kubernetes Deployments
+# ============================================================================
+
+---
+# Stream Processor Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stream-processor
+  namespace: vertiflow
+  labels:
+    app: stream-processor
+    component: processing
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: stream-processor
+  template:
+    metadata:
+      labels:
+        app: stream-processor
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+    spec:
+      serviceAccountName: vertiflow-sa
+      containers:
+        - name: stream-processor
+          image: ghcr.io/vertiflow/stream-processor:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: metrics
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: vertiflow-config
+                  key: kafka.bootstrap.servers
+            - name: CLICKHOUSE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: vertiflow-config
+                  key: clickhouse.host
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vertiflow-secrets
+                  key: clickhouse.password
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+---
+# ML Inference Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-inference
+  namespace: vertiflow
+  labels:
+    app: ml-inference
+    component: ml
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ml-inference
+  template:
+    metadata:
+      labels:
+        app: ml-inference
+    spec:
+      serviceAccountName: vertiflow-sa
+      containers:
+        - name: ml-inference
+          image: ghcr.io/vertiflow/ml-inference:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              name: api
+            - containerPort: 8080
+              name: metrics
+          env:
+            - name: MLFLOW_TRACKING_URI
+              value: "http://mlflow:5000"
+            - name: MODEL_NAME
+              value: "oracle_yield"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+---
+# Data Ingestion Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-ingestion
+  namespace: vertiflow
+  labels:
+    app: data-ingestion
+    component: ingestion
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-ingestion
+  template:
+    metadata:
+      labels:
+        app: data-ingestion
+    spec:
+      serviceAccountName: vertiflow-sa
+      containers:
+        - name: data-ingestion
+          image: ghcr.io/vertiflow/data-ingestion:latest
+          imagePullPolicy: Always
+          env:
+            - name: NASA_POWER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vertiflow-secrets
+                  key: nasa.api.key
+            - name: OPENWEATHER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vertiflow-secrets
+                  key: openweather.api.key
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

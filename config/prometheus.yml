@@ -1,0 +1,75 @@
+# ============================================================================
+# PROJET VERTIFLOW - Agriculture Verticale Intelligente
+# ============================================================================
+# Date de création    : 25/12/2025
+# Équipe              : VertiFlow Core Team
+#
+# Membres:
+#   🧙‍♂️ @Mounir       - Architecte & Scientifique
+#   🏗️ @Imrane       - DevOps & Infrastructure
+#   🐍 @Mouhammed    - Data Engineer & Analyste ETL
+#   🧬 @Asama        - Biologiste & Domain Expert
+#   ⚖️ @MrZakaria    - Encadrant & Architecte Data
+#
+# ----------------------------------------------------------------------------
+# FICHIER: prometheus.yml
+# DESCRIPTION: Configuration principale du serveur Prometheus.
+#              Définit les cibles de scraping pour l'observabilité.
+#
+# Développé par        : @Imrane
+# Ticket(s) associé(s): TICKET-060
+# Sprint              : Semaine 6 - Phase Monitoring
+#
+# ----------------------------------------------------------------------------
+# © 2025 VertiFlow Core Team
+# Initiative Nationale Marocaine JobInTech - YNOV Maroc Campus
+# ============================================================================
+
+global:
+  scrape_interval: 15s     # Fréquence de collecte par défaut
+  evaluation_interval: 15s # Fréquence d'évaluation des règles d'alerte
+  external_labels:
+    cluster: 'vertiflow-prod'
+    dc: 'casablanca-ynov'
+
+# Règles d'alerte (Fichier séparé à prévoir si besoin)
+rule_files:
+  # - "alert_rules.yml"
+
+scrape_configs:
+  # 1. Auto-surveillance Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 2. Métriques Système (CPU, RAM, Disque de l'hôte Docker)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # 3. Métriques ClickHouse (Performance Requêtes, Stockage)
+  - job_name: 'clickhouse'
+    static_configs:
+      - targets: ['clickhouse:9363'] # Port metrics natif ClickHouse
+
+  # 4. Métriques MongoDB (via mongodb-exporter)
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb-exporter:9216'] # Nécessite un conteneur exporter
+
+  # 5. Métriques Kafka (via JMX Exporter)
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:7071'] # Port JMX configuré dans docker-compose
+
+  # 6. Métriques NiFi (via Reporting Task Prometheus)
+  # Nécessite d'activer le "PrometheusReportingTask" dans NiFi sur le port 9092
+  - job_name: 'nifi'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['nifi:9092']
+
+  # 7. Métriques Docker (État des conteneurs)
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['host.docker.internal:9323'] # Nécessite config daemon.json

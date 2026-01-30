@@ -1,0 +1,163 @@
+# ATTENTION : La fondation du bus de données dépend de la stabilité de Kafka et ClickHouse.
+# Ne pas modifier les ports sous peine de rompre la communication NiFi -> Kafka.
+
+services:
+  # --- COORDINATION & MESSAGERIE ---
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - vertiflow-network
+
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,INTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092,INTERNAL://kafka:29092,CONTROLLER://kafka:9093"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    networks:
+      - vertiflow-network
+    healthcheck:
+      # Utilisation d'un test réseau fiable pour éviter le blocage 'unhealthy'
+      test: ["CMD-SHELL", "nc -z localhost 9092 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - vertiflow-network
+
+  # --- STOCKAGE ANALYTIQUE (ClickHouse - Golden Record) ---
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    container_name: clickhouse
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+    environment:
+      CLICKHOUSE_DB: vertiflow
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: "default"
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./infrastructure/init_scripts/clickhouse:/docker-entrypoint-initdb.d
+    networks:
+      - vertiflow-network
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- BASE OPÉRATIONNELLE (MongoDB - Recettes) ---
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: vertiflow_ops
+    volumes:
+      - mongodb-data:/data/db
+      - ./infrastructure/init_scripts/mongodb:/docker-entrypoint-initdb.d
+    networks:
+      - vertiflow-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      retries: 5
+
+  # --- GOUVERNANCE DES DONNÉES (Apache NiFi) ---
+  nifi:
+    image: apache/nifi:1.23.2
+    container_name: nifi
+    ports:
+      - "8443:8443"
+    environment:
+      - NIFI_WEB_HTTPS_HOST=0.0.0.0
+      - NIFI_WEB_HTTPS_PORT=8443
+      - SINGLE_USER_CREDENTIALS_USERNAME=admin
+      - SINGLE_USER_CREDENTIALS_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
+      - NIFI_SENSITIVE_PROPS_KEY=vertiflowSecretKey2025
+      - NIFI_JVM_HEAP_INIT=2g
+      - NIFI_JVM_HEAP_MAX=4g
+    volumes:
+      - nifi-conf:/opt/nifi/nifi-current/conf
+      - nifi-state:/opt/nifi/nifi-current/state
+      - ./drivers:/opt/nifi/nifi-current/drivers
+      - ./nifi_exchange:/opt/nifi/nifi-current/exchange
+    networks:
+      - vertiflow-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://localhost:8443/nifi-api/system-diagnostics"]
+      interval: 30s
+      timeout: 20s
+      retries: 15
+
+  # --- INTELLIGENCE ARTIFICIELLE (ML Engine) ---
+  ml-engine:
+    image: python:3.11-slim
+    container_name: ml_engine
+    restart: always
+    # Dépendance sur 'started' pour éviter les blocages de healthcheck infinis
+    depends_on:
+      kafka:
+        condition: service_started
+      clickhouse:
+        condition: service_started
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=9000
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Montage du code source ML
+      - ./cloud_citadel/nervous_system:/opt/vertiflow/ml
+      # Volume persistant pour préserver l'intelligence apprise (.pkl)
+      - ml-models:/opt/vertiflow/models
+      - ./logs/ml:/opt/vertiflow/logs
+    working_dir: /opt/vertiflow/ml
+    # Installation automatique des dépendances et lancement de l'Oracle (A9)
+    command: >
+      sh -c "pip install --no-cache-dir scikit-learn numpy scipy kafka-python clickhouse-driver pymongo joblib && 
+             python3 oracle.py"
+    networks:
+      - vertiflow-network
+
+# --- DÉFINITION RÉSEAU ET PERSISTANCE ---
+networks:
+  vertiflow-network:
+    driver: bridge
+
+volumes:
+  clickhouse-data:
+  mongodb-data:
+  nifi-conf:
+  nifi-state:
+  ml-models:

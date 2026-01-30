@@ -1,0 +1,25 @@
+{
+  "_comment": "========================================================================",
+  "_comment": "PROJET VERTIFLOW - Agriculture Verticale Intelligente",
+  "_comment": "Date: 25/12/2025 | Équipe: VertiFlow Core Team",
+  "_comment": "Développé par: @Mouhammed | Ticket(s): TICKET-020, TICKET-021",
+  "_comment": "© 2025 VertiFlow - JobInTech/YNOV Maroc Campus",
+  "_comment": "========================================================================",
+  "name": "clickhouse-sink-connector",
+  "config": {
+    "connector.class": "com.clickhouse.kafka.connect.ClickHouseSinkConnector",
+    "tasks.max": "3",
+    "topics": "telemetry.raw",
+    "clickhouse.server.url": "http://clickhouse:8123",
+    "clickhouse.server.database": "vertiflow",
+    "clickhouse.server.user": "default",
+    "clickhouse.server.password": "default",
+    "clickhouse.table.name": "telemetry_raw",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+    "errors.tolerance": "all",
+    "errors.deadletterqueue.topic.name": "errors",
+    "errors.deadletterqueue.context.headers.enable": "true"
+  }
+}
