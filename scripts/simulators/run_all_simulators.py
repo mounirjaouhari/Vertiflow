@@ -39,7 +39,7 @@ import threading
 
 # Configuration
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SIMULATORS_DIR = os.path.join(SCRIPT_DIR, "simulators")
+SIMULATORS_DIR = SCRIPT_DIR
 
 SIMULATORS = [
     {
