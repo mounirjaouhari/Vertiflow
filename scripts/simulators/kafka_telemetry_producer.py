@@ -72,32 +72,128 @@ class VertiFlowExpertSimulator:
         # 3. GÉNÉRATION DU RECORD (Conforme aux 157 colonnes de 01_tables.sql)
         # Nous remplissons les colonnes clés pour vos alertes NiFi
         record = {
+            # ===============================
+            # I. IDENTIFICATION & LINEAGE
+            # ===============================
             "timestamp": now.strftime("%Y-%m-%d %H:%M:%S"),
             "farm_id": "VERT-MAROC-01",
             "rack_id": rack,
             "level_index": level,
             "module_id": f"{rack}-L{level}",
+            "zone_id": f"Z{random.randint(1,3)}",
+            "tank_id": f"TANK-{random.randint(1,4)}",
+            "sensor_hardware_id": f"SENS-{uuid.uuid4().hex[:8]}",
             "species_variety": "Ocimum basilicum",
+            "data_source_type": "IoT-Expert-Drift",
+            "lineage_uuid": str(uuid.uuid4()),
 
-            # Paramètres Environnementaux
-            "air_temp_internal": round(random.gauss(temp_base, 0.2), 2),
-            "air_humidity": round(random.gauss(hum_base, 1.0), 1),
-            "vapor_pressure_deficit": 0.0, # NiFi doit le calculer en Zone 2
+            # ===============================
+            # II. ENVIRONMENT & CLIMATE
+            # ===============================
+            "air_temp_internal": round(random.gauss(temp_base, 0.3), 2),
+            "air_humidity": round(random.gauss(hum_base, 1.5), 1),
+            "co2_level_ambient": round(random.gauss(850, 40), 0),
+            "airflow_velocity": round(random.uniform(0.2, 1.2), 2),
+            "air_pressure": round(random.gauss(1013, 5), 1),
+            "vapor_pressure_deficit": round(random.uniform(0.6, 1.4), 2),
 
-            # Paramètres de Nutrition (plant_recipes.js)
+            # ===============================
+            # III. WATER & RHIZOSPHERE
+            # ===============================
+            "water_temp": round(random.gauss(20.5, 0.4), 2),
             "water_ph": round(ph_base + random.uniform(-0.05, 0.05), 2),
-            "nutrient_solution_ec": 1.8,
+            "dissolved_oxygen": round(random.uniform(6.5, 8.5), 2),
+            "water_turbidity": round(random.uniform(0.2, 1.2), 2),
+            "irrigation_line_pressure": round(random.uniform(1.0, 2.5), 2),
+            "wue_current": round(random.uniform(3.0, 6.0), 2),
+            "water_recycled_rate": round(random.uniform(0.2, 0.9), 2),
+            "coefficient_cultural_kc": round(random.uniform(0.7, 1.2), 2),
+            "redox_potential": round(random.uniform(200, 400), 0),
 
-            # Biomasse (Inspiré de basil_recipe_optimal_vance.csv)
+            # ===============================
+            # IV. NUTRITION (MACRO + MICRO)
+            # ===============================
+            "nutrient_solution_ec": round(random.uniform(1.5, 2.3), 2),
+            "nutrient_n_total": round(random.uniform(120, 220), 1),
+            "nutrient_p_phosphorus": round(random.uniform(25, 60), 1),
+            "nutrient_k_potassium": round(random.uniform(180, 320), 1),
+            "nutrient_ca_calcium": round(random.uniform(120, 200), 1),
+            "nutrient_mg_magnesium": round(random.uniform(35, 70), 1),
+            "nutrient_s_sulfur": round(random.uniform(50, 90), 1),
+            "nutrient_fe_iron": round(random.uniform(1.5, 3.0), 2),
+            "nutrient_mn_manganese": round(random.uniform(0.3, 0.8), 2),
+            "nutrient_zn_zinc": round(random.uniform(0.05, 0.2), 2),
+            "nutrient_cu_copper": round(random.uniform(0.03, 0.1), 2),
+            "nutrient_b_boron": round(random.uniform(0.2, 0.6), 2),
+            "nutrient_mo_molybdenum": round(random.uniform(0.01, 0.05), 3),
+            "nutrient_cl_chlorine": round(random.uniform(1.0, 3.0), 2),
+            "nutrient_ni_nickel": round(random.uniform(0.01, 0.05), 3),
+
+            # ===============================
+            # V. LIGHT / PAR / PHOTOSYNTHESIS
+            # ===============================
+            "light_intensity_ppfd": round(random.uniform(200, 450), 0),
+            "light_photoperiod": random.choice([16, 18]),
+            "light_ratio_red_blue": round(random.uniform(2.0, 4.0), 2),
+            "light_far_red_intensity": round(random.uniform(5, 30), 1),
+            "light_compensation_point": round(random.uniform(20, 40), 1),
+            "light_saturation_point": round(random.uniform(400, 700), 0),
+            "light_dli_accumulated": round(random.uniform(12, 20), 2),
+            "quantum_yield_psii": round(random.uniform(0.55, 0.75), 2),
+            "photosynthetic_rate_max": round(random.uniform(12, 22), 1),
+            "light_use_efficiency": round(random.uniform(0.4, 0.7), 2),
+            "leaf_absorption_pct": round(random.uniform(75, 90), 1),
+            "spectral_recipe_id": f"SPEC-{random.randint(1,5)}",
+            "spectrum_blue_450nm_pct": round(random.uniform(15, 30), 1),
+            "spectrum_red_660nm_pct": round(random.uniform(45, 65), 1),
+            "spectrum_far_red_730nm_pct": round(random.uniform(3, 10), 1),
+            "spectrum_white_pct": round(random.uniform(5, 15), 1),
+            "phytochrome_ratio": round(random.uniform(0.7, 1.2), 2),
+            "is_light_period": random.choice([0, 1]),
+            "photoperiod_progress_pct": round(random.uniform(0, 100), 1),
+
+            # ===============================
+            # VI. BIOMASS & GROWTH
+            # ===============================
             "days_since_planting": system_state["current_day"],
-            "fresh_biomass_est": round(20.0 + (system_state["current_day"] * 1.5), 2),
+            "fresh_biomass_est": round(20 + system_state["current_day"] * random.uniform(1.3, 1.7), 2),
             "growth_stage": "Végétatif",
 
-            # Hardware & Intelligence (01_tables.sql)
-            "pump_vibration_level": 0.2 if system_state["drift_type"] != "PH_ACID" else 4.5,
-            "health_score": round(1.0 - (system_state["drift_intensity"] / 10), 2),
-            "data_source_type": "IoT-Expert-Drift",
-            "lineage_uuid": str(uuid.uuid4())
+            # ===============================
+            # VII. HARDWARE & MAINTENANCE
+            # ===============================
+            "pump_vibration_level": round(random.uniform(0.1, 0.4), 2),
+            "fan_current_draw": round(random.uniform(0.2, 1.5), 2),
+            "led_driver_temp": round(random.uniform(35, 60), 1),
+            "led_power_consumption_w": round(random.uniform(80, 150), 1),
+            "led_hours_total": random.randint(200, 3000),
+            "led_efficiency_pct": round(random.uniform(30, 45), 1),
+            "filter_differential_pressure": round(random.uniform(0.05, 0.4), 2),
+            "ups_battery_health": round(random.uniform(80, 100), 1),
+
+            # ===============================
+            # VIII. REFERENCE TARGETS
+            # ===============================
+            "ref_n_target": round(random.uniform(160, 200), 1),
+            "ref_p_target": round(random.uniform(35, 55), 1),
+            "ref_k_target": round(random.uniform(220, 280), 1),
+            "ref_ca_target": round(random.uniform(140, 180), 1),
+            "ref_mg_target": round(random.uniform(45, 65), 1),
+            "ec_target": round(random.uniform(1.8, 2.2), 2),
+            "ph_target": round(random.uniform(5.8, 6.2), 2),
+
+            # ===============================
+            # IX. SAFETY & ALERTS
+            # ===============================
+            "leak_detection_status": random.choice([0, 1]),
+            "emergency_stop_status": 0,
+
+            # ===============================
+            # X. QUALITY & ANOMALIES
+            # ===============================
+            "health_score": round(random.uniform(0.7, 1.0), 2),
+            "data_integrity_flag": 0,
+            "anomaly_confidence_score": round(random.uniform(0.0, 0.6), 2),
         }
 
         # Compléter avec des valeurs par défaut pour les colonnes restantes (157 au total)
@@ -120,7 +216,7 @@ class VertiFlowExpertSimulator:
                     system_state["is_drifting"] = False
                     system_state["drift_intensity"] = 0.0
 
-                time.sleep(5)
+                time.sleep(1)
         except KeyboardInterrupt:
             self.producer.close()
 
