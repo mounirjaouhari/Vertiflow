@@ -1,0 +1,689 @@
+{
+  "annotations": { "list": [] },
+  "description": "Tableau de bord BI complet pour la direction. Vue consolidée de toutes les métriques clés de production, qualité, environnement, nutrition, énergie et finance. Modélisation OLAP optimisée avec ClickHouse.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 2,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "text",
+      "title": "",
+      "gridPos": { "h": 2, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "# 📊 VERTIFLOW BI - Tableau de Bord Exécutif\n**Agriculture Verticale Intelligente** | Données temps réel | Modèle OLAP ClickHouse"
+      }
+    },
+    {
+      "type": "row",
+      "title": "🎯 KPIs STRATÉGIQUES - Vue Direction",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 2 },
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "📈 Production Totale",
+      "description": "Biomasse fraîche totale produite sur la période sélectionnée. Indicateur clé de la capacité de production.",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 3 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(sum(fresh_biomass_est)/1000, 2) as production_kg FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kg", "displayName": "Production 24h",
+          "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 50}, {"color": "green", "value": 100}] }
+        }
+      },
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "stat",
+      "title": "🌿 Rendement Moyen",
+      "description": "Rendement moyen prédit par le modèle Oracle A9 (kg/m²). Objectif: >3.5 kg/m² pour le basilic premium.",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 3 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(predicted_yield_kg_m2), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR AND predicted_yield_kg_m2 > 0",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kg/m²", "displayName": "Rendement",
+          "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 2}, {"color": "green", "value": 3.5}] }
+        }
+      },
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "stat",
+      "title": "🏆 Qualité Premium",
+      "description": "Pourcentage de production classée Premium par le Classifier A10. Objectif: >70%.",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 3 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(countIf(quality_grade_prediction = 'Premium') * 100.0 / count(), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent", "displayName": "Premium",
+          "color": { "fixedColor": "green", "mode": "fixed" }
+        }
+      },
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "stat",
+      "title": "💚 Score Santé",
+      "description": "Score de santé moyen des cultures. Indicateur composite basé sur les conditions environnementales et physiologiques.",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 3 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(health_score) * 100, 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent", "displayName": "Santé",
+          "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 70}, {"color": "green", "value": 85}] }
+        }
+      },
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "stat",
+      "title": "⚡ Énergie/kg",
+      "description": "Consommation énergétique par kg produit. Indicateur d'efficacité opérationnelle. Objectif: <5 kWh/kg.",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 3 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(sum(energy_footprint_hourly) / nullIf(sum(fresh_biomass_est)/1000, 0), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kWh/kg", "displayName": "Efficacité",
+          "thresholds": { "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 5}, {"color": "red", "value": 10}] }
+        }
+      },
+      "options": { "colorMode": "value", "graphMode": "none" }
+    },
+    {
+      "type": "stat",
+      "title": "🌱 Lots Actifs",
+      "description": "Nombre de lots de culture actuellement en production.",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 3 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT uniqExact(batch_id) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": { "displayName": "Lots", "color": { "fixedColor": "blue", "mode": "fixed" } }
+      },
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "row",
+      "title": "📊 ANALYSE PRODUCTION - Tendances et Performances",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "📈 Évolution Production par Zone (7 jours)",
+      "description": "Tendance de la production de biomasse par zone de culture. Agrégation horaire pour identifier les patterns de croissance.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT toStartOfHour(timestamp) as time, zone_id, round(sum(fresh_biomass_est)/1000, 2) as biomasse_kg FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 7 DAY GROUP BY time, zone_id ORDER BY time",
+        "refId": "A", "format": 0
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "kg", "custom": { "lineWidth": 2, "fillOpacity": 20, "gradientMode": "opacity" } },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*Z1.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byRegexp", "options": ".*Z2.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] },
+          { "matcher": { "id": "byRegexp", "options": ".*Z3.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum", "mean"] } }
+    },
+    {
+      "type": "barchart",
+      "title": "🌱 Performance par Stade de Croissance",
+      "description": "Comparaison des KPIs de production par stade de développement des plantes.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT growth_stage as Stade, round(avg(fresh_biomass_est), 1) as Biomasse_g, round(avg(predicted_yield_kg_m2)*100, 1) as Rendement_x100, round(avg(health_score)*100, 1) as Sante FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR GROUP BY growth_stage ORDER BY avg(days_since_planting)",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": { "custom": { "fillOpacity": 80 } }
+      },
+      "options": { "orientation": "horizontal", "showValue": "always", "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "type": "row",
+      "title": "🌡️ ENVIRONNEMENT - Conditions de Culture",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 },
+      "collapsed": false
+    },
+    {
+      "type": "gauge",
+      "title": "🌡️ Température",
+      "description": "Température moyenne actuelle (°C). Plage optimale basilic: 20-25°C.",
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 17 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(air_temp_internal), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius", "min": 15, "max": 35,
+          "thresholds": { "steps": [{"color": "blue", "value": null}, {"color": "green", "value": 20}, {"color": "yellow", "value": 26}, {"color": "red", "value": 30}] }
+        }
+      },
+      "options": { "showThresholdLabels": true, "showThresholdMarkers": true }
+    },
+    {
+      "type": "gauge",
+      "title": "💧 Humidité",
+      "description": "Humidité relative moyenne (%). Plage optimale: 60-75%.",
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 17 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(air_humidity), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent", "min": 40, "max": 100,
+          "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 55}, {"color": "green", "value": 60}, {"color": "yellow", "value": 80}, {"color": "red", "value": 90}] }
+        }
+      },
+      "options": { "showThresholdLabels": true, "showThresholdMarkers": true }
+    },
+    {
+      "type": "gauge",
+      "title": "💨 VPD",
+      "description": "Déficit de Pression de Vapeur (kPa). Zone optimale: 0.8-1.2 kPa pour une transpiration saine.",
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 17 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(vapor_pressure_deficit), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kPa", "min": 0, "max": 2,
+          "thresholds": { "steps": [{"color": "blue", "value": null}, {"color": "green", "value": 0.8}, {"color": "yellow", "value": 1.2}, {"color": "red", "value": 1.5}] }
+        }
+      },
+      "options": { "showThresholdLabels": true, "showThresholdMarkers": true }
+    },
+    {
+      "type": "gauge",
+      "title": "☀️ DLI",
+      "description": "Daily Light Integral (mol/m²/jour). Optimal basilic: 12-17 mol/m²/jour.",
+      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 17 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(light_dli_accumulated), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "mol/m²/j", "min": 0, "max": 40,
+          "thresholds": { "steps": [{"color": "blue", "value": null}, {"color": "green", "value": 12}, {"color": "yellow", "value": 20}, {"color": "red", "value": 30}] }
+        }
+      },
+      "options": { "showThresholdLabels": true, "showThresholdMarkers": true }
+    },
+    {
+      "type": "gauge",
+      "title": "🫧 CO2",
+      "description": "Concentration CO2 ambiante (ppm). Enrichissement optimal: 800-1200 ppm.",
+      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 17 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(co2_level_ambient), 0) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ppm", "min": 400, "max": 1500,
+          "thresholds": { "steps": [{"color": "yellow", "value": null}, {"color": "green", "value": 800}, {"color": "yellow", "value": 1200}, {"color": "red", "value": 1400}] }
+        }
+      },
+      "options": { "showThresholdLabels": true, "showThresholdMarkers": true }
+    },
+    {
+      "type": "stat",
+      "title": "⚠️ Alertes Env.",
+      "description": "Nombre de conditions environnementales hors normes détectées.",
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 17 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT countIf(vapor_pressure_deficit < 0.4 OR vapor_pressure_deficit > 1.6 OR air_temp_internal < 18 OR air_temp_internal > 30) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Alertes",
+          "thresholds": { "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 5}, {"color": "red", "value": 20}] }
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none" }
+    },
+    {
+      "type": "timeseries",
+      "title": "📊 Tendances Environnementales (24h)",
+      "description": "Évolution des paramètres environnementaux critiques sur 24h.",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 22 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT toStartOfMinute(timestamp) as time, round(avg(air_temp_internal), 1) as Temperature, round(avg(air_humidity), 1) as Humidite, round(avg(vapor_pressure_deficit)*50, 1) as VPD_x50, round(avg(light_dli_accumulated), 1) as DLI FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR GROUP BY time ORDER BY time",
+        "refId": "A", "format": 0
+      }],
+      "fieldConfig": {
+        "defaults": { "custom": { "lineWidth": 2, "fillOpacity": 10 } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Temperature" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }, { "id": "unit", "value": "celsius" }] },
+          { "matcher": { "id": "byName", "options": "Humidite" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }, { "id": "unit", "value": "percent" }] },
+          { "matcher": { "id": "byName", "options": "VPD_x50" }, "properties": [{ "id": "color", "value": { "fixedColor": "purple", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "DLI" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "min", "max"] } }
+    },
+    {
+      "type": "row",
+      "title": "💧 NUTRITION - Gestion de la Solution Nutritive",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 },
+      "collapsed": false
+    },
+    {
+      "type": "gauge",
+      "title": "⚡ EC",
+      "description": "Conductivité électrique de la solution (mS/cm). Basilic optimal: 1.2-2.0 mS/cm.",
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 30 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(nutrient_solution_ec), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "mS/cm", "min": 0, "max": 4,
+          "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 1}, {"color": "green", "value": 1.2}, {"color": "yellow", "value": 2.2}, {"color": "red", "value": 3}] }
+        }
+      },
+      "options": { "showThresholdLabels": true, "showThresholdMarkers": true }
+    },
+    {
+      "type": "gauge",
+      "title": "🧪 pH",
+      "description": "pH de la solution nutritive. Optimal: 5.5-6.5 pour une absorption maximale des nutriments.",
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 30 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(water_ph), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pH", "min": 4, "max": 8,
+          "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 5.2}, {"color": "green", "value": 5.5}, {"color": "yellow", "value": 6.8}, {"color": "red", "value": 7.2}] }
+        }
+      },
+      "options": { "showThresholdLabels": true, "showThresholdMarkers": true }
+    },
+    {
+      "type": "barchart",
+      "title": "🧬 Balance NPK vs Cibles",
+      "description": "Comparaison des niveaux actuels de macronutriments (N, P, K) par rapport aux valeurs cibles.",
+      "gridPos": { "h": 5, "w": 8, "x": 8, "y": 30 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT 'Azote (N)' as Nutriment, round(avg(nutrient_n_total), 0) as Actuel, round(avg(ref_n_target), 0) as Cible FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR UNION ALL SELECT 'Phosphore (P)', round(avg(nutrient_p_phosphorus), 0), round(avg(ref_p_target), 0) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR UNION ALL SELECT 'Potassium (K)', round(avg(nutrient_k_potassium), 0), round(avg(ref_k_target), 0) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Actuel" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Cible" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "orientation": "horizontal", "showValue": "always", "groupWidth": 0.7 }
+    },
+    {
+      "type": "table",
+      "title": "📋 Bilan Nutritif par Zone",
+      "description": "Détail des niveaux de nutriments et écarts par zone de culture.",
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 30 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT zone_id as Zone, round(avg(nutrient_solution_ec), 2) as EC, round(avg(water_ph), 2) as pH, round(avg(nutrient_n_total), 0) as N_ppm, round(avg(nutrient_p_phosphorus), 0) as P_ppm, round(avg(nutrient_k_potassium), 0) as K_ppm, round(avg(dissolved_oxygen), 1) as DO_ppm FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR GROUP BY zone_id ORDER BY zone_id",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": { "defaults": { "custom": { "align": "center" } } },
+      "options": { "showHeader": true }
+    },
+    {
+      "type": "row",
+      "title": "🎯 QUALITÉ - Distribution et Facteurs",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 35 },
+      "collapsed": false
+    },
+    {
+      "type": "piechart",
+      "title": "🥇 Distribution Qualité",
+      "description": "Répartition des grades de qualité (Premium, Standard, Rejet) sur 24h.",
+      "gridPos": { "h": 7, "w": 6, "x": 0, "y": 36 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT quality_grade_prediction as Grade, count() as Nombre FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR AND quality_grade_prediction != '' GROUP BY quality_grade_prediction",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Premium" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Standard" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Rejet" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "pieType": "donut", "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] } }
+    },
+    {
+      "type": "stat",
+      "title": "🌿 Chlorophylle",
+      "description": "Index SPAD de chlorophylle. Indicateur de la santé foliaire et de l'azote disponible.",
+      "gridPos": { "h": 3, "w": 3, "x": 6, "y": 36 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(chlorophyll_index_spad), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "SPAD", "displayName": "SPAD",
+          "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 30}, {"color": "green", "value": 40}] }
+        }
+      },
+      "options": { "colorMode": "value", "graphMode": "none" }
+    },
+    {
+      "type": "stat",
+      "title": "🫒 Huile Essentielle",
+      "description": "Rendement en huile essentielle (%). Facteur clé de la valeur aromatique du basilic.",
+      "gridPos": { "h": 3, "w": 3, "x": 9, "y": 36 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(essential_oil_yield)*100, 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent", "displayName": "Huile",
+          "thresholds": { "steps": [{"color": "yellow", "value": null}, {"color": "green", "value": 0.5}] }
+        }
+      },
+      "options": { "colorMode": "value", "graphMode": "none" }
+    },
+    {
+      "type": "stat",
+      "title": "🍃 Phénols",
+      "description": "Contenu phénolique (mg/g). Indicateur des composés antioxydants.",
+      "gridPos": { "h": 3, "w": 3, "x": 6, "y": 39 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(phenolic_content), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "mg/g", "displayName": "Phénols", "color": { "fixedColor": "purple", "mode": "fixed" } }
+      },
+      "options": { "colorMode": "value", "graphMode": "none" }
+    },
+    {
+      "type": "stat",
+      "title": "⚠️ Risque Tip Burn",
+      "description": "Risque de brûlure des pointes. Corrélé au stress calcique et VPD élevé.",
+      "gridPos": { "h": 3, "w": 3, "x": 9, "y": 39 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(tip_burn_risk)*100, 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent", "displayName": "Risque",
+          "thresholds": { "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 20}, {"color": "red", "value": 50}] }
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none" }
+    },
+    {
+      "type": "timeseries",
+      "title": "📈 Évolution Qualité par Zone",
+      "description": "Tendance du taux de qualité Premium par zone sur 7 jours.",
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 36 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT toStartOfHour(timestamp) as time, zone_id, round(countIf(quality_grade_prediction = 'Premium')*100.0/count(), 1) as Premium_pct FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 7 DAY GROUP BY time, zone_id ORDER BY time",
+        "refId": "A", "format": 0
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "custom": { "lineWidth": 2, "fillOpacity": 15 } }
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "last"] } }
+    },
+    {
+      "type": "row",
+      "title": "⚡ ÉNERGIE & DURABILITÉ - Performance Environnementale",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 43 },
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "⚡ Énergie Totale",
+      "description": "Consommation énergétique totale sur 24h.",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 44 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(sum(energy_footprint_hourly), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": { "defaults": { "unit": "kWh", "displayName": "kWh 24h", "color": { "fixedColor": "yellow", "mode": "fixed" } } },
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "gauge",
+      "title": "🌿 Renouvelable",
+      "description": "Part d'énergie renouvelable dans la consommation. Objectif: >50%.",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 44 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(renewable_energy_pct), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent", "min": 0, "max": 100,
+          "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 30}, {"color": "green", "value": 50}] }
+        }
+      },
+      "options": { "showThresholdLabels": false, "showThresholdMarkers": true }
+    },
+    {
+      "type": "stat",
+      "title": "🌍 CO2 Footprint",
+      "description": "Empreinte carbone totale (kg CO2) sur 24h.",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 44 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(sum(carbon_footprint_per_kg), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kg CO2", "displayName": "Carbon",
+          "thresholds": { "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 50}, {"color": "red", "value": 100}] }
+        }
+      },
+      "options": { "colorMode": "value", "graphMode": "none" }
+    },
+    {
+      "type": "stat",
+      "title": "💧 WUE",
+      "description": "Water Use Efficiency - Efficacité de l'utilisation de l'eau (g biomasse/L eau).",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 44 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(wue_current), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "g/L", "displayName": "WUE", "color": { "fixedColor": "blue", "mode": "fixed" } }
+      },
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "stat",
+      "title": "♻️ Eau Recyclée",
+      "description": "Taux de recyclage de l'eau dans le système. Objectif: >90%.",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 44 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(avg(water_recycled_rate)*100, 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent", "displayName": "Recyclage",
+          "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 70}, {"color": "green", "value": 90}] }
+        }
+      },
+      "options": { "colorMode": "value", "graphMode": "none" }
+    },
+    {
+      "type": "stat",
+      "title": "💚 Crédits Carbone",
+      "description": "Valeur des crédits carbone générés (EUR).",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 44 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT round(sum(carbon_credit_value), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": { "defaults": { "unit": "currencyEUR", "displayName": "Crédits", "color": { "fixedColor": "green", "mode": "fixed" } } },
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "timeseries",
+      "title": "📊 Consommation Énergétique par Zone (7 jours)",
+      "description": "Évolution de la consommation énergétique journalière par zone de culture.",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 48 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT toStartOfDay(timestamp) as time, zone_id, round(sum(energy_footprint_hourly), 1) as Energie_kWh FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 7 DAY GROUP BY time, zone_id ORDER BY time",
+        "refId": "A", "format": 0
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "kWh", "custom": { "lineWidth": 2, "fillOpacity": 30, "stacking": { "mode": "normal" } } }
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum", "mean"] } }
+    },
+    {
+      "type": "row",
+      "title": "🔬 PERFORMANCE RECETTES - Analyse Comparative",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 54 },
+      "collapsed": false
+    },
+    {
+      "type": "table",
+      "title": "📊 Comparaison des Recettes Spectrales",
+      "description": "Performance comparative des différentes recettes lumineuses sur les KPIs principaux.",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 55 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "targets": [{
+        "rawSql": "SELECT spectral_recipe_id as Recette, count() as Echantillons, uniqExact(batch_id) as Lots, round(avg(predicted_yield_kg_m2), 3) as Rendement_kg_m2, round(avg(health_score)*100, 1) as Sante_pct, round(avg(essential_oil_yield)*100, 3) as Huile_pct, round(avg(chlorophyll_index_spad), 1) as Chlorophylle, round(avg(light_dli_accumulated), 1) as DLI_moyen, round(countIf(quality_grade_prediction = 'Premium')*100.0/count(), 1) as Premium_pct, round(avg(energy_footprint_hourly), 3) as Energie_kWh FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 7 DAY GROUP BY spectral_recipe_id ORDER BY Rendement_kg_m2 DESC",
+        "refId": "A", "format": 1
+      }],
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "center" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Rendement_kg_m2" }, "properties": [{ "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } }, { "id": "thresholds", "value": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 1}, {"color": "green", "value": 2}] } }] },
+          { "matcher": { "id": "byName", "options": "Premium_pct" }, "properties": [{ "id": "unit", "value": "percent" }, { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } }, { "id": "thresholds", "value": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 50}, {"color": "green", "value": 70}] } }] }
+        ]
+      },
+      "options": { "showHeader": true, "footer": { "show": true, "reducer": ["mean"] } }
+    },
+    {
+      "type": "row",
+      "title": "📋 DONNÉES DÉTAILLÉES - Tables et Exports",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 61 },
+      "collapsed": true,
+      "panels": [
+        {
+          "type": "table",
+          "title": "📋 Dernières Mesures par Zone",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 62 },
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+          "targets": [{
+            "rawSql": "SELECT zone_id as Zone, rack_id as Rack, argMax(growth_stage, timestamp) as Stade, round(avg(air_temp_internal), 1) as Temp, round(avg(air_humidity), 1) as Hum, round(avg(vapor_pressure_deficit), 2) as VPD, round(avg(nutrient_solution_ec), 2) as EC, round(avg(water_ph), 2) as pH, round(avg(light_dli_accumulated), 1) as DLI, round(avg(health_score)*100, 1) as Sante, round(avg(predicted_yield_kg_m2), 2) as Rendement, max(timestamp) as Derniere_MAJ FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 1 HOUR GROUP BY zone_id, rack_id ORDER BY zone_id, rack_id",
+            "refId": "A", "format": 1
+          }],
+          "options": { "showHeader": true }
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["vertiflow", "bi", "executive", "production", "quality", "environment", "energy", "olap"],
+  "templating": {
+    "list": [
+      {
+        "name": "zone",
+        "label": "Zone",
+        "type": "query",
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+        "query": "SELECT DISTINCT zone_id FROM vertiflow.basil_ultimate_realtime ORDER BY zone_id",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "current": { "selected": true, "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "growth_stage",
+        "label": "Stade",
+        "type": "query",
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+        "query": "SELECT DISTINCT growth_stage FROM vertiflow.basil_ultimate_realtime WHERE growth_stage != '' ORDER BY growth_stage",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "current": { "selected": true, "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m"],
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+  },
+  "timezone": "browser",
+  "title": "09 - BI Executive Dashboard",
+  "uid": "vertiflow-bi-executive",
+  "version": 1
+}
