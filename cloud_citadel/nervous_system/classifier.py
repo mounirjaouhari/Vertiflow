@@ -24,18 +24,20 @@ from pathlib import Path
 import joblib
 import pandas as pd
 from kafka import KafkaConsumer, KafkaProducer
+from clickhouse_driver import Client as ClickHouseClient
 
 # Ajouter le chemin racine pour importer les constantes
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from config.vertiflow_constants import KafkaTopics, Infrastructure
+from config.vertiflow_constants import KafkaTopics, Infrastructure, ClickHouseTables
 
 # Configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - [CLASSIFIER] - %(levelname)s - %(message)s')
 logger = logging.getLogger("VertiFlowClassifier")
 
-KAFKA_BROKER = Infrastructure.KAFKA_BOOTSTRAP_SERVERS
+# Utilise Kafka interne (kafka:29092) si dans Docker, sinon localhost
+KAFKA_BROKER = os.getenv('KAFKA_BOOTSTRAP_SERVERS', Infrastructure.KAFKA_INTERNAL_SERVERS)
 TOPIC_INPUT = KafkaTopics.TELEMETRY_FULL
 TOPIC_OUTPUT = KafkaTopics.QUALITY_PREDICTIONS
 
@@ -46,6 +48,15 @@ class QualityInspector:
         self.model_path = model_path or os.getenv('CLASSIFIER_MODEL_PATH', default_model_path)
         self.model = None
         self.features_list = ['air_temp_internal', 'vapor_pressure_deficit', 'light_dli_accumulated', 'nutrient_solution_ec', 'days_since_planting']
+        
+        # ClickHouse connection pour stocker les classifications
+        self.ch_client = ClickHouseClient(
+            host=os.getenv('CLICKHOUSE_HOST', Infrastructure.CLICKHOUSE_HOST),
+            port=int(os.getenv('CLICKHOUSE_PORT', Infrastructure.CLICKHOUSE_PORT)),
+            user=os.getenv('CLICKHOUSE_USER', 'default'),
+            password=os.getenv('CLICKHOUSE_PASSWORD', 'default'),
+            database=ClickHouseTables.DATABASE
+        )
         
         self.consumer = KafkaConsumer(
             TOPIC_INPUT,
@@ -96,6 +107,39 @@ class QualityInspector:
             logger.warning(f"Erreur prédiction ML, fallback mock: {e}")
             return self.mock_predict(data)
 
+    def store_classification(self, data, prediction, confidence=0.85):
+        """Stocke la classification dans ClickHouse (table quality_classifications)."""
+        try:
+            # Mapping grade vers Enum
+            grade_map = {"PREMIUM": 1, "STANDARD": 2, "REJECT": 3}
+            grade_value = grade_map.get(prediction, 2)
+            
+            insert_query = """
+            INSERT INTO quality_classifications 
+            (timestamp, batch_id, algo_id, predicted_quality_grade, health_score_input, 
+             confidence, air_temp, vpd, dli, ec, days_since_planting)
+            VALUES
+            """
+            
+            insert_data = [(
+                datetime.utcnow(),
+                data.get('batch_id', 'UNKNOWN'),
+                'A10',
+                prediction,
+                float(data.get('health_score', 0.5) or 0.5),
+                confidence,
+                float(data.get('air_temp_internal', 22.0) or 22.0),
+                float(data.get('vapor_pressure_deficit', 1.0) or 1.0),
+                float(data.get('light_dli_accumulated', 14.0) or 14.0),
+                float(data.get('nutrient_solution_ec', 1.8) or 1.8),
+                int(data.get('days_since_planting', 20) or 20)
+            )]
+            
+            self.ch_client.execute(insert_query, insert_data)
+            logger.debug(f"Classification stockée dans ClickHouse: {prediction}")
+        except Exception as e:
+            logger.warning(f"Erreur stockage ClickHouse: {e}")
+
     def run(self):
         logger.info("🕵️ Inspecteur Qualité A10 en service.")
 
@@ -112,7 +156,7 @@ class QualityInspector:
                     else:
                         prediction = self.mock_predict(data)
 
-                    # Publication
+                    # Publication vers Kafka
                     result = {
                         "timestamp": datetime.now().isoformat(),
                         "batch_id": data.get('batch_id', 'UNKNOWN'),
@@ -122,6 +166,10 @@ class QualityInspector:
                     }
 
                     self.producer.send(TOPIC_OUTPUT, value=result)
+                    
+                    # Stockage dans ClickHouse
+                    self.store_classification(data, prediction)
+                    
                     logger.info(f"🏷️ Classification {data.get('batch_id')}: {prediction}")
 
                 except Exception as e:

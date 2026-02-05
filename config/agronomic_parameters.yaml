@@ -44,6 +44,129 @@ crops:
     family: Lamiaceae
     growth_cycle_days: 35
 
+    # Stage plan aligned with basil_recipe_optimal_vance.csv
+    stage_plan:
+      - stage_id: 0
+        stage_name: GERMINATION
+        day_start: 0
+        day_end: 3
+        photoperiod_h: 0
+        ppfd_target_umol: 0
+        dli_target_mol_m2: 0
+        temp_day_c: 24.0
+        temp_night_c: 24.0
+        vpd_target_kpa: 0.3
+        co2_ppm: 400
+        rel_humidity_target_pct: 90.0
+        ec_target_dS_m: 0.0
+        ph_target: 6.0
+        N_ppm: 0
+        P_ppm: 0
+        K_ppm: 0
+        Ca_ppm: 0
+        Mg_ppm: 0
+        irrigation_strategy: MIST_CONSTANT
+      - stage_id: 1
+        stage_name: EMERGENCE
+        day_start: 4
+        day_end: 7
+        photoperiod_h: 16
+        ppfd_target_umol: 150
+        dli_target_mol_m2: 8.6
+        temp_day_c: 23.0
+        temp_night_c: 21.0
+        vpd_target_kpa: 0.6
+        co2_ppm: 600
+        rel_humidity_target_pct: 75.0
+        ec_target_dS_m: 0.8
+        ph_target: 5.8
+        N_ppm: 70
+        P_ppm: 30
+        K_ppm: 100
+        Ca_ppm: 80
+        Mg_ppm: 25
+        irrigation_strategy: EBB_FLOW_LOW
+      - stage_id: 2
+        stage_name: VEGETATIVE_EARLY
+        day_start: 8
+        day_end: 14
+        photoperiod_h: 18
+        ppfd_target_umol: 300
+        dli_target_mol_m2: 19.4
+        temp_day_c: 24.0
+        temp_night_c: 20.0
+        vpd_target_kpa: 0.9
+        co2_ppm: 800
+        rel_humidity_target_pct: 70.0
+        ec_target_dS_m: 1.4
+        ph_target: 5.8
+        N_ppm: 120
+        P_ppm: 40
+        K_ppm: 150
+        Ca_ppm: 120
+        Mg_ppm: 40
+        irrigation_strategy: DRIP_PULSE_MEDIUM
+      - stage_id: 3
+        stage_name: VEGETATIVE_RAPID
+        day_start: 15
+        day_end: 24
+        photoperiod_h: 18
+        ppfd_target_umol: 450
+        dli_target_mol_m2: 29.1
+        temp_day_c: 25.0
+        temp_night_c: 19.0
+        vpd_target_kpa: 1.1
+        co2_ppm: 1000
+        rel_humidity_target_pct: 65.0
+        ec_target_dS_m: 2.2
+        ph_target: 6.0
+        N_ppm: 160
+        P_ppm: 50
+        K_ppm: 220
+        Ca_ppm: 150
+        Mg_ppm: 50
+        irrigation_strategy: DRIP_PULSE_HIGH
+      - stage_id: 4
+        stage_name: PRE_HARVEST_FINISHING
+        day_start: 25
+        day_end: 28
+        photoperiod_h: 18
+        ppfd_target_umol: 500
+        dli_target_mol_m2: 32.4
+        temp_day_c: 22.0
+        temp_night_c: 17.0
+        vpd_target_kpa: 1.3
+        co2_ppm: 800
+        rel_humidity_target_pct: 60.0
+        ec_target_dS_m: 1.8
+        ph_target: 6.2
+        N_ppm: 100
+        P_ppm: 50
+        K_ppm: 250
+        Ca_ppm: 150
+        Mg_ppm: 60
+        irrigation_strategy: STRESS_INDUCTION
+      - stage_id: 5
+        stage_name: HARVEST_HOLD
+        day_start: 29
+        day_end: 30
+        photoperiod_h: 12
+        ppfd_target_umol: 200
+        dli_target_mol_m2: 8.6
+        temp_day_c: 18.0
+        temp_night_c: 15.0
+        vpd_target_kpa: 0.8
+        co2_ppm: 400
+        rel_humidity_target_pct: 70.0
+        ec_target_dS_m: 0.0
+        ph_target: 6.5
+        N_ppm: 0
+        P_ppm: 0
+        K_ppm: 0
+        Ca_ppm: 0
+        Mg_ppm: 0
+        irrigation_strategy: FLUSH_ONLY
+
     # Parametres environnementaux
     optimal_ranges:
       temperature_c:

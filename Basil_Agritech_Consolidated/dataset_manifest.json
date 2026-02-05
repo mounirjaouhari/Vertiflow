@@ -1,0 +1,13 @@
+{
+  "project": "Basil Agritech Federation",
+  "version": "2.0.0 (Vance Enhanced)",
+  "domains": [
+    "OPENAG",
+    "WAGENINGEN",
+    "SENSORY",
+    "GENOMICS",
+    "CHEMISTRY",
+    "TABLES",
+    "EXPERIMENTS"
+  ]
+}

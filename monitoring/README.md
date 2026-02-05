@@ -85,10 +85,34 @@ receivers:
 | `air_temp_internal` | Capteurs | 18-28°C |
 | `vapor_pressure_deficit` | Calcule | 0.4-1.2 kPa |
 
+## Integration Grafana
+
+### Datasources configurees
+- **Prometheus** : Metriques d'infrastructure (CPU, RAM, Kafka, ClickHouse, NiFi)
+- **MongoDB** : Alertes detaillees et incidents (base `vertiflow_ops`, collection `alerts`)
+
+### Dashboards Grafana
+1. **04 - System Health** : Metriques de sante via Prometheus
+2. **10 - Incident Logs** : Historique des alertes via MongoDB
+
+### Configuration du flux d'alertes
+
+```
+Prometheus (regles)
+       ↓
+AlertManager (routage)
+       ↓
+   [Slack/Email]
+       ↓
+MongoDB (vertiflow_ops)
+       ↓
+Grafana Dashboard 10 (affichage)
+```
+
 ## Demarrage
 
 ```bash
-# Avec docker-compose
+# Avec docker-compose (stack monitoring complete)
 docker-compose -f docker-compose.metrics.yml up -d
 
 # Verifier Prometheus
@@ -96,4 +120,19 @@ curl http://localhost:9090/-/healthy
 
 # Verifier AlertManager
 curl http://localhost:9093/-/healthy
+
+# Verifier Grafana
+curl http://localhost:3000/api/health
+
+# Verifier MongoDB Alerts
+curl -X GET http://localhost:27017/vertiflow_ops.alerts/find
+```
+
+## Variables d'environnement requises
+
+```bash
+# .env ou docker-compose
+SMTP_PASSWORD=your_smtp_password
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+MONGODB_URI=mongodb://vertiflow:vertiflow_password@mongodb:27017/vertiflow_ops
 ```

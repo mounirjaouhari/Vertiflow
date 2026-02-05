@@ -1,16 +1,24 @@
 apiVersion: 1
 
+
+# Auto-deletes datasources that are not in the file
+deleteDataSourcesFromUI: false
+
 datasources:
   - name: ClickHouse
     type: grafana-clickhouse-datasource
     access: proxy
     url: http://clickhouse:8123
-    database: vertiflow
-    # user: default
-    # password: default
     uid: aeb1b4ee-1f88-42c3-a35a-f594cac90e00
     isDefault: true
     editable: true
+    jsonData:
+      host: clickhouse
+      port: 9000
+      user: default
+      defaultDatabase: vertiflow
+    secureJsonData:
+      password: default
 
   - name: Prometheus
     type: prometheus
@@ -18,3 +26,17 @@ datasources:
     url: http://prometheus:9090
     uid: eac5c342-46aa-46b8-934f-8e09892a5192
     isDefault: false
+
+  - name: Alerts API (Infinity)
+    type: yesoreyeram-infinity-datasource
+    uid: infinity-alerts-uid
+    access: proxy
+    url: http://alerts-api:5000
+    isDefault: false
+    jsonData:
+      authentication:
+        type: none
+    secureJsonData: {}
+    editable: true
+
+

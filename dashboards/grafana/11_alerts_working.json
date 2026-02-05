@@ -1,0 +1,360 @@
+{
+  "annotations": { "list": [] },
+  "description": "Dashboard des Alertes IoT - Fonctionnel avec Infinity",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "type": "row",
+      "title": "Vue d'Ensemble des Alertes",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "Alertes CRITIQUES",
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/count-by-severity?resolved=false",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.data.CRITICAL"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "dark-red", "mode": "fixed" },
+          "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
+          "mappings": [],
+          "min": 0
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "type": "stat",
+      "title": "Alertes HAUTES",
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 1 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/count-by-severity?resolved=false",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.data.HIGH"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "red", "mode": "fixed" }
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "type": "stat",
+      "title": "Alertes MOYENNES",
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 1 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/count-by-severity?resolved=false",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.data.MEDIUM"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "orange", "mode": "fixed" }
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "type": "stat",
+      "title": "Alertes BASSES",
+      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 1 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/count-by-severity?resolved=false",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.data.LOW"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "yellow", "mode": "fixed" }
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "type": "stat",
+      "title": "Non Résolues",
+      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 1 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/stats",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.summary.active"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "purple", "mode": "fixed" }
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "type": "stat",
+      "title": "Total Alertes",
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 1 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/stats",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.summary.total"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "blue", "mode": "fixed" }
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "type": "row",
+      "title": "Statistiques",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "Résolues",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 7 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/stats",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.summary.resolved"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "green", "mode": "fixed" }
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "type": "stat",
+      "title": "Taux de Résolution",
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 7 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/stats",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.summary.resolution_rate"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "continuous-GrYlRd" },
+          "min": 0,
+          "max": 100
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "type": "gauge",
+      "title": "Score de Santé Global",
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 7 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/stats",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.summary.resolution_rate"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 30 },
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 70 }
+            ]
+          }
+        }
+      },
+      "options": { "orientation": "auto", "showThresholdLabels": false, "showThresholdMarkers": true }
+    },
+    {
+      "type": "stat",
+      "title": "Type Principal",
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 7 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/stats",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.by_type.PARAMETER_ISSUE"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "displayName": "PARAMETER_ISSUE",
+          "color": { "fixedColor": "semi-dark-blue", "mode": "fixed" }
+        }
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "type": "row",
+      "title": "Alertes Actives",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 },
+      "collapsed": false
+    },
+    {
+      "type": "table",
+      "title": "Alertes Actives (Dernières 50)",
+      "description": "Alertes non résolues nécessitant attention",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 13 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/active?limit=50",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.data[*]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "severity" },
+            "properties": [
+              { "id": "custom.width", "value": 100 },
+              { "id": "mappings", "value": [
+                { "type": "value", "options": { "CRITICAL": { "color": "dark-red", "text": "CRITICAL" }}},
+                { "type": "value", "options": { "HIGH": { "color": "red", "text": "HIGH" }}},
+                { "type": "value", "options": { "MEDIUM": { "color": "orange", "text": "MEDIUM" }}},
+                { "type": "value", "options": { "LOW": { "color": "yellow", "text": "LOW" }}}
+              ]}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    },
+    {
+      "type": "row",
+      "title": "Historique",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "collapsed": false
+    },
+    {
+      "type": "table",
+      "title": "Journal Complet (Dernières 100)",
+      "description": "Historique de toutes les alertes",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 24 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource", "uid": "infinity-alerts-uid" },
+      "targets": [{
+        "refId": "A",
+        "type": "json",
+        "source": "url",
+        "url": "/api/alerts/all?limit=100",
+        "format": "table",
+        "parser": "backend",
+        "root_selector": "$.data[*]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "resolved" },
+            "properties": [
+              { "id": "mappings", "value": [
+                { "type": "value", "options": { "true": { "color": "green", "text": "✓ Résolu" }}},
+                { "type": "value", "options": { "false": { "color": "red", "text": "✗ Actif" }}}
+              ]}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["iot", "alertes", "mongodb", "infinity", "vertiflow"],
+  "templating": { "list": [] },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+  },
+  "timezone": "browser",
+  "title": "Alertes IoT - MongoDB (Nouveau)",
+  "uid": "vertiflow-alerts-new",
+  "version": 1,
+  "weekStart": ""
+}

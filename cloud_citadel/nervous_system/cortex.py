@@ -42,12 +42,14 @@ class RecipeOptimizer:
     def __init__(self):
         # Utilise les constantes centralisees (config/vertiflow_constants.py)
         self.ch_client = Client(
-            host=Infrastructure.CLICKHOUSE_HOST,
-            port=Infrastructure.CLICKHOUSE_PORT,
+            host=os.getenv('CLICKHOUSE_HOST', Infrastructure.CLICKHOUSE_HOST),
+            port=int(os.getenv('CLICKHOUSE_PORT', Infrastructure.CLICKHOUSE_PORT)),
             user=os.getenv('CLICKHOUSE_USER', 'default'),
             password=os.getenv('CLICKHOUSE_PASSWORD', 'default')
         )
-        self.mongo_client = MongoClient(Infrastructure.MONGODB_URI)
+        # MongoDB connection - utilise env var si disponible
+        mongo_uri = os.getenv('MONGODB_URI', Infrastructure.MONGODB_URI)
+        self.mongo_client = MongoClient(mongo_uri)
         self.db_ops = self.mongo_client[MongoDBCollections.DATABASE]
         
     def fetch_performance_data(self):
@@ -150,7 +152,5 @@ class RecipeOptimizer:
 
 if __name__ == "__main__":
     cortex = RecipeOptimizer()
-    # Pour le test, on lance une seule itération
-    cortex.fetch_performance_data()
-    opt = cortex.optimize_recipe("TEST")
-    if opt: print(opt)
+    # Lancement du cycle d'optimisation (boucle infinie, cycle toutes les 24h)
+    cortex.run_cycle()

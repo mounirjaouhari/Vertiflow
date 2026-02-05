@@ -1,6 +1,6 @@
 {
   "annotations": { "list": [] },
-  "description": "Dashboard des Logs d Incidents - Suivi, Alertes et Historique",
+  "description": "Dashboard des Alertes IoT - Suivi, Détection et Historique depuis MongoDB",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -10,178 +10,440 @@
   "panels": [
     {
       "type": "row",
-      "title": "Vue d Ensemble des Incidents",
+      "title": "Vue d'Ensemble des Alertes IoT",
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
       "collapsed": false
     },
     {
       "type": "stat",
-      "title": "Incidents Ouverts",
+      "title": "Alertes CRITIQUES",
       "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT count() as total FROM vertiflow.incident_logs WHERE toString(status) = 'open'", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "fixedColor": "red", "mode": "fixed" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } } },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$match\": {\"severity\": \"CRITICAL\", \"resolved\": false}}, {\"$count\": \"count\"}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "dark-red", "mode": "fixed" },
+          "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
+          "mappings": [],
+          "min": 0
+        }
+      },
       "options": { "colorMode": "background", "graphMode": "area", "textMode": "value" }
     },
     {
       "type": "stat",
-      "title": "En Cours",
+      "title": "Alertes HAUTES",
       "gridPos": { "h": 5, "w": 4, "x": 4, "y": 1 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT count() as total FROM vertiflow.incident_logs WHERE toString(status) = 'in_progress'", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "fixedColor": "orange", "mode": "fixed" } } },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$match\": {\"severity\": \"HIGH\", \"resolved\": false}}, {\"$count\": \"count\"}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "red", "mode": "fixed" }
+        }
+      },
       "options": { "colorMode": "background", "graphMode": "area", "textMode": "value" }
     },
     {
       "type": "stat",
-      "title": "Resolus",
+      "title": "Alertes MOYENNES",
       "gridPos": { "h": 5, "w": 4, "x": 8, "y": 1 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT count() as total FROM vertiflow.incident_logs WHERE toString(status) = 'resolved'", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "fixedColor": "green", "mode": "fixed" } } },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$match\": {\"severity\": \"MEDIUM\", \"resolved\": false}}, {\"$count\": \"count\"}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "orange", "mode": "fixed" }
+        }
+      },
       "options": { "colorMode": "background", "graphMode": "area", "textMode": "value" }
     },
     {
       "type": "stat",
-      "title": "Planifies",
+      "title": "Alertes BASSES",
       "gridPos": { "h": 5, "w": 4, "x": 12, "y": 1 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT count() as total FROM vertiflow.incident_logs WHERE toString(status) = 'scheduled'", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "fixedColor": "blue", "mode": "fixed" } } },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$match\": {\"severity\": \"LOW\", \"resolved\": false}}, {\"$count\": \"count\"}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "yellow", "mode": "fixed" }
+        }
+      },
       "options": { "colorMode": "background", "graphMode": "area", "textMode": "value" }
     },
     {
       "type": "stat",
-      "title": "Critiques Non Resolus",
+      "title": "Non Résolues",
       "gridPos": { "h": 5, "w": 4, "x": 16, "y": 1 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT count() as total FROM vertiflow.incident_logs WHERE toString(severity) = 'critical' AND toString(status) != 'resolved'", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "fixedColor": "dark-red", "mode": "fixed" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } } },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$match\": {\"resolved\": false}}, {\"$count\": \"count\"}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "purple", "mode": "fixed" }
+        }
+      },
       "options": { "colorMode": "background", "graphMode": "area", "textMode": "value" }
     },
     {
       "type": "stat",
-      "title": "Total Incidents",
+      "title": "Total Alertes",
       "gridPos": { "h": 5, "w": 4, "x": 20, "y": 1 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT count() as total FROM vertiflow.incident_logs", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "fixedColor": "purple", "mode": "fixed" } } },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$count\": \"count\"}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "fixedColor": "blue", "mode": "fixed" }
+        }
+      },
       "options": { "colorMode": "background", "graphMode": "area", "textMode": "value" }
     },
     {
       "type": "row",
-      "title": "Analyse des Incidents",
+      "title": "Analyse des Alertes",
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
       "collapsed": false
     },
     {
       "type": "piechart",
-      "title": "Repartition par Severite",
+      "title": "Répartition par Sévérité",
       "gridPos": { "h": 8, "w": 6, "x": 0, "y": 7 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT toString(severity) as severite, count() as nombre FROM vertiflow.incident_logs GROUP BY severity", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "values": ["value", "percent"] }, "pieType": "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true } }
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$group\": {\"_id\": \"$severity\", \"count\": {\"$sum\": 1}}}, {\"$project\": {\"severity\": \"$_id\", \"count\": 1}}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "values": ["value", "percent"] },
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true }
+      }
     },
     {
       "type": "piechart",
-      "title": "Repartition par Statut",
+      "title": "Répartition par Type d'Alerte",
       "gridPos": { "h": 8, "w": 6, "x": 6, "y": 7 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT toString(status) as statut, count() as nombre FROM vertiflow.incident_logs GROUP BY status", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "values": ["value", "percent"] }, "pieType": "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true } }
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$group\": {\"_id\": \"$metadata.alert_type\", \"count\": {\"$sum\": 1}}}, {\"$project\": {\"alert_type\": \"$_id\", \"count\": 1}}, {\"$match\": {\"alert_type\": {\"$ne\": null}}}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "values": ["value", "percent"] },
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true }
+      }
     },
     {
       "type": "piechart",
-      "title": "Repartition par Type",
+      "title": "Statut de Résolution",
       "gridPos": { "h": 8, "w": 6, "x": 12, "y": 7 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT type as type_incident, count() as nombre FROM vertiflow.incident_logs GROUP BY type", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "values": ["value"] }, "pieType": "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true } }
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$group\": {\"_id\": \"$resolved\", \"count\": {\"$sum\": 1}}}, {\"$project\": {\"status\": {\"$cond\": [{\"$eq\": [\"$_id\", true]}, \"Résolu\", \"Non résolu\"]}, \"count\": 1}}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "values": ["value", "percent"] },
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true }
+      }
     },
     {
       "type": "barchart",
-      "title": "Incidents par Zone",
+      "title": "Alertes par Module",
       "gridPos": { "h": 8, "w": 6, "x": 18, "y": 7 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT zone_id as Zone, count() as incidents FROM vertiflow.incident_logs WHERE zone_id != 'ALL' GROUP BY zone_id ORDER BY incidents DESC", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "palette-classic" } } },
-      "options": { "orientation": "horizontal", "barWidth": 0.8, "showValue": "always" }
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$group\": {\"_id\": \"$module_id\", \"count\": {\"$sum\": 1}}}, {\"$sort\": {\"count\": -1}}, {\"$limit\": 10}, {\"$project\": {\"module\": \"$_id\", \"count\": 1}}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "barWidth": 0.8,
+        "showValue": "always"
+      }
     },
     {
       "type": "row",
-      "title": "Attribution et Responsables",
+      "title": "Tendances Temporelles",
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 },
       "collapsed": false
     },
     {
-      "type": "barchart",
-      "title": "Charge par Technicien",
-      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 16 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT assigned_to as Technicien, count() as incidents FROM vertiflow.incident_logs WHERE toString(status) IN ('open', 'in_progress') GROUP BY assigned_to ORDER BY incidents DESC", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "palette-classic" } } },
-      "options": { "orientation": "horizontal", "barWidth": 0.8, "showValue": "always" }
+      "type": "timeseries",
+      "title": "Évolution des Alertes (24h)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+      "targets": [
+        {
+          "queryType": "aggregate",
+          "database": "vertiflow_ops",
+          "collection": "alerts",
+          "aggregate": "[{\"$match\": {\"timestamp\": {\"$gte\": {\"$date\": \"$$from\"}, \"$lte\": {\"$date\": \"$$to\"}}}}, {\"$group\": {\"_id\": {\"$dateToString\": {\"format\": \"%Y-%m-%d %H:00:00\", \"date\": \"$timestamp\"}}, \"count\": {\"$sum\": 1}}}, {\"$sort\": {\"_id\": 1}}, {\"$project\": {\"time\": \"$_id\", \"value\": \"$count\"}}]",
+          "alias": "Toutes alertes"
+        },
+        {
+          "queryType": "aggregate",
+          "database": "vertiflow_ops",
+          "collection": "alerts",
+          "aggregate": "[{\"$match\": {\"timestamp\": {\"$gte\": {\"$date\": \"$$from\"}, \"$lte\": {\"$date\": \"$$to\"}}, \"severity\": \"CRITICAL\"}}, {\"$group\": {\"_id\": {\"$dateToString\": {\"format\": \"%Y-%m-%d %H:00:00\", \"date\": \"$timestamp\"}}, \"count\": {\"$sum\": 1}}}, {\"$sort\": {\"_id\": 1}}, {\"$project\": {\"time\": \"$_id\", \"value\": \"$count\"}}]",
+          "alias": "Alertes critiques"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "single" }
+      }
     },
     {
-      "type": "table",
-      "title": "Statistiques par Technicien",
-      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 16 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT assigned_to as Technicien, countIf(toString(status) = 'open') as Ouverts, countIf(toString(status) = 'in_progress') as En_Cours, countIf(toString(status) = 'resolved') as Resolus, countIf(toString(severity) = 'critical') as Critiques, count() as Total FROM vertiflow.incident_logs GROUP BY assigned_to ORDER BY Total DESC", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "custom": { "align": "center" } } }
+      "type": "timeseries",
+      "title": "Score de Criticité Moyen",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-datasource-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$match\": {\"timestamp\": {\"$gte\": {\"$date\": \"$$from\"}, \"$lte\": {\"$date\": \"$$to\"}}}}, {\"$group\": {\"_id\": {\"$dateToString\": {\"format\": \"%Y-%m-%d %H:00:00\", \"date\": \"$timestamp\"}}, \"avg_score\": {\"$avg\": \"$metadata.criticality_score\"}}}, {\"$sort\": {\"_id\": 1}}, {\"$project\": {\"time\": \"$_id\", \"value\": \"$avg_score\"}}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "color": { "mode": "continuous-GrYlRd" }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "hidden" }
+      }
     },
     {
       "type": "row",
-      "title": "Incidents Actifs - Attention Requise",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+      "title": "Alertes Actives - Attention Requise",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 },
       "collapsed": false
     },
     {
       "type": "table",
-      "title": "Incidents CRITIQUES Actifs",
-      "description": "Incidents critiques necessitant une intervention immediate",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 23 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT incident_id as ID, timestamp as Date, zone_id as Zone, rack_id as Rack, sensor_id as Capteur, title as Titre, description as Description, toString(status) as Statut, assigned_to as Assigne, affected_plants as Plantes, estimated_loss as Perte FROM vertiflow.incident_logs WHERE toString(severity) = 'critical' AND toString(status) IN ('open', 'in_progress') ORDER BY timestamp DESC", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "custom": { "align": "auto", "filterable": true } }, "overrides": [{ "matcher": { "id": "byName", "options": "Titre" }, "properties": [{ "id": "custom.width", "value": 280 }] }, { "matcher": { "id": "byName", "options": "Description" }, "properties": [{ "id": "custom.width", "value": 350 }] }] }
+      "title": "Alertes CRITIQUES Actives",
+      "description": "Alertes critiques nécessitant une intervention immédiate",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 25 },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-datasource-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$match\": {\"severity\": \"CRITICAL\", \"resolved\": false}}, {\"$sort\": {\"timestamp\": -1}}, {\"$project\": {\"ID\": \"$alert_id\", \"Date\": \"$timestamp\", \"Module\": \"$module_id\", \"Ferme\": \"$farm_id\", \"Sévérité\": \"$severity\", \"Type\": \"$metadata.alert_type\", \"Score\": \"$metadata.criticality_score\", \"Statut\": {\"$cond\": [{\"$eq\": [\"$resolved\", true]}, \"Résolu\", \"Actif\"]}, \"Score Anomalie\": \"$data.anomaly_confidence_score\", \"Score Santé\": \"$data.health_score\"}}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Type" },
+            "properties": [{ "id": "custom.width", "value": 150 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Ferme" },
+            "properties": [{ "id": "custom.width", "value": 120 }]
+          }
+        ]
+      }
     },
     {
       "type": "table",
-      "title": "Incidents WARNING Actifs",
-      "description": "Incidents warning a surveiller",
-      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 31 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT incident_id as ID, timestamp as Date, zone_id as Zone, sensor_id as Capteur, title as Titre, description as Description, toString(status) as Statut, assigned_to as Assigne FROM vertiflow.incident_logs WHERE toString(severity) = 'warning' AND toString(status) IN ('open', 'in_progress', 'scheduled') ORDER BY timestamp DESC", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "custom": { "align": "auto", "filterable": true } } }
+      "title": "Alertes HAUTES Actives",
+      "description": "Alertes hautes à traiter rapidement",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 33 },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-datasource-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$match\": {\"severity\": \"HIGH\", \"resolved\": false}}, {\"$sort\": {\"timestamp\": -1}}, {\"$limit\": 20}, {\"$project\": {\"ID\": \"$alert_id\", \"Date\": \"$timestamp\", \"Module\": \"$module_id\", \"Type\": \"$metadata.alert_type\", \"Détails\": \"$metadata.drift_details\", \"Statut\": \"Actif\", \"Température\": \"$data.air_temp_internal\", \"Humidité\": \"$data.air_humidity\", \"pH\": \"$data.water_ph\"}}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true }
+        }
+      }
+    },
+    {
+      "type": "row",
+      "title": "Détails des Paramètres",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 40 },
+      "collapsed": false
+    },
+    {
+      "type": "table",
+      "title": "Paramètres Hors Normes Récentes",
+      "description": "Dernières mesures hors des seuils acceptables",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 41 },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-datasource-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$match\": {\"metadata.alert_type\": \"PARAMETER_ISSUE\", \"timestamp\": {\"$gte\": {\"$date\": \"$$from\"}}}}, {\"$sort\": {\"timestamp\": -1}}, {\"$limit\": 50}, {\"$project\": {\"Date\": \"$timestamp\", \"Module\": \"$module_id\", \"Paramètre\": \"$metadata.parameter_issue\", \"Valeur Actuelle\": {\"$switch\": {\"branches\": [{\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"pH\"}}, \"then\": \"$data.water_ph\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"EC\"}}, \"then\": \"$data.nutrient_solution_ec\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"Température\"}}, \"then\": \"$data.air_temp_internal\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"Humidité\"}}, \"then\": \"$data.air_humidity\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"Oxygène\"}}, \"then\": \"$data.dissolved_oxygen\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"VPD\"}}, \"then\": \"$data.vapor_pressure_deficit\"}], \"default\": \"N/A\"}}, \"Cible\": {\"$switch\": {\"branches\": [{\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"pH\"}}, \"then\": \"$data.ph_target\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"EC\"}}, \"then\": \"$data.ec_target\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"Température\"}}, \"then\": \"$data.ref_temp_opt\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"Humidité\"}}, \"then\": \"$data.ref_humidity_opt\"}], \"default\": \"N/A\"}}, \"Écart\": {\"$abs\": {\"$subtract\": [{\"$toDouble\": {\"$switch\": {\"branches\": [{\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"pH\"}}, \"then\": \"$data.water_ph\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"EC\"}}, \"then\": \"$data.nutrient_solution_ec\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"Température\"}}, \"then\": \"$data.air_temp_internal\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"Humidité\"}}, \"then\": \"$data.air_humidity\"}], \"default\": 0}}, {\"$toDouble\": {\"$switch\": {\"branches\": [{\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"pH\"}}, \"then\": \"$data.ph_target\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"EC\"}}, \"then\": \"$data.ec_target\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"Température\"}}, \"then\": \"$data.ref_temp_opt\"}, {\"case\": {\"$regexMatch\": {\"input\": \"$metadata.parameter_issue\", \"regex\": \"Humidité\"}}, \"then\": \"$data.ref_humidity_opt\"}], \"default\": 0}}]}}}, \"Sévérité\": \"$severity\"}}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Paramètre" },
+            "properties": [{ "id": "custom.width", "value": 200 }]
+          }
+        ]
+      }
     },
     {
       "type": "row",
       "title": "Historique Complet",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 38 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 49 },
       "collapsed": false
     },
     {
       "type": "table",
-      "title": "Journal Complet des Incidents",
-      "description": "Historique de tous les incidents",
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 39 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [{ "rawSql": "SELECT incident_id as ID, timestamp as Date, toString(severity) as Severite, type as Type, title as Titre, zone_id as Zone, rack_id as Rack, toString(status) as Statut, assigned_to as Assigne, resolution as Resolution FROM vertiflow.incident_logs ORDER BY timestamp DESC", "refId": "A", "format": 2 }],
-      "fieldConfig": { "defaults": { "custom": { "align": "auto", "filterable": true } }, "overrides": [{ "matcher": { "id": "byName", "options": "Titre" }, "properties": [{ "id": "custom.width", "value": 250 }] }, { "matcher": { "id": "byName", "options": "Resolution" }, "properties": [{ "id": "custom.width", "value": 300 }] }] }
+      "title": "Journal Complet des Alertes",
+      "description": "Historique de toutes les alertes détectées",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 50 },
+      "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-datasource-uid" },
+      "targets": [{
+        "queryType": "aggregate",
+        "database": "vertiflow_ops",
+        "collection": "alerts",
+        "aggregate": "[{\"$sort\": {\"timestamp\": -1}}, {\"$limit\": 100}, {\"$project\": {\"ID\": \"$alert_id\", \"Date\": \"$timestamp\", \"Sévérité\": \"$severity\", \"Type\": \"$metadata.alert_type\", \"Module\": \"$module_id\", \"Ferme\": \"$farm_id\", \"Statut\": {\"$cond\": [{\"$eq\": [\"$resolved\", true]}, \"Résolu\", {\"$cond\": [{\"$eq\": [\"$acknowledged\", true]}, \"Pris en compte\", \"Nouveau\"]}]}, \"Assigné à\": \"$assigned_to\", \"Score Criticité\": {\"$round\": [\"$metadata.criticality_score\", 2]}, \"Temps Réponse\": \"$metadata.response_time\"}}]"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Type" },
+            "properties": [{ "id": "custom.width", "value": 150 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Temps Réponse" },
+            "properties": [{ "id": "custom.width", "value": 120 }]
+          }
+        ]
+      }
     }
   ],
   "refresh": "30s",
   "schemaVersion": 38,
-  "tags": ["logs", "incidents", "alertes"],
-  "templating": { "list": [] },
-  "time": { "from": "now-7d", "to": "now" },
-  "timepicker": {},
+  "tags": ["iot", "alertes", "mongodb", "vertiflow"],
+  "templating": {
+    "list": [
+      {
+        "name": "severity",
+        "type": "query",
+        "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+        "query": "{\"find\": \"alerts\", \"filter\": {}, \"sort\": {\"severity\": 1}, \"projection\": {\"severity\": 1}, \"distinct\": \"severity\"}",
+        "current": { "value": "all", "text": "Toutes" },
+        "includeAll": true,
+        "multi": false,
+        "refresh": 1
+      },
+      {
+        "name": "module",
+        "type": "query",
+        "datasource": { "type": "grafana-mongodb-datasource", "uid": "mongodb-incidents-uid" },
+        "query": "{\"find\": \"alerts\", \"filter\": {}, \"sort\": {\"module_id\": 1}, \"projection\": {\"module_id\": 1}, \"distinct\": \"module_id\"}",
+        "current": { "value": "all", "text": "Tous" },
+        "includeAll": true,
+        "multi": false,
+        "refresh": 1
+      },
+      {
+        "name": "timeRange",
+        "type": "interval",
+        "query": "1h,6h,12h,24h,7d,30d",
+        "current": { "value": "24h", "text": "Dernières 24h" }
+      }
+    ]
+  },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+  },
   "timezone": "browser",
-  "title": "10 - Logs d Incidents",
-  "uid": "vertiflow-incident-logs",
+  "title": "Alertes IoT - MongoDB",
+  "uid": "vertiflow-mongodb-alerts",
   "version": 1,
   "weekStart": ""
 }

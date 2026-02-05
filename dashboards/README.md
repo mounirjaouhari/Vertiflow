@@ -9,11 +9,17 @@ dashboards/
 ├── dashboards_powerbi.pbix          # Dashboard Power BI principal
 ├── dashboards_presentation_v1.pptx  # Presentation v1
 ├── dashboards_presentation_v2.pptx  # Presentation v2
+├── provisioning/                    # Configuration Grafana (datasources & dashboards)
+│   ├── datasources/
+│   │   └── datasources.yml         # Definition des datasources (ClickHouse, Prometheus, MongoDB)
+│   └── dashboards/
+│       └── dashboards.yaml         # Provisioning des dashboards Grafana
 └── grafana/                         # Dashboards Grafana (JSON)
-    ├── 01_operational_cockpit.json  # Operations temps reel
-    ├── 02_science_lab.json          # Analyses scientifiques
-    ├── 03_executive_finance.json    # KPIs financiers
-    └── 04_system_health.json        # Sante systeme
+    ├── 01_operational_cockpit.json  # Operations temps reel (ClickHouse)
+    ├── 02_science_lab.json          # Analyses scientifiques (ClickHouse)
+    ├── 03_executive_finance.json    # KPIs financiers (ClickHouse)
+    ├── 04_system_health.json        # Sante systeme (Prometheus)
+    └── 10_incident_logs.json        # Alertes IoT & Incidents (MongoDB)
 ```
 
 ## Dashboards Grafana
@@ -46,6 +52,15 @@ Monitoring infrastructure :
 - Requetes ClickHouse
 - Alertes systeme
 
+### 10 - Incident Logs
+Tableau de bord des alertes IoT et incidents :
+- Alertes critiques actives
+- Repartition par severite, type, module
+- Historique complet des alertes
+- Parametres hors normes
+- Tendances temporelles
+- Source : MongoDB (collection `vertiflow_alerts.alerts`)
+
 ## Power BI
 
 Le fichier `dashboards_powerbi.pbix` contient :
@@ -67,9 +82,45 @@ curl -X POST \
 
 ## Sources de donnees
 
-| Dashboard | Source | Refresh |
-|-----------|--------|---------|
-| Operational | ClickHouse (live) | 5s |
-| Science Lab | ClickHouse (hourly) | 1min |
-| Finance | ClickHouse (daily) | 1h |
-| System Health | Prometheus | 15s |
+| Dashboard | Source | Base de donnees | Refresh |
+|-----------|--------|-----------------|----------|
+| 01 - Operational | ClickHouse | vertiflow (telemetry_raw) | 5s |
+| 02 - Science Lab | ClickHouse | vertiflow (telemetry_enriched) | 1min |
+| 03 - Finance | ClickHouse | vertiflow (materialized views) | 1h |
+| 04 - System Health | Prometheus | (metriques temps reel) | 15s |
+| 10 - Incident Logs | MongoDB | vertiflow_ops (alerts) | 30s |
+
+## Datasources Grafana requises
+
+### ClickHouse
+- **Type** : grafana-clickhouse-datasource
+- **Host** : clickhouse:8123
+- **Database** : vertiflow
+- **Default** : true
+
+### Prometheus
+- **Type** : prometheus
+- **URL** : http://prometheus:9090
+- **Default** : false
+
+### MongoDB (Incidents)
+- **Type** : grafana-mongodb-datasource
+- **URL** : mongodb://mongodb:27017
+- **Database** : vertiflow_ops
+- **Default Collection** : alerts
+- **UID** : mongodb-incidents-uid
+- **Plugin necessaire** : grafana-mongodb-datasource (voir installation)
+
+## Installation du plugin MongoDB
+
+```bash
+# Installer le plugin Grafana MongoDB
+grafana-cli admin plugins install grafana-mongodb-datasource
+
+# Ou via docker (dans docker-compose)
+environment:
+  GF_INSTALL_PLUGINS: grafana-mongodb-datasource
+
+# Redemarrer Grafana
+docker-compose restart grafana
+```

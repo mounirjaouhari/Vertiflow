@@ -61,6 +61,16 @@ from config.vertiflow_constants import Infrastructure, ClickHouseTables, FarmCon
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Mapping des zones logiques vers les zone_id réels dans ClickHouse
+# Les données source utilisent Z1, Z2, Z3 mais la config utilise ZONE_A, ZONE_B, etc.
+ZONE_MAPPING = {
+    "ZONE_A": "Z1",
+    "ZONE_B": "Z2",
+    "NURSERY": "Z3",
+    "ZONE_GERMINATION": "Z1",  # Fallback sur Z1 si pas de données spécifiques
+    "ZONE_CROISSANCE": "Z2",   # Fallback sur Z2 si pas de données spécifiques
+}
+
 
 class OracleML:
     """ML-based yield prediction engine."""
@@ -111,7 +121,12 @@ class OracleML:
 
         Note: Utilise la table principale basil_ultimate_realtime (157 colonnes).
         Voir config/vertiflow_constants.py pour la source de vérité.
+        Mapping des zones: ZONE_A→Z1, ZONE_B→Z2, NURSERY→Z3
         """
+        # Mapper la zone logique vers le zone_id réel dans ClickHouse
+        db_zone = ZONE_MAPPING.get(zone, zone)
+        logger.debug(f"Mapping zone {zone} -> {db_zone}")
+        
         query = """
         SELECT
             avg(air_temp_internal) as temp_mean_24h,
@@ -124,7 +139,7 @@ class OracleML:
           AND timestamp > now() - INTERVAL 24 HOUR
         """
         
-        result = self.ch_client.execute(query, {'zone': zone})
+        result = self.ch_client.execute(query, {'zone': db_zone})
         
         if result and result[0]:
             features = list(result[0])

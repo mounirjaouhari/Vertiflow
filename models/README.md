@@ -111,3 +111,19 @@ models/artifacts/
 ├── quality_classifier_v*.pkl
 └── harvest_lstm_v*.h5
 ```
+
+## Modeles en production (Docker)
+
+| Fichier | Service | Description |
+|---------|---------|-------------|
+| `oracle_rf.pkl` | ml_engine | RandomForest pour prediction rendement |
+| `rf_quality_v1.pkl` | ml_classifier | RandomForest classification qualite (optionnel, mode Mock si absent) |
+
+### Emplacement dans Docker
+
+Les modeles sont montes via volume dans `/opt/vertiflow/models/` :
+
+```yaml
+volumes:
+  - ml-models:/opt/vertiflow/models
+```

@@ -1,0 +1,18 @@
+apiVersion: 1
+
+datasources:
+  - name: Alerts API (Infinity)
+    type: infinity
+    uid: infinity-alerts-uid
+    access: proxy
+    isDefault: false
+    jsonData:
+      httpMethod: GET
+      sourceType: json
+      url: http://alerts-api:5000
+      custom_http_headers:
+        - name: "Accept"
+          value: "application/json"
+      columns: []
+    secureJsonData: {}
+    editable: true

@@ -1,0 +1,60 @@
+{
+  "editable": true,
+  "panels": [
+    {
+      "title": "Alertes CRITIQUES (Non résolues)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource" },
+      "targets": [
+        {
+          "type": "json",
+          "source": "url",
+          "url": "http://mongo-api:5000/${database}",
+          "method": "POST",
+          "data": "const count = db.incident_logs.countDocuments({ severity: 'CRITICAL', resolved: false });\nreturn [{ \"count\": count }];",
+          "root_selector": "$",
+          "format": "table",
+          "columns": [{ "text": "count", "type": "number" }]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "red" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }]
+          }
+        }
+      }
+    },
+    {
+      "title": "Liste des Incidents Actifs",
+      "type": "table",
+      "gridPos": { "h": 10, "w": 18, "x": 6, "y": 0 },
+      "datasource": { "type": "yesoreyeram-infinity-datasource" },
+      "targets": [
+        {
+          "type": "json",
+          "source": "url",
+          "url": "http://mongo-api:5000/${database}",
+          "method": "POST",
+          "data": "return db.incident_logs.find({ severity: 'CRITICAL', resolved: false }).sort({ timestamp: -1 }).limit(10);",
+          "format": "table"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "database",
+        "type": "custom",
+        "query": "vertiflow_ops, vertiflow_dev",
+        "current": { "text": "vertiflow_ops", "value": "vertiflow_ops" }
+      }
+    ]
+  },
+  "title": "MongoDB Vertiflow Ops Dashboard",
+  "schemaVersion": 39
+}

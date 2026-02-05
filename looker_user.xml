@@ -1,0 +1,11 @@
+<clickhouse>
+    <users>
+        <looker_user>
+            <password_double_sha1_hex>69156c3775bc63a03bdf56ad0b48e2be5df601dd</password_double_sha1_hex>
+            <networks>
+                <ip>::/0</ip>
+            </networks>
+            <profile>default</profile>
+        </looker_user>
+    </users>
+</clickhouse>

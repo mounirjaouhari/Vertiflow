@@ -1,0 +1,4 @@
+<clickhouse>
+    <mysql_port combine="replace">9004</mysql_port>
+    <listen_host combine="replace">0.0.0.0</listen_host>
+</clickhouse>
