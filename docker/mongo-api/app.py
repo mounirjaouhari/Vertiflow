@@ -1,7 +1,23 @@
 import subprocess
+import re
 from flask import Flask, request
 
 app = Flask(__name__)
+
+def force_strict_json(raw_str):
+    """
+    Uses regex to wrap unquoted keys in double quotes.
+    Example: { timestamp: ISODate(...) } -> { "timestamp": "ISODate(...)" }
+    """
+    # 1. Quote the keys: finds word characters followed by a colon
+    # Changes { key: value } to { "key": value }
+    quoted_keys = re.sub(r'([{,]\s*)([a-zA-Z0-9_]+)(\s*):', r'\1"\2"\3:', raw_str)
+    
+    # 2. Handle ISODate and ObjectIDs (common Mongo output that isn't valid JSON)
+    # This wraps ISODate('...') in quotes so it becomes a valid JSON string
+    quoted_vals = re.sub(r'(ISODate|ObjectId)\((.*?)\)', r'"\1(\2)"', quoted_keys)
+    
+    return quoted_vals
 
 @app.route('/', methods=['POST'])
 @app.route('/<dbname>', methods=['POST'])
@@ -18,9 +34,13 @@ def run_query(dbname=""):
             capture_output=True, 
             text=True
         )
+        output = process.stdout.strip()
+        
+        # Apply the brute-force quoting
+        cleaned_output = force_strict_json(output)
         
         if process.returncode == 0:
-            return process.stdout, 200, {'Content-Type': 'application/json'}
+            return cleaned_output, 200, {'Content-Type': 'application/json'}
         else:
             return f"Mongo Shell Error: {process.stderr}\n", 400
             
