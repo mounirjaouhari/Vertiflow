@@ -1,0 +1,138 @@
+```mermaid
+---
+title: VertiFlow - Architecture Globale Hybride v2
+config:
+  layout: elk
+---
+flowchart TB
+    %% ═══════════════════════════════════════════════════════════════
+    %% SOURCES DE DONNÉES
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph SOURCES["📡 SOURCES - Multi-Canal"]
+        direction LR
+        IOT["🌱 Capteurs IoT<br/>(MQTT/Kafka)"]
+        CAMERAS["📷 Vision IA<br/>(Images)"]
+        APIS["🛰️ APIs Externes<br/>(NASA/Météo/AirQ)"]
+        LAB["🔬 Saisie Labo<br/>(CSV/REST)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ORCHESTRATION NIFI
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph NIFI["🔄 APACHE NIFI - Orchestration"]
+        direction TB
+        N_VALID["✅ Validation<br/>Schema + Z-Score"]
+        N_ENRICH["✨ Enrichissement<br/>VPD + Context"]
+        N_BATCH["📦 Batching<br/>MergeContent"]
+        N_ROUTE["🔀 Routage<br/>Multi-Destination"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% TRANSPORT KAFKA
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph KAFKA["📬 APACHE KAFKA - Transport"]
+        K_TELEM["📊 telemetry-enriched"]
+        K_PRED["🤖 model-predictions"]
+        K_CMD["⚙️ farm-commands"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% STOCKAGE HYBRIDE
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph STORAGE["💾 STOCKAGE HYBRIDE"]
+        direction TB
+        
+        subgraph LOCAL["🏠 Local (Temps Réel)"]
+            CH[("📈 ClickHouse<br/>Analytics OLAP")]
+            MG[("📝 MongoDB<br/>Documents")]
+        end
+        
+        subgraph GCP["☁️ Google Cloud (Archive)"]
+            GCS[("🗄️ Cloud Storage<br/>Data Lake Raw")]
+            BQ[("📊 BigQuery<br/>Data Warehouse")]
+        end
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% INTELLIGENCE ML
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph ML["🧠 INTELLIGENCE ML"]
+        direction LR
+        ORACLE["🎯 Oracle<br/>Random Forest"]
+        LSTM["⏳ LSTM<br/>Time Series"]
+        CORTEX["🌀 Cortex<br/>Optimisation"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% VISUALISATION
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph VIZ["📊 VISUALISATION"]
+        direction LR
+        GRAF["📈 Grafana<br/>Temps Réel"]
+        LOOKER["📊 Looker Studio<br/>Rapports"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS
+    %% ═══════════════════════════════════════════════════════════════
+    
+    %% Sources → NiFi
+    IOT ==>|"Stream"| N_VALID
+    CAMERAS -->|"Batch"| N_VALID
+    APIS ==>|"API Pull"| N_VALID
+    LAB -->|"Upload"| N_VALID
+    
+    %% NiFi interne
+    N_VALID --> N_ENRICH
+    N_ENRICH --> N_BATCH
+    N_BATCH --> N_ROUTE
+    
+    %% NiFi → Kafka
+    N_ROUTE ==>|"JSON"| K_TELEM
+    
+    %% Kafka → Storage Local
+    K_TELEM ==>|"Stream Insert"| CH
+    K_TELEM -->|"Audit Log"| MG
+    
+    %% NiFi → GCP (via Batch)
+    N_ROUTE ==>|"NDJSON Batch"| GCS
+    N_ROUTE ==>|"BigQuery Load"| BQ
+    
+    %% Storage → ML
+    CH --> ML
+    BQ --> ML
+    
+    %% ML → Kafka (Predictions)
+    ML ==>|"Predictions"| K_PRED
+    ML ==>|"Commands"| K_CMD
+    
+    %% Kafka → IoT (Feedback)
+    K_CMD -.->|"🔄 Rétroaction"| IOT
+    
+    %% Storage → Viz
+    CH ==>|"DirectQuery"| GRAF
+    BQ ==>|"DirectQuery"| LOOKER
+    K_TELEM -->|"Streaming"| GRAF
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% STYLES
+    %% ═══════════════════════════════════════════════════════════════
+    style SOURCES fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style NIFI fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style KAFKA fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    style STORAGE fill:#fafafa,stroke:#616161,stroke-width:2px
+    style LOCAL fill:#e3f2fd,stroke:#1976d2,stroke-width:1px
+    style GCP fill:#e8f5e9,stroke:#388e3c,stroke-width:1px
+    style ML fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style VIZ fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    
+    classDef stream stroke:#d32f2f,stroke-width:3px
+    classDef batch stroke:#1976d2,stroke-width:2px,stroke-dasharray:5 5
+    
+    linkStyle 0 stroke:#d32f2f,stroke-width:3px
+    linkStyle 2 stroke:#d32f2f,stroke-width:3px
+    linkStyle 6 stroke:#d32f2f,stroke-width:3px
+    linkStyle 7 stroke:#d32f2f,stroke-width:3px
+    linkStyle 10 stroke:#2e7d32,stroke-width:3px
+    linkStyle 11 stroke:#2e7d32,stroke-width:3px
+```

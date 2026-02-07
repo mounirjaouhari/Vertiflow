@@ -31,12 +31,46 @@ datasources:
     type: yesoreyeram-infinity-datasource
     uid: infinity-alerts-uid
     access: proxy
-    url: http://alerts-api:5000
+    url: http://mongo-api:5000
     isDefault: false
     jsonData:
       authentication:
         type: none
     secureJsonData: {}
     editable: true
+
+  # Infinity Datasource pour MongoDB (GRATUIT - recommandé)
+  - name: MongoDB via API
+    type: yesoreyeram-infinity-datasource
+    uid: mongodb-infinity-uid
+    access: proxy
+    url: http://mongo-api:5000
+    isDefault: false
+    jsonData:
+      authentication:
+        type: none
+    secureJsonData: {}
+    editable: true
+
+  # MongoDB Datasources pour les dashboards d'alertes IoT
+  - name: MongoDB (Incidents)
+    type: grafana-mongodb-datasource
+    uid: mongodb-incidents-uid
+    access: proxy
+    isDefault: false
+    editable: true
+    jsonData:
+      url: mongodb://mongodb:27017
+      defaultDatabase: vertiflow_ops
+
+  - name: MongoDB (Alerts)
+    type: grafana-mongodb-datasource
+    uid: mongodb-datasource-uid
+    access: proxy
+    isDefault: false
+    editable: true
+    jsonData:
+      url: mongodb://mongodb:27017
+      defaultDatabase: vertiflow_ops
 
 

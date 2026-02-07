@@ -36,7 +36,7 @@ CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "agronomic_parame
 
 # Configuration Kafka (supporte les variables d'environnement Docker)
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
-KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "basil_telemetry_full")
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "vertiflow.ingestion.raw")
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - [SIM] - %(message)s')
 logger = logging.getLogger("VertiFlow.ExpertSim")
 

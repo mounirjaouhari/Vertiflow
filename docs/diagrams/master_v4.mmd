@@ -1,0 +1,179 @@
+```mermaid
+---
+title: VertiFlow Data Platform - Architecture v4 (Hybrid Cloud)
+config:
+  layout: elk
+---
+flowchart TB
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 0 : DONNÉES EXTERNES
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z0["🌐 ZONE 0 : EXTERNAL DATA APIs"]
+        style Z0 fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px
+        API_WEATHER["☀️ Open-Meteo Weather"]
+        API_NASA["🛰️ NASA POWER"]
+        API_AIR["💨 OpenAQ Air Quality"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% SIMULATEURS (Source de données)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph SIM["🔌 SIMULATEURS IoT"]
+        style SIM fill:#e0f7fa,stroke:#00838f,stroke-width:2px
+        MQTT_SIM["🌡️ MQTT Simulator<br/>(mqtt_iot_simulator.py)"]
+        KAFKA_SIM["📊 Kafka Simulator<br/>(basil_telemetry_full)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 1 : INGESTION & VALIDATION
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z1["📡 ZONE 1 : INGESTION & VALIDATION"]
+        style Z1 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+        IOT_MQTT["🌱 ConsumeMQTT<br/>(vertiflow/farm/#)"]
+        IOT_HTTP["🔗 ListenHTTP<br/>(REST API)"]
+        KAFKA_IN["📬 ConsumeKafka<br/>(basil_telemetry_full)"]
+        VALIDATE["✅ ValidateRecord"]
+        MONITOR["📊 Monitor Health"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 2 : CONTEXTUALISATION & ENRICHISSEMENT
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z2["🔄 ZONE 2 : CONTEXTUALISATION"]
+        style Z2 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+        VPD_CALC["🌡️ ExecuteScript<br/>(VPD Calculation)"]
+        LOOKUP["📚 LookupRecord<br/>(Plant Recipes)"]
+        KAFKA_OUT["📤 PublishKafka<br/>(Telemetry Enriched)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 3 : PERSISTANCE (HYBRID CLOUD)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z3["💾 ZONE 3 : PERSISTANCE"]
+        style Z3 fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+        
+        subgraph LOCAL["🏠 Stockage Local"]
+            style LOCAL fill:#e3f2fd,stroke:#1976d2
+            CLICKHOUSE[("📈 ClickHouse<br/>Analytics Temps Réel")]
+            MONGODB[("📝 MongoDB<br/>Audit & Config")]
+        end
+        
+        subgraph CLOUD["☁️ Google Cloud Platform"]
+            style CLOUD fill:#e8f5e9,stroke:#388e3c
+            GCS[("🗄️ GCS Data Lake<br/>Archive Brute")]
+            BIGQUERY[("📊 BigQuery<br/>Analytics Avancée")]
+        end
+        
+        MERGE["📦 MergeContent<br/>(Batching)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 4 : RÉTROACTION & ALERTES
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z4["🔁 ZONE 4 : RÉTROACTION"]
+        style Z4 fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+        KAFKA_FEED["📥 ConsumeKafka<br/>(vertiflow.feedback.commands)"]
+        QUERY["🔍 QueryRecord<br/>(Anomalies)"]
+        MQTT_OUT["📡 PublishMQTT<br/>(Commands)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 5 : CHARGEURS STATIQUES
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z5["📁 ZONE 5 : STATIC LOADERS"]
+        style Z5 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+        CSV_LOAD["📄 GetFile CSV"]
+        LAB_LOAD["🔬 GetFile Lab"]
+        RECIPE_LOAD["📋 GetFile Recipes"]
+        SCRAPED["🌐 ConsumeKafka<br/>(Scraped Data)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% VISUALISATION
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph VIZ["📊 VISUALISATION"]
+        style VIZ fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+        GRAFANA["📈 Grafana<br/>Dashboards Live"]
+        LOOKER["📊 Looker Studio<br/>(BigQuery)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% DLQ
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph DLQ["⚠️ DLQ - Dead Letter Queue"]
+        style DLQ fill:#ffebee,stroke:#c62828
+        DLQ_LOG["📝 DLQ Logger"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS PRINCIPALES
+    %% ═══════════════════════════════════════════════════════════════
+    
+    %% Simulateurs → Zone 1
+    MQTT_SIM ==>|"MQTT QoS1"| IOT_MQTT
+    KAFKA_SIM ==>|"Stream"| KAFKA_IN
+    
+    %% Zone 0 → Zone 1
+    API_WEATHER --> KAFKA_IN
+    API_NASA --> KAFKA_IN
+    API_AIR --> KAFKA_IN
+    
+    %% Zone 1 interne
+    IOT_MQTT --> VALIDATE
+    IOT_HTTP --> VALIDATE
+    KAFKA_IN --> VALIDATE
+    VALIDATE --> MONITOR
+    MONITOR --> Z2
+    
+    %% Zone 2 interne
+    MONITOR --> VPD_CALC
+    VPD_CALC --> LOOKUP
+    LOOKUP -->|"Enrichi avec targets"| KAFKA_OUT
+    
+    %% Zone 2 → Zone 3
+    KAFKA_OUT --> MERGE
+    KAFKA_OUT --> CLICKHOUSE
+    KAFKA_OUT --> MONGODB
+    
+    %% Zone 3 Cloud
+    MERGE --> GCS
+    MERGE --> BIGQUERY
+    
+    %% Zone 3 → Zone 4 (Feedback source)
+    CLICKHOUSE -->|"Anomalies détectées"| QUERY
+    MONGODB --> QUERY
+    
+    %% Zone 4 interne (Feedback Loop)
+    KAFKA_FEED --> QUERY
+    QUERY -->|"Actions correctives"| MQTT_OUT
+    
+    %% Zone 4 → IoT (feedback loop complet)
+    MQTT_OUT -.->|"🔄 Control Commands"| IOT_MQTT
+    
+    %% Zone 3 → Zone 4 (Publish feedback)
+    CLICKHOUSE -.->|"PublishKafka"| KAFKA_FEED
+    
+    %% Zone 5 → Zone 1
+    CSV_LOAD --> VALIDATE
+    LAB_LOAD --> VALIDATE
+    RECIPE_LOAD --> MONGODB
+    SCRAPED --> VALIDATE
+    
+    %% Visualisation
+    CLICKHOUSE --> GRAFANA
+    BIGQUERY --> LOOKER
+    
+    %% DLQ
+    VALIDATE -.->|"❌ Invalid"| DLQ_LOG
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% STYLES
+    %% ═══════════════════════════════════════════════════════════════
+    classDef cloud fill:#a5d6a7,stroke:#2e7d32,stroke-width:2px
+    classDef local fill:#90caf9,stroke:#1565c0,stroke-width:2px
+    classDef kafka fill:#ffcc80,stroke:#ef6c00,stroke-width:2px
+    
+    class GCS,BIGQUERY cloud
+    class CLICKHOUSE,MONGODB local
+    class KAFKA_IN,KAFKA_OUT,KAFKA_FEED kafka
+```
