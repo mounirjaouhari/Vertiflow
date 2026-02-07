@@ -126,3 +126,4 @@ models/*.joblib
 # Archives et backups
 backup/
 *.bak
+security/gcp/vertiflow-gcp-key.json

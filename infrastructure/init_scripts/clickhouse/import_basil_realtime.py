@@ -15,7 +15,7 @@ CLICKHOUSE_PORT = 8123
 CLICKHOUSE_USER = 'default'
 CLICKHOUSE_PASSWORD = 'default'
 CLICKHOUSE_DB = 'vertiflow'
-CSV_FILE = '/home/mounirjaouhari/vertiflow_cloud_release/basil_ultimate_realtime1.csv'
+CSV_FILE = '/home/mounirjaouhari/vertiflow_cloud_release/Basil_Agritech_Consolidated/basil_ultimate_realtime1.csv'
 
 # Mapping colonnes CSV → ClickHouse (basé sur analyse dashboards)
 COLUMN_MAPPING = {
