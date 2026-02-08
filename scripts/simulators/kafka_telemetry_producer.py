@@ -753,7 +753,7 @@ class VertiFlowExpertSimulator:
             "ref_humidity_opt": ref_humidity_opt,
             
             # XXIII. MÉTADONNÉES & LINEAGE (7 colonnes)
-            "data_source_type": "IoT-Expert-Drift",
+            "data_source_type": "IoT",
             "sensor_hardware_id": f"SENS-{uuid.uuid4().hex[:8]}",
             "api_endpoint_version": "2.1.0",
             "source_reliability_score": round(random.uniform(0.8, 1.0), 2),
