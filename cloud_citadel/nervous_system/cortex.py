@@ -146,6 +146,11 @@ class RecipeOptimizer:
                 # 3. Appliquer
                 if new_targets:
                     self.apply_new_recipe("RECIPE_GENOVESE_STD_V1", new_targets)
+
+                self.ch_client.execute(
+                   'INSERT INTO vertiflow.ml_predictions (temp_opt, ec_target, dli_target) VALUES',
+                   [new_targets]
+               )
             
             logger.info("--- Fin du Cycle. Veille 24h ---")
             time.sleep(86400) # 24h

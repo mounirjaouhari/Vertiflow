@@ -1,872 +1,2633 @@
 {
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "description": "Tableau de bord complet des modèles d'Intelligence Artificielle VertiFlow. Visualise en temps réel les prédictions de rendement (Oracle A9), les estimations de récolte basées sur le modèle scientifique GDD+Gompertz (Harvest A9b), la classification qualité (Classifier A10) et l'optimisation des recettes agronomiques (Cortex A11).",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": null,
+  "id": 25,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
-      "type": "text",
-      "title": "🧠 VertiFlow ML Engine - Système d'Intelligence Agronomique",
       "description": "Vue d'ensemble complète du système de Machine Learning VertiFlow pour l'agriculture verticale intelligente",
-      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
       "options": {
-        "mode": "markdown",
-        "content": "## 🌱 Intelligence Artificielle pour l'Agriculture Verticale\n\nCe tableau de bord présente les **4 modèles ML** actifs de la plateforme VertiFlow :\n\n| Modèle | Algorithme | Fonction | Références Scientifiques |\n|--------|-----------|----------|-------------------------|\n| **A9 - Oracle** | RandomForest Regressor | Prédiction du rendement (kg/m²) | Breiman (2001) |\n| **A9b - Harvest** | GDD + Gompertz | Prédiction date de récolte | McMaster & Wilhelm (1997), Zwietering (1990) |\n| **A10 - Classifier** | Gradient Boosting | Classification qualité (Premium/Standard/Rejet) | Friedman (2001) |\n| **A11 - Cortex** | Scipy L-BFGS-B | Optimisation des recettes agronomiques | Byrd et al. (1995) |\n\n**Paramètres Basilic (A9b):** T_base=10°C | GDD_récolte=550 | VPD_optimal=0.8-1.2 kPa | DLI_optimal=12-17 mol/m²/jour"
-      }
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "## 🌱 Intelligence Artificielle pour l'Agriculture Verticale\n\nCe tableau de bord présente les **4 modèles ML** actifs de la plateforme VertiFlow :\n\n| Modèle | Algorithme | Fonction | Références Scientifiques |\n|--------|-----------|----------|-------------------------|\n| **A9 - Oracle** | RandomForest Regressor | Prédiction du rendement (kg/m²) | Breiman (2001) |\n| **A9b - Harvest** | GDD + Gompertz | Prédiction date de récolte | McMaster & Wilhelm (1997), Zwietering (1990) |\n| **A10 - Classifier** | Gradient Boosting | Classification qualité (Premium/Standard/Rejet) | Friedman (2001) |\n| **A11 - Cortex** | Scipy L-BFGS-B | Optimisation des recettes agronomiques | Byrd et al. (1995) |\n\n**Paramètres Basilic (A9b):** T_base=10°C | GDD_récolte=550 | VPD_optimal=0.8-1.2 kPa | DLI_optimal=12-17 mol/m²/jour",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.2",
+      "title": "🧠 VertiFlow ML Engine - Système d'Intelligence Agronomique",
+      "type": "text"
     },
     {
-      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 2,
+      "panels": [],
       "title": "📊 Vue Globale - Activité des 4 Modèles ML (24h)",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
-      "collapsed": false
+      "type": "row"
     },
     {
-      "type": "stat",
-      "title": "🔮 Oracle A9",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Nombre de prédictions de rendement. Le modèle RandomForest analyse température, humidité, DLI, EC et pH pour estimer le rendement en kg/m². Performance: R² > 0.87",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 6 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT count() FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR AND predicted_yield_kg_m2 > 0",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "displayName": "Prédictions Rendement",
-          "color": { "fixedColor": "green", "mode": "fixed" },
-          "thresholds": { "steps": [{ "color": "green", "value": null }] }
-        }
-      },
-      "options": { "colorMode": "background", "graphMode": "area" }
-    },
-    {
-      "type": "stat",
-      "title": "🌡️ Harvest A9b",
-      "description": "Prédictions de date de récolte basées sur le modèle GDD (Growing Degree Days) + Gompertz. Calcule l'accumulation thermique et estime les jours restants. Références: McMaster & Wilhelm (1997)",
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 6 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT count() FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "displayName": "Prédictions Récolte",
-          "color": { "fixedColor": "orange", "mode": "fixed" },
-          "thresholds": { "steps": [{ "color": "orange", "value": null }] }
-        }
-      },
-      "options": { "colorMode": "background", "graphMode": "area" }
-    },
-    {
-      "type": "stat",
-      "title": "🎯 Classifier A10",
-      "description": "Classifications de qualité. Le modèle Gradient Boosting évalue chaque lot selon le score de santé, VPD, DLI et EC pour attribuer un grade: Premium (>85%), Standard (60-85%), Rejet (<60%). Précision: >92%",
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 6 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT count() FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "displayName": "Classifications",
-          "color": { "fixedColor": "blue", "mode": "fixed" },
-          "thresholds": { "steps": [{ "color": "blue", "value": null }] }
-        }
-      },
-      "options": { "colorMode": "background", "graphMode": "area" }
-    },
-    {
-      "type": "stat",
-      "title": "🧬 Cortex A11",
-      "description": "Optimisations de recettes agronomiques. L'algorithme L-BFGS-B optimise simultanément EC (1.0-2.5), pH (5.5-6.5), température (18-28°C) et DLI (12-20) pour maximiser le rendement prédit.",
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 6 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT count() FROM vertiflow.ml_predictions WHERE model_name = 'Cortex_A11' AND timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "displayName": "Optimisations",
-          "color": { "fixedColor": "purple", "mode": "fixed" },
-          "thresholds": { "steps": [{ "color": "purple", "value": null }] }
-        }
-      },
-      "options": { "colorMode": "background", "graphMode": "area" }
-    },
-    {
-      "type": "row",
-      "title": "🤖 A9 - ORACLE : Prédiction de Rendement (RandomForest)",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 10 },
-      "collapsed": false
-    },
-    {
-      "type": "stat",
-      "title": "🌿 Rendement Moyen Prédit",
-      "description": "Moyenne des rendements prédits par le modèle Oracle sur les dernières 24h. Le modèle RandomForest utilise 5 features: température, humidité, DLI, EC et pH. Objectif: >3.5 kg/m² pour le basilic.",
-      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 11 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(avg(predicted_yield_kg_m2), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR AND predicted_yield_kg_m2 > 0",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "kg/m²",
-          "decimals": 2,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 2 },
-              { "color": "green", "value": 3.5 }
-            ]
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
           },
-          "color": { "mode": "thresholds" }
-        }
-      },
-      "options": { "colorMode": "value", "graphMode": "area" }
-    },
-    {
-      "type": "gauge",
-      "title": "📈 Rendement Maximum",
-      "description": "Rendement maximum prédit sur 24h. Indique le potentiel de production dans les meilleures conditions. Seuils: <2 (rouge), 2-3 (jaune), 3-4 (orange), >4 (vert)",
-      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 11 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(max(predicted_yield_kg_m2), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "kg/m²",
-          "min": 0,
-          "max": 6,
+          "displayName": "Prédictions Rendement",
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "orange", "value": 2 },
-              { "color": "yellow", "value": 3 },
-              { "color": "green", "value": 4 }
+              {
+                "color": "green",
+                "value": 0
+              }
             ]
           }
-        }
+        },
+        "overrides": []
       },
-      "options": { "orientation": "auto", "showThresholdLabels": true, "showThresholdMarkers": true }
-    },
-    {
-      "type": "timeseries",
-      "title": "📊 Évolution du Rendement Prédit par Zone",
-      "description": "Courbe temporelle des prédictions de rendement par lot de culture. Permet de suivre l'évolution des performances et détecter les tendances. Agrégation horaire sur 7 jours.",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 11 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 6
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
       "targets": [
         {
-          "rawSql": "SELECT toStartOfHour(timestamp) as time, avg(predicted_yield_kg_m2) as rendement_predit, batch_id FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 7 DAY AND predicted_yield_kg_m2 > 0 GROUP BY time, batch_id ORDER BY time",
-          "refId": "A",
-          "format": 0
+          "format": 1,
+          "rawSql": "SELECT count() FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR AND predicted_yield_kg_m2 > 0",
+          "refId": "A"
         }
       ],
+      "title": "🔮 Oracle A9",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Prédictions de date de récolte basées sur le modèle GDD (Growing Degree Days) + Gompertz. Calcule l'accumulation thermique et estime les jours restants. Références: McMaster & Wilhelm (1997)",
       "fieldConfig": {
         "defaults": {
-          "unit": "kg/m²",
-          "displayName": "Rendement",
+          "color": {
+            "fixedColor": "orange",
+            "mode": "fixed"
+          },
+          "displayName": "Prédictions Récolte",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 6
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT count() FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "🌡️ Harvest A9b",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Classifications de qualité. Le modèle Gradient Boosting évalue chaque lot selon le score de santé, VPD, DLI et EC pour attribuer un grade: Premium (>85%), Standard (60-85%), Rejet (<60%). Précision: >92%",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "displayName": "Classifications",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 6
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT count() FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "🎯 Classifier A10",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Optimisations de recettes agronomiques. L'algorithme L-BFGS-B optimise simultanément EC (1.0-2.5), pH (5.5-6.5), température (18-28°C) et DLI (12-20) pour maximiser le rendement prédit.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "purple",
+            "mode": "fixed"
+          },
+          "displayName": "Optimisations",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 6
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT count() FROM vertiflow.ml_predictions WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "🧬 Cortex A11",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 7,
+      "panels": [],
+      "title": "🤖 A9 - ORACLE : Prédiction de Rendement (RandomForest)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Moyenne des rendements prédits par le modèle Oracle sur les dernières 24h. Le modèle RandomForest utilise 5 features: température, humidité, DLI, EC et pH. Objectif: >3.5 kg/m² pour le basilic.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 2
+              },
+              {
+                "color": "green",
+                "value": 3.5
+              }
+            ]
+          },
+          "unit": "kg/m²"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 11
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(avg(predicted_yield_kg_m2), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR AND predicted_yield_kg_m2 > 0",
+          "refId": "A"
+        }
+      ],
+      "title": "🌿 Rendement Moyen Prédit",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Rendement maximum prédit sur 24h. Indique le potentiel de production dans les meilleures conditions. Seuils: <2 (rouge), 2-3 (jaune), 3-4 (orange), >4 (vert)",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 6,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 2
+              },
+              {
+                "color": "yellow",
+                "value": 3
+              },
+              {
+                "color": "green",
+                "value": 4
+              }
+            ]
+          },
+          "unit": "kg/m²"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 11
+      },
+      "id": 9,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(max(predicted_yield_kg_m2), 2) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "📈 Rendement Maximum",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Courbe temporelle des prédictions de rendement par lot de culture. Permet de suivre l'évolution des performances et détecter les tendances. Agrégation horaire sur 7 jours.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
-            "lineWidth": 2,
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
             "fillOpacity": 20,
             "gradientMode": "opacity",
-            "showPoints": "auto"
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
-          "color": { "mode": "palette-classic" }
-        }
-      },
-      "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] },
-        "tooltip": { "mode": "multi", "sort": "desc" }
-      }
-    },
-    {
-      "type": "stat",
-      "title": "📋 Total Prédictions",
-      "description": "Nombre total de prédictions de rendement générées aujourd'hui par le modèle Oracle A9.",
-      "gridPos": { "h": 3, "w": 6, "x": 0, "y": 16 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT count() FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= today() AND predicted_yield_kg_m2 > 0",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "displayName": "Aujourd'hui",
-          "color": { "fixedColor": "blue", "mode": "fixed" }
-        }
-      },
-      "options": { "colorMode": "value", "graphMode": "area" }
-    },
-    {
-      "type": "stat",
-      "title": "🎯 Précision Modèle",
-      "description": "Stabilité des prédictions calculée comme 100 - (écart-type / moyenne * 100). Plus la valeur est élevée, plus les prédictions sont cohérentes.",
-      "gridPos": { "h": 3, "w": 6, "x": 6, "y": 16 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(100 - (stddevPop(predicted_yield_kg_m2) / avg(predicted_yield_kg_m2) * 100), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR AND predicted_yield_kg_m2 > 0",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "displayName": "Stabilité",
-          "thresholds": {
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 70 },
-              { "color": "green", "value": 85 }
-            ]
-          }
-        }
-      },
-      "options": { "colorMode": "value", "graphMode": "area" }
-    },
-    {
-      "type": "row",
-      "title": "🌡️ A9b - HARVEST PREDICTOR : Prédiction de Récolte (GDD + Gompertz)",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 19 },
-      "collapsed": false
-    },
-    {
-      "type": "text",
-      "title": "📚 Modèle Scientifique GDD",
-      "description": "Explication du modèle Growing Degree Days",
-      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 20 },
-      "options": {
-        "mode": "markdown",
-        "content": "### Calcul GDD (McMaster & Wilhelm 1997)\n```\nGDD = max(0, T_moyenne - T_base)\n```\n- **T_base** = 10°C (basilic)\n- **GDD récolte** = 550 degrés-jours\n- **Stades**: SEEDLING (<100) → VEGETATIVE (100-400) → PRE_HARVEST (400-500) → READY (≥500)"
-      }
-    },
-    {
-      "type": "gauge",
-      "title": "🌡️ GDD Accumulés (Moyenne)",
-      "description": "Degrés-jours de croissance accumulés. Le basilic nécessite environ 550 GDD pour atteindre la maturité de récolte. Formule: GDD = Σ max(0, T_moy - 10°C)",
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 20 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(avg(gdd_accumulated), 0) FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 1 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "°C·j",
-          "min": 0,
-          "max": 550,
+          "displayName": "Rendement",
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "blue", "value": null },
-              { "color": "green", "value": 100 },
-              { "color": "yellow", "value": 400 },
-              { "color": "orange", "value": 500 }
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
             ]
-          }
+          },
+          "unit": "kg/m²"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
         }
       },
-      "options": { "orientation": "auto", "showThresholdLabels": true, "showThresholdMarkers": true }
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 0,
+          "rawSql": "SELECT toStartOfHour(timestamp) as time, avg(predicted_yield_kg_m2) as rendement_predit, batch_id FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 7 DAY AND predicted_yield_kg_m2 > 0 GROUP BY time, batch_id ORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "📊 Évolution du Rendement Prédit par Zone",
+      "type": "timeseries"
     },
     {
-      "type": "stat",
-      "title": "📅 Jours Restants",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Nombre total de prédictions de rendement générées aujourd'hui par le modèle Oracle A9.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "displayName": "Aujourd'hui",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 0,
+        "y": 16
+      },
+      "id": 11,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT count() FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= today() AND predicted_yield_kg_m2 > 0",
+          "refId": "A"
+        }
+      ],
+      "title": "📋 Total Prédictions",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Stabilité des prédictions calculée comme 100 - (écart-type / moyenne * 100). Plus la valeur est élevée, plus les prédictions sont cohérentes.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Stabilité",
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 6,
+        "y": 16
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(100 - (stddevPop(predicted_yield_kg_m2) / avg(predicted_yield_kg_m2) * 100), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR AND predicted_yield_kg_m2 > 0",
+          "refId": "A"
+        }
+      ],
+      "title": "🎯 Précision Modèle",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 13,
+      "panels": [],
+      "title": "🌡️ A9b - HARVEST PREDICTOR : Prédiction de Récolte (GDD + Gompertz)",
+      "type": "row"
+    },
+    {
+      "description": "Explication du modèle Growing Degree Days",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 20
+      },
+      "id": 14,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### Calcul GDD (McMaster & Wilhelm 1997)\n```\nGDD = max(0, T_moyenne - T_base)\n```\n- **T_base** = 10°C (basilic)\n- **GDD récolte** = 550 degrés-jours\n- **Stades**: SEEDLING (<100) → VEGETATIVE (100-400) → PRE_HARVEST (400-500) → READY (≥500)",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.2",
+      "title": "📚 Modèle Scientifique GDD",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Degrés-jours de croissance accumulés. Le basilic nécessite environ 550 GDD pour atteindre la maturité de récolte. Formule: GDD = Σ max(0, T_moy - 10°C)",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 550,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 100
+              },
+              {
+                "color": "yellow",
+                "value": 400
+              },
+              {
+                "color": "orange",
+                "value": 500
+              }
+            ]
+          },
+          "unit": "°C·j"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 20
+      },
+      "id": 15,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(avg(gdd_accumulated), 0) FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 1 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "🌡️ GDD Accumulés (Moyenne)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Nombre de jours estimés avant la récolte optimale. Calculé en fonction du GDD accumulé et du taux d'accumulation moyen journalier.",
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 20 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(avg(days_to_harvest), 0) FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 1 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "unit": "jours",
           "displayName": "Avant Récolte",
+          "mappings": [],
           "thresholds": {
+            "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 7 },
-              { "color": "orange", "value": 21 },
-              { "color": "blue", "value": 35 }
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 7
+              },
+              {
+                "color": "orange",
+                "value": 21
+              },
+              {
+                "color": "blue",
+                "value": 35
+              }
             ]
-          }
-        }
+          },
+          "unit": "jours"
+        },
+        "overrides": []
       },
-      "options": { "colorMode": "value", "graphMode": "none" }
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 20
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(avg(days_to_harvest), 0) FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 1 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "📅 Jours Restants",
+      "type": "stat"
     },
     {
-      "type": "stat",
-      "title": "🌿 Biomasse Estimée",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Biomasse actuelle estimée par le modèle Gompertz. Courbe de croissance sigmoïdale basée sur: B(t) = B_max * exp(-exp(-k*(GDD-GDD_inflexion))). Référence: Zwietering et al. (1990)",
-      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 20 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(avg(biomass_estimated_g), 1) FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 1 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "unit": "g",
           "displayName": "Par Plant",
+          "mappings": [],
           "thresholds": {
+            "mode": "absolute",
             "steps": [
-              { "color": "blue", "value": null },
-              { "color": "green", "value": 20 },
-              { "color": "yellow", "value": 60 },
-              { "color": "orange", "value": 100 }
+              {
+                "color": "blue",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "orange",
+                "value": 100
+              }
             ]
-          }
-        }
+          },
+          "unit": "g"
+        },
+        "overrides": []
       },
-      "options": { "colorMode": "value", "graphMode": "area" }
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 20
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(avg(biomass_estimated_g), 1) FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 1 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "🌿 Biomasse Estimée",
+      "type": "stat"
     },
     {
-      "type": "stat",
-      "title": "💨 VPD Moyen",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Déficit de Pression de Vapeur (kPa). Calculé avec l'équation de Tetens (1930). Optimal pour basilic: 0.8-1.2 kPa. VPD = e_sat(T) * (1 - HR/100)",
-      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 20 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(avg(vpd_kpa), 2) FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 1 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "unit": "kPa",
           "displayName": "VPD",
+          "mappings": [],
           "thresholds": {
+            "mode": "absolute",
             "steps": [
-              { "color": "blue", "value": null },
-              { "color": "green", "value": 0.8 },
-              { "color": "yellow", "value": 1.2 },
-              { "color": "red", "value": 1.5 }
+              {
+                "color": "blue",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 0.8
+              },
+              {
+                "color": "yellow",
+                "value": 1.2
+              },
+              {
+                "color": "red",
+                "value": 1.5
+              }
             ]
-          }
-        }
+          },
+          "unit": "kPa"
+        },
+        "overrides": []
       },
-      "options": { "colorMode": "value", "graphMode": "none" }
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 20
+      },
+      "id": 18,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(avg(vpd_kpa), 2) FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 1 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "💨 VPD Moyen",
+      "type": "stat"
     },
     {
-      "type": "table",
-      "title": "📊 Prédictions de Récolte par Zone",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Tableau détaillé des prédictions de récolte pour chaque zone de culture. Inclut: GDD accumulés, jours restants, date prévue, biomasse, stade de croissance, VPD, DLI et facteur de stress.",
-      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 24 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "GDD"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "°C·j"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Biomasse_g"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "g"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Confiance_pct"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Stade"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "PRE_HARVEST": {
+                        "color": "yellow",
+                        "text": "🌾 Pré-récolte"
+                      },
+                      "READY": {
+                        "color": "orange",
+                        "text": "✂️ Prêt"
+                      },
+                      "SEEDLING": {
+                        "color": "blue",
+                        "text": "🌱 Semis"
+                      },
+                      "VEGETATIVE": {
+                        "color": "green",
+                        "text": "🌿 Végétatif"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Stress"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.7
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 24
+      },
+      "id": 19,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.2",
       "targets": [
         {
+          "format": 1,
           "rawSql": "SELECT zone as Zone, round(gdd_accumulated, 0) as GDD, round(days_to_harvest, 0) as Jours_Restants, predicted_harvest_date as Date_Recolte, round(biomass_estimated_g, 1) as Biomasse_g, growth_stage as Stade, round(vpd_kpa, 2) as VPD_kPa, round(dli_mol, 1) as DLI, round(stress_factor, 2) as Stress, round(confidence * 100, 0) as Confiance_pct FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 2 HOUR ORDER BY timestamp DESC LIMIT 20",
-          "refId": "A",
-          "format": 1
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "custom": { "align": "center" } },
-        "overrides": [
-          { "matcher": { "id": "byName", "options": "GDD" }, "properties": [{ "id": "unit", "value": "°C·j" }] },
-          { "matcher": { "id": "byName", "options": "Biomasse_g" }, "properties": [{ "id": "unit", "value": "g" }] },
-          { "matcher": { "id": "byName", "options": "Confiance_pct" }, "properties": [{ "id": "unit", "value": "percent" }] },
-          { "matcher": { "id": "byName", "options": "Stade" }, "properties": [{ "id": "custom.cellOptions", "value": { "type": "color-text" } }, { "id": "mappings", "value": [{ "type": "value", "options": { "SEEDLING": { "color": "blue", "text": "🌱 Semis" }, "VEGETATIVE": { "color": "green", "text": "🌿 Végétatif" }, "PRE_HARVEST": { "color": "yellow", "text": "🌾 Pré-récolte" }, "READY": { "color": "orange", "text": "✂️ Prêt" } } }] }] },
-          { "matcher": { "id": "byName", "options": "Stress" }, "properties": [{ "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } }, { "id": "thresholds", "value": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.7 }, { "color": "red", "value": 0.5 }] } }] }
-        ]
-      },
-      "options": { "showHeader": true, "footer": { "show": false } }
+      "title": "📊 Prédictions de Récolte par Zone",
+      "type": "table"
     },
     {
-      "type": "timeseries",
-      "title": "📈 Évolution GDD et Biomasse",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Suivi de l'accumulation thermique (GDD) et de la croissance de biomasse dans le temps. Permet de visualiser la progression vers la maturité de récolte.",
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 24 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "GDD.*"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "°C·j"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Biomasse.*"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "g"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.2",
       "targets": [
         {
+          "format": 0,
           "rawSql": "SELECT toStartOfHour(timestamp) as time, zone, avg(gdd_accumulated) as GDD, avg(biomass_estimated_g) as Biomasse FROM vertiflow.harvest_predictions WHERE timestamp >= now() - INTERVAL 7 DAY GROUP BY time, zone ORDER BY time",
-          "refId": "A",
-          "format": 0
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "lineWidth": 2, "fillOpacity": 15 },
-          "color": { "mode": "palette-classic" }
-        },
-        "overrides": [
-          { "matcher": { "id": "byRegexp", "options": "GDD.*" }, "properties": [{ "id": "unit", "value": "°C·j" }, { "id": "custom.axisPlacement", "value": "left" }] },
-          { "matcher": { "id": "byRegexp", "options": "Biomasse.*" }, "properties": [{ "id": "unit", "value": "g" }, { "id": "custom.axisPlacement", "value": "right" }] }
-        ]
-      },
-      "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last"] }
-      }
+      "title": "📈 Évolution GDD et Biomasse",
+      "type": "timeseries"
     },
     {
-      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 21,
+      "panels": [],
       "title": "🎯 A10 - CLASSIFIER : Classification Qualité (Gradient Boosting)",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
-      "collapsed": false
+      "type": "row"
     },
     {
-      "type": "piechart",
-      "title": "🥇 Distribution des Grades de Qualité",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Répartition des classifications de qualité sur 24h. PREMIUM: produit d'excellence (>85% score santé), STANDARD: qualité acceptable (60-85%), REJECT: non conforme (<60%). Basé sur VPD, DLI, EC et température.",
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 33 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT toString(predicted_quality_grade) as Grade, count() as Nombre FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR GROUP BY predicted_quality_grade ORDER BY Nombre DESC",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
         },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "PREMIUM" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "STANDARD" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "REJECT" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PREMIUM"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "STANDARD"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "REJECT"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
         ]
       },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 33
+      },
+      "id": 22,
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
         "pieType": "donut",
-        "tooltip": { "mode": "single" },
-        "reduceOptions": { "calcs": ["sum"] }
-      }
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT toString(predicted_quality_grade) as Grade, count() as Nombre FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR GROUP BY predicted_quality_grade ORDER BY Nombre DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "🥇 Distribution des Grades de Qualité",
+      "type": "piechart"
     },
     {
-      "type": "stat",
-      "title": "🏆 Premium",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Pourcentage de lots classés PREMIUM. Critères: score santé >85%, VPD 0.8-1.2 kPa, DLI 12-17 mol/m²/jour, EC 1.2-2.0 mS/cm. Objectif: >70%",
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 33 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(countIf(predicted_quality_grade = 'PREMIUM') * 100.0 / count(), 1) FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
           "displayName": "Excellence",
-          "color": { "fixedColor": "green", "mode": "fixed" },
-          "thresholds": { "steps": [{ "color": "green", "value": null }] }
-        }
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
       },
-      "options": { "colorMode": "background", "graphMode": "area" }
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 33
+      },
+      "id": 23,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(countIf(predicted_quality_grade = 'PREMIUM') * 100.0 / count(), 1) FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "🏆 Premium",
+      "type": "stat"
     },
     {
-      "type": "stat",
-      "title": "📦 Standard",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Pourcentage de lots classés STANDARD. Qualité commerciale acceptable mais perfectible. Score santé entre 60% et 85%.",
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 33 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(countIf(predicted_quality_grade = 'STANDARD') * 100.0 / count(), 1) FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
+          "color": {
+            "fixedColor": "yellow",
+            "mode": "fixed"
+          },
           "displayName": "Acceptable",
-          "color": { "fixedColor": "yellow", "mode": "fixed" },
-          "thresholds": { "steps": [{ "color": "yellow", "value": null }] }
-        }
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
       },
-      "options": { "colorMode": "background", "graphMode": "area" }
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 33
+      },
+      "id": 24,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(countIf(predicted_quality_grade = 'STANDARD') * 100.0 / count(), 1) FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "📦 Standard",
+      "type": "stat"
     },
     {
-      "type": "stat",
-      "title": "⚠️ Rejet",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Pourcentage de lots classés REJECT. Non conforme aux standards de qualité. Nécessite une analyse des causes (stress hydrique, maladies, carences). Objectif: <5%",
-      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 33 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(countIf(predicted_quality_grade = 'REJECT') * 100.0 / count(), 1) FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
           "displayName": "Non Conforme",
-          "color": { "fixedColor": "red", "mode": "fixed" },
-          "thresholds": { "steps": [{ "color": "red", "value": null }] }
-        }
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
       },
-      "options": { "colorMode": "background", "graphMode": "area" }
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 33
+      },
+      "id": 25,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(countIf(predicted_quality_grade = 'REJECT') * 100.0 / count(), 1) FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "⚠️ Rejet",
+      "type": "stat"
     },
     {
-      "type": "gauge",
-      "title": "🎯 Confiance Moyenne",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Niveau de confiance moyen du classificateur. Plus la valeur est élevée, plus le modèle est certain de ses prédictions. Objectif: >80%",
-      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 33 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 33
+      },
+      "id": 26,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.3.2",
       "targets": [
         {
+          "format": 1,
           "rawSql": "SELECT round(avg(confidence) * 100, 1) FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
-          "thresholds": {
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 60 },
-              { "color": "green", "value": 80 }
-            ]
-          }
-        }
-      },
-      "options": { "orientation": "auto", "showThresholdLabels": false, "showThresholdMarkers": true }
+      "title": "🎯 Confiance Moyenne",
+      "type": "gauge"
     },
     {
-      "type": "table",
-      "title": "📋 Dernières Classifications de Qualité",
-      "description": "Historique des classifications avec détails des paramètres d'entrée: score santé, température, VPD, DLI, EC et jours depuis plantation.",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 37 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT timestamp as Heure, batch_id as Lot, toString(predicted_quality_grade) as Grade, round(health_score_input, 1) as Score_Sante, round(air_temp, 1) as Temp_C, round(vpd, 2) as VPD, round(dli, 1) as DLI, round(ec, 2) as EC, days_since_planting as Jours, round(confidence * 100, 0) as Confiance FROM vertiflow.quality_classifications ORDER BY timestamp DESC LIMIT 15",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": { "custom": { "align": "center" } },
-        "overrides": [
-          { "matcher": { "id": "byName", "options": "Grade" }, "properties": [{ "id": "mappings", "value": [{ "type": "value", "options": { "PREMIUM": { "color": "green", "text": "🏆 PREMIUM" }, "STANDARD": { "color": "yellow", "text": "📦 STANDARD" }, "REJECT": { "color": "red", "text": "⚠️ REJECT" } } }] }] },
-          { "matcher": { "id": "byName", "options": "Confiance" }, "properties": [{ "id": "unit", "value": "percent" }] },
-          { "matcher": { "id": "byName", "options": "Score_Sante" }, "properties": [{ "id": "unit", "value": "percent" }] }
-        ]
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
       },
-      "options": { "showHeader": true, "footer": { "show": false } }
-    },
-    {
-      "type": "timeseries",
-      "title": "📈 Évolution de la Qualité dans le Temps",
       "description": "Tendance des classifications sur 7 jours. Permet d'identifier les périodes problématiques et de corréler avec les conditions environnementales.",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 37 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 40,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Premium"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Standard"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Rejet"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 37
+      },
+      "id": 28,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.2",
       "targets": [
         {
+          "format": 0,
           "rawSql": "SELECT toStartOfHour(timestamp) as time, countIf(predicted_quality_grade = 'PREMIUM') as Premium, countIf(predicted_quality_grade = 'STANDARD') as Standard, countIf(predicted_quality_grade = 'REJECT') as Rejet FROM vertiflow.quality_classifications WHERE timestamp >= now() - INTERVAL 7 DAY GROUP BY time ORDER BY time",
-          "refId": "A",
-          "format": 0
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "lineWidth": 2, "fillOpacity": 40, "stacking": { "mode": "normal" } }
-        },
-        "overrides": [
-          { "matcher": { "id": "byName", "options": "Premium" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "Standard" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "Rejet" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
-        ]
-      },
-      "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["sum", "mean"] }
-      }
+      "title": "📈 Évolution de la Qualité dans le Temps",
+      "type": "timeseries"
     },
     {
-      "type": "row",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Historique des classifications avec détails des paramètres d'entrée: score santé, température, VPD, DLI, EC et jours depuis plantation.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grade"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "PREMIUM": {
+                        "color": "green",
+                        "text": "🏆 PREMIUM"
+                      },
+                      "REJECT": {
+                        "color": "red",
+                        "text": "⚠️ REJECT"
+                      },
+                      "STANDARD": {
+                        "color": "yellow",
+                        "text": "📦 STANDARD"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Confiance"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Score_Sante"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 41
+      },
+      "id": 27,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT timestamp as Heure, batch_id as Lot, toString(predicted_quality_grade) as Grade, round(health_score_input, 1) as Score_Sante, round(air_temp, 1) as Temp_C, round(vpd, 2) as VPD, round(dli, 1) as DLI, round(ec, 2) as EC, days_since_planting as Jours, round(confidence * 100, 0) as Confiance FROM vertiflow.quality_classifications ORDER BY timestamp DESC LIMIT 15",
+          "refId": "A"
+        }
+      ],
+      "title": "📋 Dernières Classifications de Qualité",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "id": 29,
+      "panels": [],
       "title": "🧬 A11 - CORTEX : Optimisation des Recettes (L-BFGS-B)",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 45 },
-      "collapsed": false
+      "type": "row"
     },
     {
-      "type": "text",
-      "title": "⚙️ Algorithme d'Optimisation",
-      "description": "Explication de l'optimiseur Cortex A11",
-      "gridPos": { "h": 5, "w": 8, "x": 0, "y": 46 },
-      "options": {
-        "mode": "markdown",
-        "content": "### Scipy L-BFGS-B (Byrd et al. 1995)\n\nOptimise simultanément 4 paramètres sous contraintes:\n\n| Paramètre | Min | Max | Unité |\n|-----------|-----|-----|-------|\n| **EC** | 1.0 | 2.5 | mS/cm |\n| **pH** | 5.5 | 6.5 | - |\n| **Température** | 18 | 28 | °C |\n| **DLI** | 12 | 20 | mol/m²/j |\n\n**Objectif**: Maximiser `predicted_yield`"
-      }
-    },
-    {
-      "type": "stat",
-      "title": "💊 Score Santé Moyen",
-      "description": "Score de santé global des cultures sur 24h. Indicateur composite basé sur les conditions environnementales. Objectif: >85%",
-      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 46 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(avg(health_score), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "displayName": "Santé Globale",
-          "thresholds": {
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 70 },
-              { "color": "green", "value": 85 }
-            ]
-          }
-        }
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
       },
-      "options": { "colorMode": "value", "graphMode": "area" }
-    },
-    {
-      "type": "gauge",
-      "title": "🔍 Confiance Anomalie",
       "description": "Score de confiance de détection d'anomalies. Valeur élevée = anomalie détectée avec certitude. Surveiller si >60%.",
-      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 46 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 40
+              },
+              {
+                "color": "orange",
+                "value": 60
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 12,
+        "y": 45
+      },
+      "id": 32,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.3.2",
       "targets": [
         {
+          "format": 1,
           "rawSql": "SELECT round(avg(anomaly_confidence_score) * 100, 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 40 },
-              { "color": "orange", "value": 60 },
-              { "color": "red", "value": 80 }
-            ]
-          }
-        }
-      },
-      "options": { "orientation": "auto", "showThresholdLabels": true, "showThresholdMarkers": true }
+      "title": "🔍 Confiance Anomalie",
+      "type": "gauge"
     },
     {
-      "type": "gauge",
-      "title": "🔧 Intégrité Module",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Score d'intégrité des modules de culture. Indique l'état de fonctionnement des équipements (capteurs, actuateurs). Alerte si <90%.",
-      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 46 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(avg(module_integrity_score), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
-          "min": 0,
+          "mappings": [],
           "max": 100,
+          "min": 0,
           "thresholds": {
+            "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 80 },
-              { "color": "green", "value": 90 }
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 80
+              },
+              {
+                "color": "green",
+                "value": 90
+              }
             ]
-          }
-        }
+          },
+          "unit": "percent"
+        },
+        "overrides": []
       },
-      "options": { "orientation": "auto", "showThresholdLabels": false, "showThresholdMarkers": true }
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 16,
+        "y": 45
+      },
+      "id": 33,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(avg(module_integrity_score), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "🔧 Intégrité Module",
+      "type": "gauge"
     },
     {
-      "type": "stat",
-      "title": "🚨 Urgence Maintenance",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
       "description": "Score d'urgence de maintenance. Valeur élevée = intervention requise rapidement. Seuils: <30% (OK), 30-60% (Planifier), >60% (Urgent).",
-      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 46 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT round(avg(maintenance_urgency_score), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
-          "refId": "A",
-          "format": 1
-        }
-      ],
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
           "displayName": "Urgence",
+          "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
+            "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 30 },
-              { "color": "red", "value": 60 }
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 30
+              },
+              {
+                "color": "red",
+                "value": 60
+              }
             ]
-          }
-        }
+          },
+          "unit": "percent"
+        },
+        "overrides": []
       },
-      "options": { "colorMode": "background", "graphMode": "area" }
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 20,
+        "y": 45
+      },
+      "id": 34,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(avg(maintenance_urgency_score), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "🚨 Urgence Maintenance",
+      "type": "stat"
     },
     {
-      "type": "timeseries",
-      "title": "📊 Évolution des Indicateurs de Performance",
-      "description": "Suivi temporel des KPIs: santé, anomalies, intégrité et rendement scalé. Permet de corréler les variations et identifier les causes racines.",
-      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 51 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
-      "targets": [
-        {
-          "rawSql": "SELECT toStartOfHour(timestamp) as time, round(avg(health_score), 1) as Sante, round(avg(anomaly_confidence_score) * 100, 1) as Anomalie, round(avg(module_integrity_score), 1) as Integrite, round(avg(predicted_yield_kg_m2) * 25, 1) as Rendement_x25 FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 7 DAY GROUP BY time ORDER BY time",
-          "refId": "A",
-          "format": 0
-        }
-      ],
+      "description": "Explication de l'optimiseur Cortex A11",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 51
+      },
+      "id": 30,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### Scipy L-BFGS-B (Byrd et al. 1995)\n\nOptimise simultanément 4 paramètres sous contraintes:\n\n| Paramètre | Min | Max | Unité |\n|-----------|-----|-----|-------|\n| **EC** | 1.0 | 2.5 | mS/cm |\n| **pH** | 5.5 | 6.5 | - |\n| **Température** | 18 | 28 | °C |\n| **DLI** | 12 | 20 | mol/m²/j |\n\n**Objectif**: Maximiser `predicted_yield`",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.2",
+      "title": "⚙️ Algorithme d'Optimisation",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Score de santé global des cultures sur 24h. Indicateur composite basé sur les conditions environnementales. Objectif: >85%",
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+          "displayName": "Santé Globale",
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 8,
+        "y": 51
+      },
+      "id": 31,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 1,
+          "rawSql": "SELECT round(avg(health_score), 1) FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "💊 Score Santé Moyen",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Vue consolidée des dernières mesures et prédictions par lot de culture.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "Sante" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "Anomalie" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "Integrite" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "Rendement_x25" }, "properties": [{ "id": "color", "value": { "fixedColor": "purple", "mode": "fixed" } }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Rendement"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "kg/m²"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sante"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Anomalie"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         ]
       },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 51
+      },
+      "id": 36,
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "min", "max"] }
-      }
-    },
-    {
-      "type": "table",
-      "title": "📋 Dernières Données par Lot",
-      "description": "Vue consolidée des dernières mesures et prédictions par lot de culture.",
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 51 },
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.2",
       "targets": [
         {
+          "format": 1,
           "rawSql": "SELECT batch_id as Lot, max(timestamp) as Derniere_MAJ, round(avg(predicted_yield_kg_m2), 2) as Rendement, any(quality_grade_prediction) as Qualite, round(avg(health_score), 0) as Sante, round(avg(anomaly_confidence_score), 2) as Anomalie FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 24 HOUR GROUP BY batch_id ORDER BY Derniere_MAJ DESC LIMIT 10",
-          "refId": "A",
-          "format": 1
+          "refId": "A"
         }
       ],
+      "title": "📋 Dernières Données par Lot",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+      },
+      "description": "Suivi temporel des KPIs: santé, anomalies, intégrité et rendement scalé. Permet de corréler les variations et identifier les causes racines.",
       "fieldConfig": {
-        "defaults": { "custom": { "align": "center" } },
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "Rendement" }, "properties": [{ "id": "unit", "value": "kg/m²" }] },
-          { "matcher": { "id": "byName", "options": "Sante" }, "properties": [{ "id": "unit", "value": "percent" }] },
-          { "matcher": { "id": "byName", "options": "Anomalie" }, "properties": [{ "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } }, { "id": "thresholds", "value": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.5 }] } }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sante"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Anomalie"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Integrite"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Rendement_x25"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
         ]
       },
-      "options": { "showHeader": true }
-    },
-    {
-      "type": "row",
-      "title": "📖 Documentation et Références Scientifiques",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 59 },
-      "collapsed": false
-    },
-    {
-      "type": "text",
-      "title": "📚 Références Bibliographiques",
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 60 },
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 56
+      },
+      "id": 35,
       "options": {
-        "mode": "markdown",
-        "content": "### Références Scientifiques des Modèles VertiFlow\n\n| Modèle | Méthode | Référence |\n|--------|---------|----------|\n| **A9 Oracle** | Random Forest | Breiman, L. (2001). Random Forests. *Machine Learning*, 45(1), 5-32. |\n| **A9b Harvest** | Growing Degree Days | McMaster, G.S., & Wilhelm, W.W. (1997). Growing degree-days: one equation, two interpretations. *Agricultural and Forest Meteorology*, 87(4), 291-300. |\n| **A9b Harvest** | Modèle Gompertz | Zwietering, M.H., et al. (1990). Modeling of the bacterial growth curve. *Applied and Environmental Microbiology*, 56(6), 1875-1881. |\n| **A9b Harvest** | VPD (Tetens) | Tetens, O. (1930). Über einige meteorologische Begriffe. *Zeitschrift für Geophysik*, 6, 297-309. |\n| **A9b Harvest** | DLI Optimal | Faust, J.E., & Logan, J. (2018). Daily Light Integral: A Research Review and High-resolution Maps. *HortScience*, 53(9), 1250-1257. |\n| **A10 Classifier** | Gradient Boosting | Friedman, J.H. (2001). Greedy function approximation: A gradient boosting machine. *Annals of Statistics*, 29(5), 1189-1232. |\n| **A11 Cortex** | L-BFGS-B | Byrd, R.H., et al. (1995). A limited memory algorithm for bound constrained optimization. *SIAM Journal on Scientific Computing*, 16(5), 1190-1208. |\n\n---\n**VertiFlow™ Data Platform** | Version 2.0 | Dernière mise à jour: 2026-02-05"
-      }
+        "legend": {
+          "calcs": [
+            "mean",
+            "min",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "format": 0,
+          "rawSql": "SELECT toStartOfHour(timestamp) as time, round(avg(health_score), 1) as Sante, round(avg(anomaly_confidence_score) * 100, 1) as Anomalie, round(avg(module_integrity_score), 1) as Integrite, round(avg(predicted_yield_kg_m2) * 25, 1) as Rendement_x25 FROM vertiflow.basil_ultimate_realtime WHERE timestamp >= now() - INTERVAL 7 DAY GROUP BY time ORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "📊 Évolution des Indicateurs de Performance",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
+      "id": 37,
+      "panels": [],
+      "title": "📖 Documentation et Références Scientifiques",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 65
+      },
+      "id": 38,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### Références Scientifiques des Modèles VertiFlow\n\n| Modèle | Méthode | Référence |\n|--------|---------|----------|\n| **A9 Oracle** | Random Forest | Breiman, L. (2001). Random Forests. *Machine Learning*, 45(1), 5-32. |\n| **A9b Harvest** | Growing Degree Days | McMaster, G.S., & Wilhelm, W.W. (1997). Growing degree-days: one equation, two interpretations. *Agricultural and Forest Meteorology*, 87(4), 291-300. |\n| **A9b Harvest** | Modèle Gompertz | Zwietering, M.H., et al. (1990). Modeling of the bacterial growth curve. *Applied and Environmental Microbiology*, 56(6), 1875-1881. |\n| **A9b Harvest** | VPD (Tetens) | Tetens, O. (1930). Über einige meteorologische Begriffe. *Zeitschrift für Geophysik*, 6, 297-309. |\n| **A9b Harvest** | DLI Optimal | Faust, J.E., & Logan, J. (2018). Daily Light Integral: A Research Review and High-resolution Maps. *HortScience*, 53(9), 1250-1257. |\n| **A10 Classifier** | Gradient Boosting | Friedman, J.H. (2001). Greedy function approximation: A gradient boosting machine. *Annals of Statistics*, 29(5), 1189-1232. |\n| **A11 Cortex** | L-BFGS-B | Byrd, R.H., et al. (1995). A limited memory algorithm for bound constrained optimization. *SIAM Journal on Scientific Computing*, 16(5), 1190-1208. |\n\n---\n**VertiFlow™ Data Platform** | Version 2.0 | Dernière mise à jour: 2026-02-05",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.2",
+      "title": "📚 Références Bibliographiques",
+      "type": "text"
     }
   ],
+  "preload": false,
   "refresh": "30s",
-  "schemaVersion": 38,
-  "style": "dark",
-  "tags": ["vertiflow", "ml", "ia", "predictions", "oracle", "harvest", "classifier", "cortex", "gdd", "gompertz"],
+  "schemaVersion": 42,
+  "tags": [
+    "vertiflow",
+    "ml",
+    "ia",
+    "predictions",
+    "oracle",
+    "harvest",
+    "classifier",
+    "cortex",
+    "gdd",
+    "gompertz"
+  ],
   "templating": {
     "list": [
       {
-        "name": "zone",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+        },
+        "includeAll": true,
         "label": "Zone de Culture",
-        "type": "query",
-        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+        "multi": true,
+        "name": "zone",
+        "options": [],
         "query": "SELECT DISTINCT zone FROM vertiflow.harvest_predictions ORDER BY zone",
         "refresh": 2,
-        "multi": true,
-        "includeAll": true,
-        "current": { "selected": true, "text": "All", "value": "$__all" }
+        "type": "query"
       },
       {
-        "name": "batch_id",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00"
+        },
+        "includeAll": true,
         "label": "Lot de Culture",
-        "type": "query",
-        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "aeb1b4ee-1f88-42c3-a35a-f594cac90e00" },
+        "multi": true,
+        "name": "batch_id",
+        "options": [],
         "query": "SELECT DISTINCT batch_id FROM vertiflow.basil_ultimate_realtime ORDER BY batch_id",
         "refresh": 2,
-        "multi": true,
-        "includeAll": true,
-        "current": { "selected": true, "text": "All", "value": "$__all" }
+        "type": "query"
       }
     ]
   },
-  "time": { "from": "now-24h", "to": "now" },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
   "timepicker": {
-    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m"],
-    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d"]
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ]
   },
   "timezone": "browser",
   "title": "08 - Intelligence Artificielle VertiFlow",
   "uid": "vertiflow-ml-predictions-v2",
-  "version": 1
+  "version": 2
 }
