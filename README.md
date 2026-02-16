@@ -788,13 +788,13 @@ Installation Unique (3 Zones):
 - [x] Assistant IA Agri-Copilot Pro
 - [ ] Hardening déploiement production
 
-### v1.1 (Q2 2026) - Observabilité++
+### v1.1 (Q2 2026) - Observabilité++ ✅
 
-- [ ] Sidecar Metrics Collector (Prometheus)
-- [ ] Framework Shadow Validation (Great Expectations)
-- [ ] Data Catalog Live (auto-généré)
-- [ ] Dashboards Grafana améliorés
-- [ ] Endpoints REST API
+- [x] Sidecar Metrics Collector (Prometheus)
+- [x] Framework Shadow Validation (Great Expectations)
+- [x] Data Catalog Live (auto-généré)
+- [x] Dashboards Grafana améliorés
+- [x] Endpoints REST API
 
 ### v1.2 (Q3 2026) - Computer Vision
 
