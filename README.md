@@ -99,6 +99,16 @@
 
 Conçue pour les **chercheurs agricoles**, les **data engineers** et les **entreprises AgTech**, VertiFlow démontre comment les pipelines de données industriels peuvent transformer l'agriculture traditionnelle en culture de précision pilotée par les données.
 
+<div align="center">
+
+### 📊 Tableau de Bord Exécutif
+
+<img src="images/dashboard_bi.png" alt="VertiFlow BI - Tableau de Bord Exécutif" width="900"/>
+
+*KPIs stratégiques : Production 75.4kg/24h, Rendement 1.78 kg/m², Qualité Premium 33.5%, Santé 84.7%*
+
+</div>
+
 ### 🎯 Pourquoi VertiFlow ?
 
 On s'est posé une question simple : pourquoi les fermes verticales perdent-elles encore des données, font-elles confiance aveugle aux capteurs, et n'exploitent pas vraiment le cloud ?
@@ -115,6 +125,25 @@ On s'est posé une question simple : pourquoi les fermes verticales perdent-elle
 ---
 
 ## ✨ Fonctionnalités Clés
+
+<div align="center">
+
+### 🖥️ Monitoring en Temps Réel
+
+<table>
+<tr>
+<td><img src="images/dashboard_iot.png" alt="Centre de Contrôle IoT" width="450"/></td>
+<td><img src="images/dashboard_alerts.png" alt="Tableau des Alertes" width="450"/></td>
+</tr>
+<tr>
+<td align="center"><em>22 capteurs, 91.9% santé réseau, 73.3% batterie</em></td>
+<td align="center"><em>50 alertes, analyse par sévérité et module</em></td>
+</tr>
+</table>
+
+</div>
+
+<br/>
 
 ### 📡 Ingestion temps réel
 Les capteurs envoient leurs mesures toutes les 30 secondes via MQTT. NiFi les récupère, les valide, les enrichit avec des métadonnées, et les pousse dans Kafka. De là, les données partent vers ClickHouse (local) et BigQuery (cloud).
@@ -600,6 +629,14 @@ Trois niveaux de fallback. On peut toujours revenir voir ce qui s'est passé.
 
 ## 🤖 Les cerveaux de VertiFlow
 
+<div align="center">
+<img src="images/dashboard_ml_engine.png" alt="VertiFlow ML Engine - Système d'Intelligence Agronomique" width="900"/>
+
+*Dashboard ML Engine : Oracle A9 (prédictions rendement), Harvest A9b (date récolte), Classifier A10 (qualité), Cortex A11 (optimisation)*
+</div>
+
+<br/>
+
 ### Oracle : prédire le rendement
 
 On entraîne un RandomForest sur les données historiques pour prédire combien de grammes de basilic on va récolter dans 30 jours.
@@ -645,7 +682,15 @@ Cycle d'optimisation : toutes les 24h.
 [![Gemini](https://img.shields.io/badge/Google%20Gemini-AI-4285F4)](https://ai.google.dev/)
 [![BigQuery](https://img.shields.io/badge/BigQuery-Analytics-669DF6)](https://cloud.google.com/bigquery)
 
+<br/>
+
+<img src="images/agri_copilot_pro.png" alt="Interface Agri-Copilot Pro" width="900"/>
+
+*Interface Agri-Copilot Pro : Assistant IA avec analyse en temps réel et recommandations*
+
 </div>
+
+<br/>
 
 Notre assistant IA. Au lieu d'écrire du SQL, vous posez des questions en français (ou en anglais, arabe, tamazight) et il vous répond.
 
