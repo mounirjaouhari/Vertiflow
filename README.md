@@ -964,7 +964,7 @@ Ce projet s'appuie sur d'excellents travaux de :
 
 **Ce projet a été réalisé dans le cadre du programme national JobInTech**
 
-<img src="images/vue1.jpg" alt="VertiFlow System" width="600"/>
+<img src="images/jobintech.png" alt="JobInTech - MTNRA, CDG, Maroc Numeric Cluster" width="700"/>
 
 <br/><br/>
 
