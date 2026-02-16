@@ -1,0 +1,178 @@
+```mermaid
+---
+title: VertiFlow - Détail des Processeurs par Zone
+---
+flowchart TB
+    %% ═══════════════════════════════════════════════════════════════
+    %% LÉGENDE DES ÉTATS
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph LEGEND["📋 Légende"]
+        direction LR
+        L1["🟢 Running"]
+        L2["🔴 Stopped"]
+        L3["⚪ Disabled"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 0 : EXTERNAL DATA APIs (9 processeurs - tous 🟢)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z0["🌐 ZONE 0 - External Data APIs (9 processeurs)"]
+        direction LR
+        
+        subgraph Z0_W["Weather"]
+            Z0_1["🟢 Trigger<br/>GenerateFlowFile"]
+            Z0_2["🟢 API - Open-Meteo<br/>InvokeHTTP"]
+            Z0_3["🟢 Publish Weather<br/>PublishKafka_2_6"]
+        end
+        
+        subgraph Z0_A["Air Quality"]
+            Z0_4["🟢 Trigger<br/>GenerateFlowFile"]
+            Z0_5["🟢 API - OpenAQ<br/>InvokeHTTP"]
+            Z0_6["🟢 Publish AirQuality<br/>PublishKafka_2_6"]
+        end
+        
+        subgraph Z0_N["NASA"]
+            Z0_7["🟢 Trigger<br/>GenerateFlowFile"]
+            Z0_8["🟢 API - NASA POWER<br/>InvokeHTTP"]
+            Z0_9["🟢 Publish NASA<br/>PublishKafka_2_6"]
+        end
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 1 : INGESTION & VALIDATION (5 processeurs - tous 🟢)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z1["📡 ZONE 1 - Ingestion & Validation (5 processeurs)"]
+        direction TB
+        Z1_1["🟢 A2 - ConsumeMQTT<br/>vertiflow/farm/#"]
+        Z1_2["🟢 A1 - ListenHTTP<br/>REST API"]
+        Z1_3["🟢 ConsumeKafkaRecord_2_6<br/>basil_telemetry_full"]
+        Z1_4["🟢 ValidateRecord<br/>Schema Validation"]
+        Z1_5["🟢 Monitor_Ingestion_Health<br/>MonitorActivity"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 2 : CONTEXTUALISATION (2 processeurs - tous 🟢)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z2["🔄 ZONE 2 - Contextualisation (2 processeurs)"]
+        direction LR
+        Z2_1["🟢 B2 - ExecuteScript (VPD)<br/>Python VPD Calculation"]
+        Z2_2["🟢 B4 - PublishKafka (Telemetry)<br/>PublishKafka_2_6"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 3 : PERSISTANCE (10 processeurs - tous 🟢)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z3["💾 ZONE 3 - Persistance (10 processeurs)"]
+        direction TB
+        
+        subgraph Z3_PREP["Préparation"]
+            Z3_1["🟢 D1 - QueryRecord<br/>SQL Filtering"]
+            Z3_2["🟢 UpdateRecord<br/>Field Updates"]
+            Z3_3["🟢 M1 - MergeContent<br/>Batching"]
+        end
+        
+        subgraph Z3_STORE["Stockage"]
+            Z3_4["🟢 C1 - PutClickHouse<br/>PutDatabaseRecord JDBC"]
+            Z3_5["🟢 C2 - PutMongo (Audit)<br/>MongoDB"]
+            Z3_6["🟢 C3 - PutFile (Archive)<br/>Local Filesystem"]
+            Z3_7["🟢 C4 - PutGCSObject<br/>Data Lake"]
+            Z3_8["🟢 C5 - PutBigQueryBatch<br/>Analytics"]
+        end
+        
+        subgraph Z3_RATE["Rate Limiting"]
+            Z3_9["🟢 Rate Limit<br/>ControlRate x2"]
+            Z3_10["🟢 Log Error<br/>LogAttribute x2"]
+        end
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 4 : RÉTROACTION (11 processeurs - tous 🟢)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z4["🔁 ZONE 4 - Rétroaction (11 processeurs)"]
+        direction TB
+        
+        subgraph Z4_DETECT["Détection Anomalies"]
+            Z4_1["🟢 Z-Score Validator<br/>ExecuteScript"]
+            Z4_2["🟢 D1 - QueryRecord x2<br/>Anomaly Detection"]
+            Z4_3["🟢 EvaluateJsonPath<br/>Field Extraction"]
+        end
+        
+        subgraph Z4_ACTION["Actions Correctives"]
+            Z4_4["🟢 UpdateAttribute<br/>Metadata"]
+            Z4_5["🟢 D2 - AttributesToJSON<br/>Build Payload"]
+            Z4_6["🟢 B4 - PublishKafka<br/>Corrector Commands"]
+            Z4_7["🟢 D3 - PublishMQTT<br/>IoT Commands"]
+        end
+        
+        subgraph Z4_PERSIST["Persistance Feedback"]
+            Z4_8["🟢 M1 - MergeContent<br/>Batching"]
+            Z4_9["🟢 C4 - PutGCSObject<br/>Feedback Archive"]
+            Z4_10["🟢 C2 - PutMongo<br/>Feedback Audit"]
+        end
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 5 : STATIC DATA LOADERS (10 processeurs - tous 🟢)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z5["📁 ZONE 5 - Static Data Loaders (10 processeurs)"]
+        direction TB
+        
+        subgraph Z5_DS["Datasets CSV"]
+            Z5_1["🟢 GetFile - Datasets CSV<br/>CSV Files"]
+            Z5_2["🟢 ConvertRecord<br/>CSV to JSON"]
+            Z5_3["🟢 Publish Datasets<br/>PublishKafka_2_6"]
+        end
+        
+        subgraph Z5_LAB["Lab Data"]
+            Z5_4["🟢 GetFile - Lab Data<br/>Lab Files"]
+            Z5_5["🟢 ValidateRecord - Lab<br/>Schema Validation"]
+            Z5_6["🟢 Publish Lab<br/>PublishKafka_2_6"]
+        end
+        
+        subgraph Z5_OTHER["Recipes & Market"]
+            Z5_7["🟢 GetFile - Recipes<br/>Recipe Files"]
+            Z5_8["🟢 PutMongo - Recipes<br/>MongoDB"]
+            Z5_9["🟢 ConsumeKafka - Scraped<br/>ConsumeKafka_2_6"]
+            Z5_10["🟢 PutMongo - Market<br/>MongoDB"]
+        end
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% DLQ (1 processeur - 🟢)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph DLQ["⚠️ DLQ - Dead Letter Queue (1 processeur)"]
+        DLQ_1["🟢 DLQ_Logger<br/>LogMessage"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS INTER-ZONES
+    %% ═══════════════════════════════════════════════════════════════
+    Z0 --> Z1
+    Z1 --> Z2
+    Z2 --> Z3
+    Z3 --> Z4
+    Z5 --> Z1
+    Z5 --> Z3
+    Z1 -.-> DLQ
+    Z4 -.->|"Feedback Loop"| Z1
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% STYLES
+    %% ═══════════════════════════════════════════════════════════════
+    style LEGEND fill:#fafafa,stroke:#9e9e9e
+    style Z0 fill:#e8eaf6,stroke:#3f51b5,stroke-width:3px
+    style Z1 fill:#e3f2fd,stroke:#1565c0,stroke-width:3px
+    style Z2 fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
+    style Z3 fill:#fff3e0,stroke:#ef6c00,stroke-width:3px
+    style Z4 fill:#fce4ec,stroke:#c2185b,stroke-width:3px
+    style Z5 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
+    style DLQ fill:#ffebee,stroke:#c62828,stroke-width:3px
+    
+    style Z3_PREP fill:#fff9c4,stroke:#fbc02d
+    style Z3_STORE fill:#c8e6c9,stroke:#388e3c
+    style Z3_RATE fill:#ffccbc,stroke:#e64a19
+    
+    style Z4_DETECT fill:#e1bee7,stroke:#8e24aa
+    style Z4_ACTION fill:#b2dfdb,stroke:#00897b
+    style Z4_PERSIST fill:#ffe0b2,stroke:#f57c00
+```

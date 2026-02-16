@@ -1,0 +1,312 @@
+```mermaid
+---
+title: VertiFlow Data Pipeline - Architecture Réelle NiFi (50 Processeurs)
+config:
+  theme: base
+  themeVariables:
+    primaryColor: '#e3f2fd'
+    secondaryColor: '#e8f5e9'
+    tertiaryColor: '#fff3e0'
+---
+flowchart TB
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 0 : DONNÉES EXTERNES (9 processeurs)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z0["🌐 ZONE 0 - External Data APIs"]
+        direction TB
+        
+        subgraph Z0_WEATHER["☀️ Weather Pipeline"]
+            Z0_TRIG1["⏰ Trigger<br/>(GenerateFlowFile)"]
+            Z0_WEATHER_API["🌤️ API - Open-Meteo Weather<br/>(InvokeHTTP)"]
+            Z0_WEATHER_PUB["📤 Publish - Weather to Kafka<br/>(PublishKafka_2_6)"]
+        end
+        
+        subgraph Z0_AIR["💨 Air Quality Pipeline"]
+            Z0_TRIG2["⏰ Trigger<br/>(GenerateFlowFile)"]
+            Z0_AIR_API["🌬️ API - OpenAQ Air Quality<br/>(InvokeHTTP)"]
+            Z0_AIR_PUB["📤 Publish - AirQuality to Kafka<br/>(PublishKafka_2_6)"]
+        end
+        
+        subgraph Z0_NASA["🛰️ NASA Pipeline"]
+            Z0_TRIG3["⏰ Trigger<br/>(GenerateFlowFile)"]
+            Z0_NASA_API["🌍 API - NASA POWER<br/>(InvokeHTTP)"]
+            Z0_NASA_PUB["📤 Publish - NASA to Kafka<br/>(PublishKafka_2_6)"]
+        end
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% SOURCES IoT SIMULÉES
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph SIM["🔌 Sources de Données IoT"]
+        MQTT_SIM["🌡️ MQTT Simulator<br/>(mqtt_iot_simulator.py)"]
+        KAFKA_SIM["📊 Kafka Producer<br/>(basil_telemetry_full)"]
+        HTTP_CLIENT["🔗 REST Clients<br/>(HTTP POST)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 1 : INGESTION & VALIDATION (5 processeurs)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z1["📡 ZONE 1 - Ingestion & Validation"]
+        direction TB
+        Z1_MQTT["🌱 A2 - ConsumeMQTT<br/>(vertiflow/farm/#)"]
+        Z1_HTTP["🔗 A1 - ListenHTTP<br/>(REST API :8081)"]
+        Z1_KAFKA["📬 ConsumeKafkaRecord_2_6<br/>(basil_telemetry_full)"]
+        Z1_VALIDATE["✅ ValidateRecord<br/>(Schema Validation)"]
+        Z1_MONITOR["📊 Monitor_Ingestion_Health<br/>(MonitorActivity)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 2 : CONTEXTUALISATION (2 processeurs)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z2["🔄 ZONE 2 - Contextualisation"]
+        Z2_VPD["🌡️ B2 - ExecuteScript (VPD)<br/>(Calcul VPD Python)"]
+        Z2_KAFKA["📤 B4 - PublishKafka (Telemetry)<br/>(PublishKafka_2_6)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 3 : PERSISTANCE (10 processeurs)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z3["💾 ZONE 3 - Persistance"]
+        direction TB
+        
+        subgraph Z3_PREP["📦 Préparation"]
+            Z3_MERGE["📦 M1 - MergeContent<br/>(Batching 100 records)"]
+            Z3_QUERY["🔍 D1 - QueryRecord<br/>(SQL Filtering)"]
+            Z3_UPDATE["✏️ UpdateRecord<br/>(Field Updates)"]
+        end
+        
+        subgraph Z3_LOCAL["🏠 Stockage Local"]
+            Z3_CLICK["📈 C1 - PutClickHouse<br/>(PutDatabaseRecord JDBC)"]
+            Z3_MONGO["📝 C2 - PutMongo (Audit)<br/>(MongoDB)"]
+            Z3_FILE["📁 C3 - PutFile (Archive)<br/>(Local Filesystem)"]
+        end
+        
+        subgraph Z3_CLOUD["☁️ Google Cloud"]
+            Z3_GCS["🗄️ C4 - PutGCSObject<br/>(Data Lake)"]
+            Z3_BQ["📊 C5 - PutBigQueryBatch<br/>(Analytics)"]
+        end
+        
+        subgraph Z3_RATE["⚡ Rate Limiting"]
+            Z3_RATE1["🚦 Rate Limit - b43c2342<br/>(ControlRate)"]
+            Z3_RATE2["🚦 Rate Limit - b43c2140<br/>(ControlRate)"]
+            Z3_LOG1["📝 Log Error - b43c2342<br/>(LogAttribute)"]
+            Z3_LOG2["📝 Log Error - b43c2140<br/>(LogAttribute)"]
+        end
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 4 : RÉTROACTION (11 processeurs)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z4["🔁 ZONE 4 - Rétroaction & Alertes"]
+        direction TB
+        
+        subgraph Z4_ANALYSIS["🔬 Analyse"]
+            Z4_ZSCORE["📊 Z-Score Validator<br/>(ExecuteScript)"]
+            Z4_QUERY1["🔍 D1 - QueryRecord<br/>(Anomalies)"]
+            Z4_QUERY2["🔍 D1 - QueryRecord<br/>(Thresholds)"]
+            Z4_JSON["📋 EvaluateJsonPath<br/>(Extract Fields)"]
+        end
+        
+        subgraph Z4_ACTION["⚡ Actions"]
+            Z4_ATTR["🏷️ UpdateAttribute<br/>(Add Metadata)"]
+            Z4_ATOJ["📄 D2 - AttributesToJSON<br/>(Build Payload)"]
+            Z4_KAFKA["📤 B4 - PublishKafka (Corrector)<br/>(Feedback Commands)"]
+            Z4_MQTT["📡 D3 - PublishMQTT<br/>(IoT Commands)"]
+        end
+        
+        subgraph Z4_PERSIST["💾 Persistance Feedback"]
+            Z4_MERGE["📦 M1 - MergeContent<br/>(Batching)"]
+            Z4_GCS["🗄️ C4 - PutGCSObject<br/>(Feedback Archive)"]
+            Z4_MONGO["📝 C2 - PutMongo<br/>(Feedback Audit)"]
+        end
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% ZONE 5 : CHARGEURS STATIQUES (10 processeurs)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph Z5["📁 ZONE 5 - Static Data Loaders"]
+        direction TB
+        
+        subgraph Z5_DATASETS["📊 Datasets CSV"]
+            Z5_GET_CSV["📄 GetFile - Datasets CSV<br/>(CSV Files)"]
+            Z5_CONVERT["🔄 ConvertRecord - CSV to JSON<br/>(ConvertRecord)"]
+            Z5_PUB_DS["📤 Publish - Datasets to Kafka<br/>(PublishKafka_2_6)"]
+        end
+        
+        subgraph Z5_LAB["🔬 Lab Data"]
+            Z5_GET_LAB["🧪 GetFile - Lab Data<br/>(Lab Files)"]
+            Z5_VALIDATE_LAB["✅ ValidateRecord - Lab Data<br/>(Schema Check)"]
+            Z5_PUB_LAB["📤 Publish - Lab to Kafka<br/>(PublishKafka_2_6)"]
+        end
+        
+        subgraph Z5_RECIPES["📋 Recipes"]
+            Z5_GET_REC["📋 GetFile - Recipes<br/>(Recipe Files)"]
+            Z5_MONGO_REC["📝 PutMongo - Plant Recipes<br/>(MongoDB)"]
+        end
+        
+        subgraph Z5_MARKET["💰 Market Data"]
+            Z5_SCRAPED["🌐 ConsumeKafka - Scraped Data<br/>(ConsumeKafka_2_6)"]
+            Z5_MONGO_MKT["📝 PutMongo - Market Prices<br/>(MongoDB)"]
+        end
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% DLQ - Dead Letter Queue (1 processeur)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph DLQ["⚠️ DLQ - Dead Letter Queue"]
+        DLQ_LOG["📝 DLQ_Logger<br/>(LogMessage)"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% STOCKAGE FINAL
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph STORAGE["🗄️ Stockage"]
+        CLICKHOUSE[("📈 ClickHouse<br/>Time-Series Analytics")]
+        MONGODB[("📝 MongoDB<br/>Documents & Audit")]
+        GCS[("☁️ GCS<br/>Data Lake")]
+        BIGQUERY[("📊 BigQuery<br/>Advanced Analytics")]
+        KAFKA[("📬 Kafka<br/>Event Streaming")]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% VISUALISATION
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph VIZ["📊 Visualisation"]
+        GRAFANA["📈 Grafana<br/>Real-time Dashboards"]
+        LOOKER["📊 Looker Studio<br/>Business Analytics"]
+    end
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Zone 0
+    %% ═══════════════════════════════════════════════════════════════
+    Z0_TRIG1 --> Z0_WEATHER_API --> Z0_WEATHER_PUB
+    Z0_TRIG2 --> Z0_AIR_API --> Z0_AIR_PUB
+    Z0_TRIG3 --> Z0_NASA_API --> Z0_NASA_PUB
+    
+    Z0_WEATHER_PUB --> KAFKA
+    Z0_AIR_PUB --> KAFKA
+    Z0_NASA_PUB --> KAFKA
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Sources → Zone 1
+    %% ═══════════════════════════════════════════════════════════════
+    MQTT_SIM ==>|"MQTT QoS1"| Z1_MQTT
+    KAFKA_SIM ==>|"Kafka Stream"| Z1_KAFKA
+    HTTP_CLIENT ==>|"REST POST"| Z1_HTTP
+    KAFKA ==>|"External Data"| Z1_KAFKA
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Zone 1 interne
+    %% ═══════════════════════════════════════════════════════════════
+    Z1_MQTT --> Z1_VALIDATE
+    Z1_HTTP --> Z1_VALIDATE
+    Z1_KAFKA --> Z1_VALIDATE
+    Z1_VALIDATE -->|"✅ Valid"| Z1_MONITOR
+    Z1_VALIDATE -.->|"❌ Invalid"| DLQ_LOG
+    Z1_MONITOR --> Z2_VPD
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Zone 2
+    %% ═══════════════════════════════════════════════════════════════
+    Z2_VPD -->|"Enriched Data"| Z2_KAFKA
+    Z2_KAFKA --> KAFKA
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Zone 2 → Zone 3
+    %% ═══════════════════════════════════════════════════════════════
+    Z2_KAFKA --> Z3_MERGE
+    Z2_KAFKA --> Z3_QUERY
+    
+    Z3_MERGE --> Z3_GCS
+    Z3_MERGE --> Z3_BQ
+    
+    Z3_QUERY --> Z3_UPDATE
+    Z3_UPDATE --> Z3_CLICK
+    Z3_UPDATE --> Z3_MONGO
+    Z3_UPDATE --> Z3_FILE
+    
+    Z3_RATE1 --> Z3_CLICK
+    Z3_RATE2 --> Z3_MONGO
+    Z3_RATE1 -.->|"Error"| Z3_LOG1
+    Z3_RATE2 -.->|"Error"| Z3_LOG2
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Zone 3 → Stockage
+    %% ═══════════════════════════════════════════════════════════════
+    Z3_CLICK --> CLICKHOUSE
+    Z3_MONGO --> MONGODB
+    Z3_GCS --> GCS
+    Z3_BQ --> BIGQUERY
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Zone 4 (Feedback Loop)
+    %% ═══════════════════════════════════════════════════════════════
+    CLICKHOUSE -->|"Anomalies"| Z4_ZSCORE
+    Z4_ZSCORE --> Z4_QUERY1
+    Z4_QUERY1 --> Z4_QUERY2
+    Z4_QUERY2 --> Z4_JSON
+    Z4_JSON --> Z4_ATTR
+    Z4_ATTR --> Z4_ATOJ
+    Z4_ATOJ --> Z4_KAFKA
+    Z4_ATOJ --> Z4_MQTT
+    
+    Z4_KAFKA --> KAFKA
+    Z4_MQTT -.->|"🔄 Control Commands"| MQTT_SIM
+    
+    Z4_MERGE --> Z4_GCS
+    Z4_MERGE --> Z4_MONGO
+    Z4_GCS --> GCS
+    Z4_MONGO --> MONGODB
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Zone 5
+    %% ═══════════════════════════════════════════════════════════════
+    Z5_GET_CSV --> Z5_CONVERT --> Z5_PUB_DS --> KAFKA
+    Z5_GET_LAB --> Z5_VALIDATE_LAB --> Z5_PUB_LAB --> KAFKA
+    Z5_GET_REC --> Z5_MONGO_REC --> MONGODB
+    Z5_SCRAPED --> Z5_MONGO_MKT --> MONGODB
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Visualisation
+    %% ═══════════════════════════════════════════════════════════════
+    CLICKHOUSE --> GRAFANA
+    BIGQUERY --> LOOKER
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% STYLES
+    %% ═══════════════════════════════════════════════════════════════
+    style Z0 fill:#e8eaf6,stroke:#3f51b5,stroke-width:3px
+    style Z1 fill:#e3f2fd,stroke:#1565c0,stroke-width:3px
+    style Z2 fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
+    style Z3 fill:#fff3e0,stroke:#ef6c00,stroke-width:3px
+    style Z4 fill:#fce4ec,stroke:#c2185b,stroke-width:3px
+    style Z5 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
+    style DLQ fill:#ffebee,stroke:#c62828,stroke-width:3px
+    style SIM fill:#e0f7fa,stroke:#00838f,stroke-width:2px
+    style STORAGE fill:#eceff1,stroke:#546e7a,stroke-width:2px
+    style VIZ fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    
+    style Z0_WEATHER fill:#bbdefb,stroke:#1976d2
+    style Z0_AIR fill:#c8e6c9,stroke:#388e3c
+    style Z0_NASA fill:#ffe0b2,stroke:#f57c00
+    
+    style Z3_LOCAL fill:#bbdefb,stroke:#1976d2
+    style Z3_CLOUD fill:#c8e6c9,stroke:#388e3c
+    style Z3_PREP fill:#fff9c4,stroke:#fbc02d
+    style Z3_RATE fill:#ffccbc,stroke:#e64a19
+    
+    style Z4_ANALYSIS fill:#e1bee7,stroke:#8e24aa
+    style Z4_ACTION fill:#b2dfdb,stroke:#00897b
+    style Z4_PERSIST fill:#ffe0b2,stroke:#f57c00
+    
+    style Z5_DATASETS fill:#b3e5fc,stroke:#0288d1
+    style Z5_LAB fill:#dcedc8,stroke:#689f38
+    style Z5_RECIPES fill:#ffe0b2,stroke:#f57c00
+    style Z5_MARKET fill:#f8bbd9,stroke:#c2185b
+
+    classDef storage fill:#e0e0e0,stroke:#616161,stroke-width:2px
+    classDef kafka fill:#ffcc80,stroke:#ef6c00,stroke-width:2px
+    
+    class CLICKHOUSE,MONGODB,GCS,BIGQUERY storage
+    class KAFKA kafka
+```

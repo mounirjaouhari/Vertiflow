@@ -1,7 +1,7 @@
 # VERTIFLOW PROJECT MANIFEST (Basil Platform)
 
 Statut : EN COURS (Harmonisé avec le code et la roadmap)
-Protocole : VANCE COMPLIANT
+Protocole : DATA GOVERNANCE COMPLIANT
 Durée du Sprint : 3 Semaines (Intensif)
 
 ## ÉQUIPE PROJET

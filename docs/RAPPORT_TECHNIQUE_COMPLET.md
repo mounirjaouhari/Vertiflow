@@ -38,7 +38,7 @@
 - ✅ **Validation Zero-Trust** avec schémas JSON stricts
 - ✅ **Architecture hybride** (ClickHouse OLAP + MongoDB Document Store)
 - ✅ **Intelligence artificielle** (prédiction, optimisation, détection anomalies)
-- ✅ **Gouvernance automatisée** (Protocole Vance, DLQ 3 niveaux)
+- ✅ **Gouvernance automatisée** (validation zero-trust, DLQ 3 niveaux)
 - ✅ **Intégration données externes** (NASA Power, OpenAg, Wageningen)
 
 ### 1.2 Objectifs Métier
@@ -176,7 +176,7 @@
 ├──────────────────────────────────────────────────────────┤
 │ 1️⃣ ConsumeMQTT → Ingestion des messages                  │
 │ 2️⃣ ValidateRecord → Schema JSON v3.0 validation          │
-│    ├─ ✅ Valid → Gouvernance Stamping (Vance Protocol)    │
+│    ├─ ✅ Valid → Gouvernance Stamping (automatic)           │
 │    └─ ❌ Invalid → Route to DLQ (Kafka errors topic)      │
 │ 3️⃣ Jolt Transform → Enrichment (VPD, DLI calculations)   │
 │ 4️⃣ PutKafka → Publish to telemetry.raw                   │
@@ -840,7 +840,7 @@ Avec :
 
 ## 8. GOUVERNANCE ET QUALITÉ
 
-### 8.1 Protocole Vance (Data Governance)
+### 8.1 Gouvernance des Données
 
 **Principes :**
 
@@ -1073,7 +1073,7 @@ sequenceDiagram
 
 ✅ **Architecture industrielle robuste** (Lambda + Event-Driven)  
 ✅ **Stack moderne & éprouvée** (Kafka, ClickHouse, NiFi)  
-✅ **Gouvernance stricte** (Protocole Vance, DLQ 3 niveaux)  
+✅ **Gouvernance stricte** (validation zero-trust, DLQ 3 niveaux)  
 ✅ **IA intégrée nativement** (prédiction, optimisation, anomalies)  
 ✅ **Scalabilité démontrée** (testé 10k msg/min)  
 ✅ **Documentation complète** (25+ fichiers MD)

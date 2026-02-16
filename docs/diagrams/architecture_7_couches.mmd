@@ -1,0 +1,232 @@
+```mermaid
+---
+title: VertiFlow Data Platform - Architecture 7 Couches (Hybrid Cloud + AI Agents)
+config:
+  layout: elk
+---
+flowchart TB
+    %% ═══════════════════════════════════════════════════════════════
+    %% COUCHE 1 : PHYSIQUE IoT
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph C1["🔌 COUCHE 1 : PHYSIQUE IoT"]
+        direction LR
+        CAPTEURS_ENV["🌡️ Capteurs Environnement<br/>(Temp, Humidité, CO2)"]
+        CAPTEURS_HYDRO["💧 Capteurs Hydroponique<br/>(pH, EC, DO)"]
+        CAPTEURS_LIGHT["💡 Capteurs Lumière<br/>(PPFD, DLI, Spectre)"]
+        VISION["📷 Vision IA<br/>(Caméras)"]
+        APIS_EXT["🛰️ APIs Externes<br/>(NASA/OpenMeteo/OpenAQ)"]
+    end
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% COUCHE 2 : INGESTION
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph C2["📡 COUCHE 2 : INGESTION"]
+        direction TB
+        
+        subgraph MQTT_LAYER["📶 MQTT Broker"]
+            MQTT["🔗 Eclipse Mosquitto<br/>(vertiflow/farm/#)"]
+        end
+        
+        subgraph NIFI_LAYER["🔄 Apache NiFi (50 Processeurs)"]
+            N_Z1["📡 Zone 1 - Ingestion<br/>(ConsumeMQTT, ListenHTTP)"]
+            N_Z2["🔄 Zone 2 - Contextualisation<br/>(VPD Calculation)"]
+            N_Z5["📁 Zone 5 - Static Loaders<br/>(CSV, Recipes, Lab)"]
+            N_Z0["🌐 Zone 0 - External APIs<br/>(Weather, Air, NASA)"]
+        end
+    end
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% COUCHE 3 : STREAMING
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph C3["📬 COUCHE 3 : STREAMING"]
+        direction LR
+        K_TELEMETRY["📊 basil_telemetry_full<br/>(Données Capteurs)"]
+        K_FEEDBACK["🔁 vertiflow.feedback<br/>(Commands)"]
+        K_EXTERNAL["🌐 external_data<br/>(APIs Externes)"]
+        K_ML["🤖 ml_predictions<br/>(Modèles ML)"]
+    end
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% COUCHE 4 : STOCKAGE HYBRID CLOUD
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph C4["💾 COUCHE 4 : STOCKAGE"]
+        direction TB
+        
+        subgraph LOCAL["🏠 On-Premise"]
+            CLICK[("📈 ClickHouse<br/>Time-Series Analytics<br/>157 colonnes Golden Record")]
+            MONGO[("📝 MongoDB<br/>Documents & Audit<br/>plant_recipes, live_state")]
+        end
+        
+        subgraph CLOUD["☁️ Google Cloud Platform"]
+            GCS[("🗄️ GCS Data Lake<br/>Archive Parquet/JSON")]
+            BIGQUERY[("📊 BigQuery<br/>Analytics ML Ready")]
+        end
+    end
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% COUCHE 5 : INTELLIGENCE ML
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph C5["🧠 COUCHE 5 : INTELLIGENCE ML"]
+        direction TB
+        
+        subgraph ALGOS["⚡ Algorithmes Temps Réel"]
+            ALGO_ORACLE["🔮 Oracle<br/>(Prédiction Rendement)"]
+            ALGO_CLASSIFIER["🏷️ Classifier<br/>(Qualité/Anomalies)"]
+            ALGO_CORTEX["🧠 Cortex<br/>(Z-Score & Tendances)"]
+        end
+        
+        subgraph AI_AGENTS["🤖 AI Agents (Agri-Copilot)"]
+            GEMINI["✨ Google Gemini<br/>(NL → SQL)"]
+            VERTEX["🚀 Vertex AI<br/>(ML Models)"]
+            STREAMLIT["💬 Streamlit UI<br/>(Chat FR/EN/AR)"]
+            FASTAPI["⚡ FastAPI<br/>(REST API)"]
+        end
+    end
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% COUCHE 6 : RÉTROACTION (FEEDBACK LOOP)
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph C6["🔁 COUCHE 6 : RÉTROACTION"]
+        direction TB
+        
+        subgraph NIFI_FEEDBACK["🔄 NiFi Zone 4"]
+            N_Z4["🔁 Zone 4 - Feedback<br/>(11 Processeurs)"]
+            ZSCORE["📊 Z-Score Validator"]
+            MQTT_OUT["📡 PublishMQTT<br/>(Commandes IoT)"]
+        end
+        
+        subgraph ACTIONS["⚡ Actions Correctives"]
+            CMD_HVAC["🌡️ Ajustement HVAC"]
+            CMD_NUTRIENT["💧 Dosage Nutriments"]
+            CMD_LIGHT["💡 Spectre LED"]
+            CMD_IRRIGATION["🚿 Irrigation"]
+        end
+    end
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% COUCHE 7 : VISUALISATION
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph C7["📊 COUCHE 7 : VISUALISATION"]
+        direction LR
+        GRAFANA["📈 Grafana<br/>Dashboards Live<br/>(ClickHouse)"]
+        LOOKER["📊 Looker Studio<br/>Business Analytics<br/>(BigQuery)"]
+        PLOTLY["📉 Plotly Charts<br/>(Agent Generated)"]
+    end
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS COUCHE 1 → COUCHE 2
+    %% ═══════════════════════════════════════════════════════════════
+    CAPTEURS_ENV ==>|"MQTT QoS1"| MQTT
+    CAPTEURS_HYDRO ==>|"MQTT QoS1"| MQTT
+    CAPTEURS_LIGHT ==>|"MQTT QoS1"| MQTT
+    VISION --> N_Z1
+    APIS_EXT --> N_Z0
+    MQTT --> N_Z1
+    
+    %% NiFi interne
+    N_Z0 --> N_Z1
+    N_Z1 --> N_Z2
+    N_Z5 --> N_Z2
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS COUCHE 2 → COUCHE 3
+    %% ═══════════════════════════════════════════════════════════════
+    N_Z2 --> K_TELEMETRY
+    N_Z0 --> K_EXTERNAL
+    N_Z5 --> K_TELEMETRY
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS COUCHE 3 → COUCHE 4
+    %% ═══════════════════════════════════════════════════════════════
+    K_TELEMETRY --> CLICK
+    K_TELEMETRY --> MONGO
+    K_TELEMETRY --> GCS
+    K_EXTERNAL --> BIGQUERY
+    GCS --> BIGQUERY
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS COUCHE 4 → COUCHE 5
+    %% ═══════════════════════════════════════════════════════════════
+    CLICK --> ALGO_CORTEX
+    CLICK --> ALGO_CLASSIFIER
+    BIGQUERY --> ALGO_ORACLE
+    BIGQUERY --> VERTEX
+    VERTEX --> GEMINI
+    CLICK --> GEMINI
+    BIGQUERY --> GEMINI
+    GEMINI --> STREAMLIT
+    GEMINI --> FASTAPI
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS COUCHE 5 → COUCHE 6
+    %% ═══════════════════════════════════════════════════════════════
+    ALGO_CORTEX --> N_Z4
+    ALGO_CLASSIFIER --> N_Z4
+    ALGO_ORACLE -.->|"Predictions"| K_ML
+    K_ML --> N_Z4
+    N_Z4 --> ZSCORE
+    ZSCORE --> MQTT_OUT
+    N_Z4 --> K_FEEDBACK
+    
+    %% Actions correctives
+    MQTT_OUT --> CMD_HVAC
+    MQTT_OUT --> CMD_NUTRIENT
+    MQTT_OUT --> CMD_LIGHT
+    MQTT_OUT --> CMD_IRRIGATION
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS COUCHE 6 → COUCHE 1 (Boucle Fermée)
+    %% ═══════════════════════════════════════════════════════════════
+    CMD_HVAC -.->|"🔄 Control"| CAPTEURS_ENV
+    CMD_NUTRIENT -.->|"🔄 Control"| CAPTEURS_HYDRO
+    CMD_LIGHT -.->|"🔄 Control"| CAPTEURS_LIGHT
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS COUCHE 4/5 → COUCHE 7
+    %% ═══════════════════════════════════════════════════════════════
+    CLICK --> GRAFANA
+    BIGQUERY --> LOOKER
+    STREAMLIT --> PLOTLY
+    FASTAPI --> PLOTLY
+
+    %% ═══════════════════════════════════════════════════════════════
+    %% STYLES PAR COUCHE
+    %% ═══════════════════════════════════════════════════════════════
+    style C1 fill:#e0f7fa,stroke:#00838f,stroke-width:3px
+    style C2 fill:#e3f2fd,stroke:#1565c0,stroke-width:3px
+    style C3 fill:#fff3e0,stroke:#ef6c00,stroke-width:3px
+    style C4 fill:#f5f5f5,stroke:#616161,stroke-width:3px
+    style C5 fill:#fce4ec,stroke:#c2185b,stroke-width:3px
+    style C6 fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
+    style C7 fill:#fff9c4,stroke:#f9a825,stroke-width:3px
+    
+    style LOCAL fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style CLOUD fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style MQTT_LAYER fill:#b3e5fc,stroke:#0288d1,stroke-width:1px
+    style NIFI_LAYER fill:#bbdefb,stroke:#1976d2,stroke-width:1px
+    style ALGOS fill:#f8bbd9,stroke:#c2185b,stroke-width:1px
+    style AI_AGENTS fill:#e1bee7,stroke:#8e24aa,stroke-width:1px
+    style NIFI_FEEDBACK fill:#c8e6c9,stroke:#388e3c,stroke-width:1px
+    style ACTIONS fill:#dcedc8,stroke:#689f38,stroke-width:1px
+    
+    %% Classes de couleur
+    CLICK:::Class_Click
+    MONGO:::Class_Mongo
+    K_TELEMETRY:::Class_Kafka
+    K_FEEDBACK:::Class_Kafka
+    K_EXTERNAL:::Class_Kafka
+    K_ML:::Class_Kafka
+    GCS:::Class_Cloud
+    BIGQUERY:::Class_Cloud
+    VERTEX:::Class_Cloud
+    GEMINI:::Class_AI
+    STREAMLIT:::Class_Agent
+    FASTAPI:::Class_Agent
+    
+    classDef Class_Mongo fill:#00C853,stroke:#333,color:white
+    classDef Class_Click fill:#FFD600,stroke:#333,color:black
+    classDef Class_Kafka fill:#FF9800,stroke:#333,color:white
+    classDef Class_Cloud fill:#4285F4,stroke:#333,color:white
+    classDef Class_AI fill:#EA4335,stroke:#333,color:white
+    classDef Class_Agent fill:#9C27B0,stroke:#333,color:white
+```

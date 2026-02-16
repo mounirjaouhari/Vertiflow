@@ -1,71 +1,184 @@
 ---
+title: VertiFlow Data Platform - Architecture Master v2 (Hybrid Cloud + AI Agents)
 config:
   layout: elk
 ---
 flowchart TB
+    %% ═══════════════════════════════════════════════════════════════
+    %% 1. SOURCES DE DONNÉES
+    %% ═══════════════════════════════════════════════════════════════
     subgraph SOURCES["📡 1. SOURCES"]
-        IOT["🌱 Capteurs IoT"]
-        VISION["📷 Vision IA"]
-        APIS["🛰️ APIs NASA/RTE"]
-        LAB["🔬 Saisie Labo"]
+        direction TB
+        IOT["🌱 Capteurs IoT<br/>(MQTT/Kafka)"]
+        VISION["📷 Vision IA<br/>(Caméras)"]
+        APIS["🛰️ APIs Externes<br/>(NASA/OpenMeteo/OpenAQ)"]
+        LAB["🔬 Saisie Labo<br/>(CSV/Fichiers)"]
     end
     
-    subgraph NIFI["🔄 2. APACHE NIFI"]
-        N_NORM["🔄 Normalisation"]
-        N_ENRICH["✨ Enrichissement"]
-        N_QUAL["🔐 Traçabilité"]
+    %% ═══════════════════════════════════════════════════════════════
+    %% 2. APACHE NIFI - 50 PROCESSEURS
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph NIFI["🔄 2. APACHE NIFI (50 Processeurs)"]
+        direction TB
+        N_INGEST["📡 Zone 1<br/>Ingestion & Validation"]
+        N_ENRICH["🔄 Zone 2<br/>Contextualisation (VPD)"]
+        N_PERSIST["💾 Zone 3<br/>Persistance Multi-Cloud"]
+        N_FEEDBACK["🔁 Zone 4<br/>Rétroaction & Alertes"]
+        N_STATIC["📁 Zone 5<br/>Static Data Loaders"]
     end
     
+    %% ═══════════════════════════════════════════════════════════════
+    %% 3. APACHE KAFKA - EVENT BUS
+    %% ═══════════════════════════════════════════════════════════════
     subgraph KAFKA["📬 3. APACHE KAFKA"]
-        K_TOPIC["📊 Topic Principal"]
+        direction LR
+        K_TELEMETRY["📊 basil_telemetry_full"]
+        K_FEEDBACK["🔁 vertiflow.feedback"]
+        K_EXTERNAL["🌐 external_data"]
     end
     
-    subgraph STORAGE["💾 4. STOCKAGE"]
-        MONGO[("⚡ MongoDB - Temps Réel")]
-        CLICK[("📈 ClickHouse - Analytique")]
+    %% ═══════════════════════════════════════════════════════════════
+    %% 4. STOCKAGE HYBRID CLOUD
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph STORAGE["💾 4. STOCKAGE HYBRID CLOUD"]
+        direction TB
+        
+        subgraph LOCAL["🏠 Stockage Local (On-Premise)"]
+            MONGO[("⚡ MongoDB<br/>Documents & Audit")]
+            CLICK[("📈 ClickHouse<br/>Time-Series Analytics<br/>157 colonnes Golden Record")]
+        end
+        
+        subgraph CLOUD["☁️ Google Cloud Platform"]
+            GCS[("🗄️ GCS Data Lake<br/>Archive & Raw Data")]
+            BIGQUERY[("📊 BigQuery<br/>Analytics Avancée<br/>ML Ready")]
+            VERTEX["🤖 Vertex AI<br/>ML Models"]
+        end
     end
     
-    subgraph INTELLIGENCE["🧠 5. INTELLIGENCE"]
-        ALGO_REFLEXE["🚨 Algo Réflexe"]
-        ALGO_STAT["📊 Algo Statistique"]
-        ALGO_PREDICT["🤖 Algo Prédictif"]
+    %% ═══════════════════════════════════════════════════════════════
+    %% 5. AI AGENTS - AGRI-COPILOT
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph AGENTS["🤖 5. AI AGENTS (Agri-Copilot)"]
+        direction TB
+        
+        subgraph COPILOT["🌿 Agri-Copilot Chat"]
+            STREAMLIT["💬 Interface Streamlit<br/>(Chat Multilingue FR/EN/AR)"]
+            GEMINI["✨ Google Gemini<br/>(Natural Language → SQL)"]
+        end
+        
+        subgraph COPILOT_PRO["🚀 Agri-Copilot Pro API"]
+            FASTAPI["⚡ FastAPI Server<br/>(REST API)"]
+            QUERY_SVC["🔍 Query Service<br/>(SQL Generation)"]
+            AUTH["🔐 Auth & RBAC<br/>(JWT + Rôles)"]
+        end
     end
     
-    subgraph VIZ["📊 6. VISUALISATION"]
-        PBI_LIVE["⚡ Dashboard Live"]
-        PBI_SCIENCE["🔬 Rapport Science"]
+    %% ═══════════════════════════════════════════════════════════════
+    %% 6. INTELLIGENCE & ML
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph INTELLIGENCE["🧠 6. INTELLIGENCE"]
+        direction TB
+        ALGO_REFLEXE["🚨 Algo Réflexe<br/>(Z-Score Temps Réel)"]
+        ALGO_STAT["📊 Algo Statistique<br/>(Tendances)"]
+        ALGO_PREDICT["🤖 Algo Prédictif<br/>(Rendement/Qualité)"]
     end
     
-    %% CONNECTIONS
-    IOT --> N_NORM
-    VISION --> N_NORM
-    APIS --> N_NORM
-    LAB --> N_NORM
-    N_NORM --> N_ENRICH
-    N_ENRICH --> N_QUAL
-    N_QUAL --> K_TOPIC
-    K_TOPIC --> MONGO
-    K_TOPIC --> CLICK
-    K_TOPIC --> ALGO_PREDICT
+    %% ═══════════════════════════════════════════════════════════════
+    %% 7. VISUALISATION
+    %% ═══════════════════════════════════════════════════════════════
+    subgraph VIZ["📊 7. VISUALISATION"]
+        direction LR
+        GRAFANA["📈 Grafana<br/>Dashboards Live"]
+        LOOKER["📊 Looker Studio<br/>Business Analytics"]
+        PLOTLY["📉 Plotly Charts<br/>(Agent Generated)"]
+    end
+    
+    %% ═══════════════════════════════════════════════════════════════
+    %% CONNEXIONS - Sources → NiFi
+    %% ═══════════════════════════════════════════════════════════════
+    IOT ==>|"MQTT QoS1"| N_INGEST
+    VISION --> N_INGEST
+    APIS --> N_INGEST
+    LAB --> N_STATIC
+    
+    %% NiFi interne
+    N_INGEST --> N_ENRICH
+    N_ENRICH --> N_PERSIST
+    N_PERSIST --> N_FEEDBACK
+    N_STATIC --> N_PERSIST
+    
+    %% NiFi → Kafka
+    N_ENRICH --> K_TELEMETRY
+    N_FEEDBACK --> K_FEEDBACK
+    APIS --> K_EXTERNAL
+    
+    %% Kafka → Stockage
+    K_TELEMETRY --> MONGO
+    K_TELEMETRY --> CLICK
+    K_TELEMETRY --> GCS
+    K_TELEMETRY --> BIGQUERY
+    
+    %% Cloud Integration
+    GCS --> BIGQUERY
+    BIGQUERY --> VERTEX
+    VERTEX --> ALGO_PREDICT
+    
+    %% Intelligence
     MONGO <--> ALGO_REFLEXE
     CLICK <--> ALGO_STAT
-    ALGO_PREDICT -.->|Feedback| K_TOPIC
-    MONGO --> PBI_LIVE
-    K_TOPIC -->|Streaming| PBI_LIVE
-    CLICK --> PBI_SCIENCE
-    ALGO_REFLEXE -.->|Contrôle| IOT
+    K_TELEMETRY --> ALGO_PREDICT
+    ALGO_PREDICT -.->|"Predictions"| K_FEEDBACK
+    ALGO_REFLEXE -.->|"🔄 Contrôle IoT"| IOT
+    
+    %% AI Agents Connections
+    GEMINI --> QUERY_SVC
+    QUERY_SVC --> CLICK
+    QUERY_SVC --> BIGQUERY
+    STREAMLIT --> GEMINI
+    FASTAPI --> QUERY_SVC
+    AUTH --> FASTAPI
+    
+    %% Visualisation
+    CLICK --> GRAFANA
+    BIGQUERY --> LOOKER
+    QUERY_SVC --> PLOTLY
+    STREAMLIT --> PLOTLY
+    
+    %% Feedback Loop
+    K_FEEDBACK -->|"Commands"| N_FEEDBACK
+    N_FEEDBACK -.->|"MQTT Commands"| IOT
 
+    %% ═══════════════════════════════════════════════════════════════
     %% STYLES
+    %% ═══════════════════════════════════════════════════════════════
     MONGO:::Class_Mongo
     CLICK:::Class_Click
-    K_TOPIC:::Class_Kafka
-    N_QUAL:::Class_NiFi
+    K_TELEMETRY:::Class_Kafka
+    K_FEEDBACK:::Class_Kafka
+    K_EXTERNAL:::Class_Kafka
+    GCS:::Class_Cloud
+    BIGQUERY:::Class_Cloud
+    VERTEX:::Class_Cloud
+    GEMINI:::Class_AI
+    STREAMLIT:::Class_Agent
+    FASTAPI:::Class_Agent
     
     classDef Class_Mongo fill:#00C853,stroke:#333,color:white
     classDef Class_Click fill:#FFD600,stroke:#333,color:black
     classDef Class_Kafka fill:#FF9800,stroke:#333,color:white
     classDef Class_NiFi fill:#03A9F4,stroke:#333,color:white
+    classDef Class_Cloud fill:#4285F4,stroke:#333,color:white
+    classDef Class_AI fill:#EA4335,stroke:#333,color:white
+    classDef Class_Agent fill:#9C27B0,stroke:#333,color:white
     
-    linkStyle 6 stroke:#FF9800,stroke-width:4px
-    linkStyle 7 stroke:#00C853,stroke-width:4px
-    linkStyle 13 stroke:#D50000,stroke-width:3px,stroke-dasharray:5 5
+    style SOURCES fill:#e0f7fa,stroke:#00838f,stroke-width:2px
+    style NIFI fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style KAFKA fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    style STORAGE fill:#f5f5f5,stroke:#616161,stroke-width:2px
+    style LOCAL fill:#e3f2fd,stroke:#1976d2,stroke-width:1px
+    style CLOUD fill:#e8f5e9,stroke:#388e3c,stroke-width:1px
+    style AGENTS fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style COPILOT fill:#e1bee7,stroke:#8e24aa,stroke-width:1px
+    style COPILOT_PRO fill:#ce93d8,stroke:#7b1fa2,stroke-width:1px
+    style INTELLIGENCE fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style VIZ fill:#fff9c4,stroke:#f9a825,stroke-width:2px

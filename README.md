@@ -1,790 +1,892 @@
 <div align="center">
 
-# VertiFlow
+<!-- Logo et titre principal -->
+<img src="images/versiflow.PNG" alt="VertiFlow Logo" width="800"/>
 
-### **Data Platform for Intelligent Vertical Farming**
+# 🌱 VertiFlow
 
-![versiflow](G:\codespaces\test-projet-agri\versiflow.PNG)
+### **Plateforme Data pour l'Agriculture Verticale Intelligente**
+
+<br/>
+
+---
+
+## 🎓 PROJET DE FIN DE FORMATION DATA ENGINEERING
+
+**Réalisé par l'équipe DATAFLOW**
+
+---
+
+<br/>
+
+<img src="images/unnamed.jpg" alt="Digital Agriculture" width="600"/>
+
+<br/>
+
+> **Programme JobInTech** — Initiative nationale portée par le **Ministère de la Transition Numérique et de la Réforme de l'Administration (MTNRA)**, en partenariat avec le **Groupe CDG**, et opéré par **Maroc Numeric Cluster (MNC)**.
+>
+> Formation dispensée à **YNOV Maroc Campus**
+
+<br/>
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/docker-24.0+-blue.svg)](https://www.docker.com/)
 [![Status](https://img.shields.io/badge/status-development-yellow.svg)](CHANGELOG.md)
+[![NiFi](https://img.shields.io/badge/Apache%20NiFi-1.23+-728E9B.svg)](https://nifi.apache.org/)
+[![ClickHouse](https://img.shields.io/badge/ClickHouse-23.8+-FFCC00.svg)](https://clickhouse.com/)
 
-**Real-time IoT telemetry | ML-driven automation | Zero-trust validation | Enterprise-grade resilience**
+**Télémétrie IoT temps réel | Automatisation ML | Validation Zero-Trust | Résilience Enterprise**
 
-[Features](#-key-features) | [Quick Start](#-quick-start) | [Architecture](#-architecture) | [Documentation](#-documentation) | [Roadmap](#-roadmap)
+[🚀 Démarrage](#-démarrage-rapide) • [🏗️ Architecture](#-architecture) • [🤖 Intelligence](#-intelligence-artificielle) • [📊 Diagrammes](#-diagrammes) • [🌿 Agri-Copilot Pro](#-agri-copilot-pro)
 
-
-
-</div>![unnamed](G:\codespaces\test-projet-agri\unnamed.jpg)
+</div>
 
 ---
 
-## Project Information
+## 📋 Informations du Projet
 
-| Attribute | Value |
-|-----------|-------|
-| **Created** | 25/12/2025 |
-| **Team** | VertiFlow Core Team |
-| **Lead Developer** | @Mounir |
-| **Ticket** | TICKET-001 |
-| **Sprint** | Week 1 - Initialization Phase |
+| Attribut | Valeur |
+|----------|--------|
+| **Date de création** | 25/12/2025 |
+| **Équipe** | DATAFLOW |
+| **Formation** | Data Engineering - JobInTech |
+| **École** | YNOV Maroc Campus |
+| **Référent** | @MrZakaria |
 
-### Team Members
+### 👥 Membres de l'Équipe
 
-| Role | Member | Responsibility |
+| Rôle | Membre | Responsabilité |
 |------|--------|----------------|
-| Architect & Scientist | **@Mounir** | System design, ML models, Bio-physics |
-| DevOps & Infrastructure | **@Imrane** | Docker, CI/CD, Monitoring |
-| Data Engineer | **@Mouhammed** | ETL pipelines, Kafka, ClickHouse |
-| Biologist & Domain Expert | **@Asama** | Agronomic calibration, Scientific validation |
-| Tech Lead & Data Architect | **@MrZakaria** | Architecture review, Data governance |
+| 🏗️ Architecte & Data Scientist | **@Mounir** | Conception système, Modèles ML, Bio-physique |
+| ⚙️ DevOps & Infrastructure | **@Imrane** | Docker, CI/CD, Monitoring |
+| 📊 Data Engineer | **@Mouhammed** | Pipelines ETL, Kafka, ClickHouse |
+| 🌿 Biologiste & Expert Métier | **@Asama** | Calibration agronomique, Validation scientifique |
+| 👨‍💼 Tech Lead & Data Architect | **@MrZakaria** | Revue architecture, Gouvernance des données |
 
 ---
 
-## Table of Contents
+## 📑 Table des Matières
 
-- [Overview](#-overview)
-- [Key Features](#-key-features)
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Quick Start](#-quick-start)
-- [Project Structure](#-project-structure)
-- [Data Governance](#-data-governance)
-- [Machine Learning](#-machine-learning)
-- [Algorithms](#-algorithms)
-- [External Data Sources](#-external-data-sources)
-- [Performance Metrics](#-performance-metrics)
-- [Current Status](#-current-status)
-- [Roadmap](#-roadmap)
-- [Contributing](#-contributing)
-- [Team](#-team)
-- [License](#-license)
-
----
-
-## Overview
-
-**VertiFlow** is an enterprise-grade data engineering platform designed for **intelligent vertical farming automation**. It processes **millions of IoT sensor readings**, validates data with **Zero-Trust protocols**, stores time-series efficiently, and drives **autonomous climate control** through Machine Learning.
-
-Built for **agricultural researchers**, **data engineers**, and **AgTech companies**, VertiFlow demonstrates how industrial data pipelines can transform traditional agriculture into data-driven precision cultivation.
-
-### What Makes VertiFlow Unique?
-
-| Feature | Traditional Systems | VertiFlow |
-|---------|---------------------|-----------|
-| **Data Validation** | Basic checks | Zero-Trust schema validation with DLQ |
-| **Storage** | Single database | Hybrid (ClickHouse + MongoDB) optimized |
-| **ML Integration** | Separate systems | Native real-time predictions |
-| **Governance** | Manual tracking | Automated Vance Protocol lineage |
-| **Resilience** | Data loss possible | 3-tier DLQ guarantees 99.98% retention |
-| **External Data** | None | Integrated NASA, OpenAg, Wageningen |
+- [🌍 Vue d'Ensemble](#-vue-densemble)
+- [✨ Fonctionnalités Clés](#-fonctionnalités-clés)
+- [🏗️ Architecture](#-architecture)
+- [📊 Diagrammes](#-diagrammes)
+- [🧰 Stack Technologique](#-stack-technologique)
+- [🚀 Démarrage Rapide](#-démarrage-rapide)
+- [📁 Structure du Projet](#-structure-du-projet)
+- [🔬 Algorithmes Scientifiques](#-algorithmes-scientifiques)
+- [🛡️ Gouvernance des Données](#-gouvernance-des-données)
+- [🤖 Intelligence Artificielle](#-intelligence-artificielle)
+- [🌿 Agri-Copilot Pro](#-agri-copilot-pro)
+- [🌐 Sources de Données Externes](#-sources-de-données-externes)
+- [📈 Métriques de Performance](#-métriques-de-performance)
+- [🗺️ Roadmap](#-roadmap)
+- [🤝 Contribution](#-contribution)
+- [📜 Licence](#-licence)
 
 ---
 
-## Key Features
+## 🌍 Vue d'Ensemble
 
-### Real-Time Data Ingestion
-- **MQTT -> Apache NiFi -> Kafka -> ClickHouse** pipeline
-- **69,120 messages/day** per installation (8 sensors x 3 zones x 2 msg/min)
-- **< 5 seconds** end-to-end latency (P99)
-- **Zero-Trust validation** against JSON Schema v3.0
+<div align="center">
+<img src="images/verticalfarming.PNG" alt="Vertical Farming" width="700"/>
+</div>
 
-### Enterprise Resilience
-- **Dead Letter Queue (DLQ)** with 3-tier fallback
-- **Schema validation** rejects malformed data instantly
-- **Governance stamping** (Vance Protocol metadata injection)
-- **No data loss** guarantee (99.98% success rate)
+<br/>
 
-### Hybrid Storage Architecture
-- **ClickHouse:** Time-series OLAP (Gorilla compression, 5:1 ratio)
-- **MongoDB:** Document store (recipes, batches, knowledge base)
-- **30-day TTL** on raw data, 90-day on aggregations
-- **Materialized views** for sub-second BI queries
+**VertiFlow** est une plateforme de Data Engineering enterprise conçue pour l'**automatisation intelligente de l'agriculture verticale**. Elle traite **des millions de lectures IoT**, valide les données avec des protocoles **Zero-Trust**, stocke efficacement les séries temporelles, et pilote le **contrôle climatique autonome** grâce au Machine Learning.
 
-### Autonomous Intelligence
-- **Cortex Engine (A11):** Cognitive loop for climate control optimization
-- **Oracle ML (A9):** RandomForest yield predictions (R2 > 0.87)
-- **Classifier (A10):** Quality classification (Premium/Standard/Reject)
-- **Bio-Physics Simulator:** VPD, photosynthesis, transpiration models
-- **Spectral Recipes:** Dynamic LED adjustment (Blue/Red/Far-Red)
+Conçue pour les **chercheurs agricoles**, les **data engineers** et les **entreprises AgTech**, VertiFlow démontre comment les pipelines de données industriels peuvent transformer l'agriculture traditionnelle en culture de précision pilotée par les données.
 
-### Business Intelligence
-- **Power BI dashboards** with real-time KPIs
-- **Grafana monitoring** for system health
-- **VPD calculations** at query time (Tetens formula)
-- **Energy cost tracking** per zone
+### 🎯 Pourquoi VertiFlow ?
 
-### External Data Integration
-- **NASA POWER:** Solar irradiance & climate data
-- **OpenAg Foundation:** 73k+ benchmark datapoints
-- **Wageningen University:** LED spectrum research
-- **USDA Databases:** Nutritional profiles
+On s'est posé une question simple : pourquoi les fermes verticales perdent-elles encore des données, font-elles confiance aveugle aux capteurs, et n'exploitent pas vraiment le cloud ?
+
+| Ce qu'on fait différemment | L'approche classique | Notre solution |
+|----------------------------|----------------------|----------------|
+| **Validation des données** | On fait confiance aux capteurs | On valide tout avant de stocker |
+| **Stockage** | Une seule base | Hybride local + cloud GCP |
+| **Machine Learning** | Ajouté après coup | Intégré dès le départ |
+| **Traçabilité** | Documentation manuelle | Métadonnées automatiques |
+| **Quand ça plante** | On perd des données | 3 niveaux de fallback, rien ne se perd |
+| **Pour interroger les données** | Il faut être dev | On pose des questions en français |
 
 ---
 
-## Architecture
+## ✨ Fonctionnalités Clés
 
-### System Overview (7-Layer Architecture)
+### 📡 Ingestion temps réel
+Les capteurs envoient leurs mesures toutes les 30 secondes via MQTT. NiFi les récupère, les valide, les enrichit avec des métadonnées, et les pousse dans Kafka. De là, les données partent vers ClickHouse (local) et BigQuery (cloud).
+
+- Pipeline : **MQTT → NiFi → Kafka → ClickHouse + GCS + BigQuery**
+- Débit : **69 120 messages/jour** par installation
+- Latence : **moins de 5 secondes** de bout en bout
+
+### 🛡️ On ne perd rien
+- **Dead Letter Queue (DLQ)** : si quelque chose échoue, on a 3 plans de secours
+- **Validation stricte** : une donnée mal formée ne rentre jamais dans le système
+- **Métadonnées automatiques** : on sait d'où vient chaque donnée, quand, comment
+- Résultat : **99.98% des données arrivent à destination**, même en cas de panne
+
+### 💾 Stockage Hybride : Local + Cloud GCP
+
+**En local (pour la rapidité) :**
+- **ClickHouse** : les séries temporelles des capteurs, compression 5:1
+- **MongoDB** : les recettes, configurations, logs d'audit
+
+**Sur Google Cloud (pour la puissance) :**
+- **GCS (Cloud Storage)** : Data Lake - on archive tout en Parquet/JSON
+- **BigQuery** : Analytics lourdes et features pour le ML
+- **Vertex AI** : entraînement des modèles
+- **Looker Studio** : dashboards business
+
+Les données brutes restent 30 jours, les agrégats 90 jours. Les requêtes BI répondent en moins d'une seconde.
+
+### 🧠 L'intelligence derrière tout ça
+- **Cortex** : le cerveau qui optimise les recettes de culture en continu
+- **Oracle** : prédit le rendement à J+30 avec 87% de précision
+- **Classifier** : note la qualité (Premium, Standard ou à rejeter)
+- **Simulateur** : modèles bio-physiques (VPD, photosynthèse, transpiration)
+- Et pour la lumière, on ajuste dynamiquement le spectre LED (Bleu/Rouge/Far-Red)
+
+### 🌿 Agri-Copilot Pro : posez vos questions en français
+Plutôt que d'écrire du SQL, demandez simplement :
+> "Quelle était la température moyenne de la zone A hier ?"
+
+- Fonctionne en français, anglais, arabe et tamazight
+- Utilise **Google Gemini** pour comprendre et générer les requêtes
+- Interroge directement ClickHouse et BigQuery
+- Accès contrôlé selon votre rôle (admin, agronome, agriculteur)
+
+---
+
+## 🏗️ Architecture
+
+### Comment ça marche (7 couches)
 
 ```
-                       VERTIFLOW PLATFORM
-+------------------------------------------------------------------+
-|                                                                  |
-| LAYER 1: PHYSICAL (IoT)                                         |
-| +------------------------------------------------------------+  |
-| | ESP32 Sensors -> Mosquitto MQTT Broker -> Edge Gateway     |  |
-| | Sensors: Temp, Humidity, CO2, PAR, pH, EC                  |  |
-| | Frequency: 30s | QoS: 1 | Topic: vertiflow/sensors/#       |  |
-| +------------------------------------------------------------+  |
-|                              |                                   |
-|                              v                                   |
-| LAYER 2: INGESTION (Apache NiFi)                                |
-| +------------------------------------------------------------+  |
-| | - Schema Validation (JSON Schema Draft 7)                  |  |
-| | - Governance Stamping (Vance Protocol)                     |  |
-| | - Jolt Transform (Horizontal -> Vertical)                  |  |
-| | - Dead Letter Queue (3-tier fallback)                      |  |
-| +------------------------------------------------------------+  |
-|                              |                                   |
-|                              v                                   |
-| LAYER 3: STREAMING (Apache Kafka)                               |
-| +------------------------------------------------------------+  |
-| | Topics: basil_telemetry_full | commands | alerts |         |  |
-| |         quality_predictions | recipe_updates               |  |
-| | Retention: 7 days | Compression: Snappy | Partitions: 12   |  |
-| +------------------------------------------------------------+  |
-|                              |                                   |
-|              +---------------+---------------+                   |
-|              v                               v                   |
-| LAYER 4: STORAGE                                                |
-| +---------------------------+ +------------------------------+  |
-| |      CLICKHOUSE          | |         MONGODB              |  |
-| |    (Time-Series OLAP)    | |     (Document Store)         |  |
-| +---------------------------+ +------------------------------+  |
-| | - sensor_telemetry (raw) | | - plant_recipes              |  |
-| | - computed_features      | | - quality_predictions        |  |
-| | - hourly_aggregates      | | - recipe_optimizations       |  |
-| | - powerbi_views          | | - system_logs                |  |
-| +---------------------------+ +------------------------------+  |
-|                              |                                   |
-|                              v                                   |
-| LAYER 5: INTELLIGENCE (Python ML)                               |
-| +------------------------------------------------------------+  |
-| | - Cortex: Recipe optimization (scipy.optimize)             |  |
-| | - Oracle: Yield prediction (RandomForest)                  |  |
-| | - Classifier: Quality grading (RandomForest)               |  |
-| | - Simulator: Bio-physics models (VPD, photosynthesis)      |  |
-| +------------------------------------------------------------+  |
-|                              |                                   |
-|                              v                                   |
-| LAYER 6: OPTIMIZATION                                           |
-| +------------------------------------------------------------+  |
-| | - Multi-objective optimization (Yield x Quality - Cost)    |  |
-| | - Constraint-based recipe adjustment                       |  |
-| | - 24h optimization cycles                                  |  |
-| +------------------------------------------------------------+  |
-|                              |                                   |
-|                              v                                   |
-| LAYER 7: VISUALIZATION                                          |
-| +------------------------------------------------------------+  |
-| | Power BI | Grafana | REST API (planned)                    |  |
-| +------------------------------------------------------------+  |
-|                                                                  |
-+------------------------------------------------------------------+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          VERTIFLOW - HYBRID CLOUD                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  COUCHE 1: LES CAPTEURS                                                     │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ ESP32 → MQTT Mosquitto → Edge Gateway                                  │ │
+│  │ Température, Humidité, CO2, PAR, pH, EC, Vision IA                     │ │
+│  │ + APIs externes : NASA POWER, Open-Meteo, OpenAQ                       │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                              ↓                                               │
+│  COUCHE 2: NETTOYAGE (Apache NiFi - 50 processeurs)                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ • On valide chaque message (JSON Schema)                               │ │
+│  │ • On ajoute les métadonnées (timestamp, source, version)               │ │
+│  │ • On calcule le VPD à la volée                                         │ │
+│  │ • Si ça plante → Dead Letter Queue (on ne perd rien)                   │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                              ↓                                               │
+│  COUCHE 3: TRANSPORT (Apache Kafka)                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ Topics: basil_telemetry_full | feedback | external_data | ml_predictions│ │
+│  │ Rétention 7 jours | Compression Snappy | 12 partitions                 │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                              ↓                                               │
+│       ┌──────────────────────┴──────────────────────┐                       │
+│       ↓                                              ↓                       │
+│  COUCHE 4: STOCKAGE HYBRIDE                                                 │
+│  ┌─────────────────────────┐    ┌────────────────────────────────────────┐ │
+│  │   🏠 LOCAL              │    │   ☁️ GOOGLE CLOUD PLATFORM             │ │
+│  │                         │    │                                        │ │
+│  │  📈 ClickHouse          │    │  🗄️ GCS (Data Lake)                   │ │
+│  │   → Séries temporelles  │    │   → Archive Parquet/JSON              │ │
+│  │   → 157 colonnes        │    │                                        │ │
+│  │                         │    │  📊 BigQuery                           │ │
+│  │  📝 MongoDB             │    │   → Analytics lourdes                  │ │
+│  │   → Recettes, configs   │    │   → Features ML                        │ │
+│  │   → Audit, live_state   │    │                                        │ │
+│  └─────────────────────────┘    └────────────────────────────────────────┘ │
+│                              ↓                                               │
+│  COUCHE 5: INTELLIGENCE (Python + GCP)                                      │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ LOCAL:                          │  CLOUD:                              │ │
+│  │ • Cortex (optimisation)         │  • Vertex AI (entraînement)         │ │
+│  │ • Oracle (prédiction rendement) │  • Gemini (NL→SQL)                  │ │
+│  │ • Classifier (qualité)          │                                      │ │
+│  │ • Simulator (bio-physique)      │                                      │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                              ↓                                               │
+│  COUCHE 6: BOUCLE DE RÉTROACTION                                            │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ Quand le système détecte une anomalie (Z-Score), il génère une         │ │
+│  │ commande corrective et l'envoie aux actionneurs via MQTT.              │ │
+│  │ → Ajustement HVAC, dosage nutriments, spectre LED, irrigation          │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                              ↓                                               │
+│  COUCHE 7: VISUALISATION                                                    │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ Grafana (ClickHouse) | Looker Studio (BigQuery) | Agri-Copilot Pro     │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Data Flow: Telemetry Pipeline
+### Le flux des données
 
 ```mermaid
 graph LR
-    A[ESP32 Sensor] -->|MQTT QoS 1| B[Mosquitto]
-    B --> C[NiFi: ConsumeMQTT]
-    C --> D{Validate Schema}
-    D -->|Valid| E[Stamp Governance]
-    D -->|Invalid| F[Wrap Error]
-    E --> G[Jolt Transform]
-    G --> H[Kafka: basil_telemetry_full]
-    F --> I[Kafka: errors]
-    I --> J[File DLQ]
-    H --> K[ClickHouse Sink]
-    K --> L[(sensor_telemetry)]
+    A[🌡️ Capteur] -->|MQTT| B[📡 Mosquitto]
+    B --> C[⚙️ NiFi]
+    C --> D{Valide ?}
+    D -->|Oui| E[📬 Kafka]
+    D -->|Non| F[⚠️ DLQ]
+    E --> G[📈 ClickHouse]
+    E --> H[🗄️ GCS]
+    H --> I[📊 BigQuery]
+    G --> J[📈 Grafana]
+    I --> K[📊 Looker]
+    I --> L[🌿 Agri-Copilot]
 ```
 
 ---
 
-## Tech Stack
+## 📊 Diagrammes
 
-| Layer | Technology | Version | Purpose |
-|-------|------------|---------|---------|
-| **IoT** | ESP32 + MQTT | - | Sensor acquisition |
-| **Message Broker** | Eclipse Mosquitto | 2.0+ | MQTT broker (QoS 1) |
-| **ETL** | Apache NiFi | 1.23+ | Data ingestion & transformation |
-| **Streaming** | Apache Kafka | 7.5+ | Event bus & decoupling |
-| **Coordination** | Zookeeper | 7.5+ | Kafka coordination |
-| **OLAP** | ClickHouse | 23.8+ | Time-series analytics |
-| **NoSQL** | MongoDB | 7.0+ | Document store |
-| **ML** | Python (scikit-learn, TensorFlow) | 3.11+ | Predictions & automation |
-| **Optimization** | SciPy | - | Recipe optimization |
-| **Orchestration** | Docker Compose | 2.20+ | Container management |
-| **Monitoring** | Grafana + Prometheus | - | Observability |
-| **BI** | Power BI | - | Business dashboards |
+Les diagrammes détaillés de l'architecture sont disponibles dans le dossier **[docs/diagrams/](docs/diagrams/)** :
 
-### Why These Choices?
+| Diagramme | Description | Fichier |
+|-----------|-------------|---------|
+| 🏗️ **Architecture Globale** | Vue d'ensemble des 7 couches | [architecture_globale.mmd](docs/diagrams/architecture_globale.mmd) |
+| 🔄 **Pipeline NiFi v5** | 50 processeurs détaillés | [data_pipeline_v5.mmd](docs/diagrams/data_pipeline_v5.mmd) |
+| 🧮 **Algorithmes** | Chaîne des 11 algorithmes | [algorithmes.mmd](docs/diagrams/algorithmes.mmd) |
+| 📬 **Kafka** | Architecture de streaming | [kafka.mmd](docs/diagrams/kafka.mmd) |
+| ⚙️ **NiFi** | Processeurs détaillés | [nifi.mmd](docs/diagrams/nifi.mmd) |
+| 📋 **Master v4** | Vue intégrée complète | [master_v4.mmd](docs/diagrams/master_v4.mmd) |
 
-- **NiFi vs Airflow:** NiFi provides built-in provenance tracking (data lineage) and real-time streaming, while Airflow is batch-oriented.
-- **ClickHouse vs TimescaleDB:** ClickHouse offers 10x faster query performance on aggregations and native Kafka integration.
-- **Kafka vs RabbitMQ:** Kafka provides replay capability and distributed log architecture essential for ML model retraining.
+### Architecture Globale Simplifiée
+
+```mermaid
+flowchart TB
+ subgraph SOURCES["📡 Sources - 153 Colonnes"]
+        IOT["🌡️ Capteurs IoT"]
+        CAMERAS["📷 Vision IA"]
+        APIS["🌐 APIs NASA/Météo"]
+  end
+ subgraph NIFI["⚙️ Apache NiFi"]
+        N["Normalisation & Validation"]
+  end
+ subgraph KAFKA["📬 Apache Kafka"]
+        K["Topic Telemetry Full"]
+  end
+ subgraph DB["💾 Bases de Données"]
+        M[("🟢 MongoDB<br/>Temps Réel")]
+        C[("🟡 ClickHouse<br/>Historique")]
+  end
+ subgraph VIZ["📊 Visualisation"]
+        P["Power BI / Grafana"]
+        COPILOT["🌿 Agri-Copilot Pro"]
+  end
+    IOT ==> N
+    CAMERAS --> N
+    APIS ==> N
+    N -- JSON Standardisé --> K
+    K -- Stream Temps Réel --> M
+    K -- Batch Insert --> C
+    M -- DirectQuery --> P
+    C -- DirectQuery --> P
+    C -- SQL Analytics --> COPILOT
+    M == Alerte ==> N
+```
+
+### Chaîne des Algorithmes Scientifiques
+
+```mermaid
+graph TD
+    subgraph P1["🔧 PHASE 1: PRÉ-TRAITEMENT<br/>(NiFi)"]
+        DATA["📥 Donnée Brute"] --> A1["A1: Normalisation JSON"]
+        A1 --> A2["A2: Détection Aberration<br/>(Z-Score)"]
+        A2 --> A3["A3: Enrichissement<br/>Contextuel"]
+    end
+    
+    subgraph P2["⚡ PHASE 2: CONTRÔLE RÉFLEXE<br/>(MongoDB)"]
+        A3 --> A4["A4: Seuillage<br/>Dynamique"]
+        A4 --> A5["A5: Règles<br/>Métier"]
+    end
+    
+    subgraph P3["📊 PHASE 3: STATISTIQUES<br/>(ClickHouse)"]
+        A3 --> A6["A6: Agrégation<br/>Temporelle"]
+        A6 --> A7["A7: Corrélation<br/>Pearson"]
+        A7 --> A8["A8: Segmentation<br/>ANOVA"]
+    end
+    
+    subgraph P4["🧠 PHASE 4: ML & OPTIMISATION<br/>(Python)"]
+        A6 --> A9["A9: LSTM<br/>Séries Temp."]
+        A7 --> A9
+        A9 --> A10["A10: RandomForest<br/>Classification"]
+        A10 --> A11["A11: Gradient Descent<br/>Optimisation"]
+    end
+    
+    A11 -.->|🔄 Mise à jour Cibles| A4
+
+    style P1 fill:#e3f2fd,stroke:#1565c0
+    style P2 fill:#ffebee,stroke:#c62828
+    style P3 fill:#fff3e0,stroke:#ef6c00
+    style P4 fill:#f3e5f5,stroke:#7b1fa2
+```
 
 ---
 
-## Quick Start
+## 🧰 Stack Technologique
 
-### Prerequisites
+### Infrastructure locale
+
+| Composant | Technologie | Version | Rôle |
+|-----------|-------------|---------|------|
+| **Capteurs** | ESP32 + MQTT | - | Acquisition des mesures |
+| **Broker MQTT** | Eclipse Mosquitto | 2.0+ | QoS 1, topics vertiflow/# |
+| **ETL** | Apache NiFi | 1.23+ | 50 processeurs, validation, enrichissement |
+| **Streaming** | Apache Kafka | 7.5+ | Bus événementiel, 12 partitions |
+| **Time-Series** | ClickHouse | 23.8+ | OLAP, compression Gorilla |
+| **Documents** | MongoDB | 7.0+ | Recettes, configs, audit |
+| **ML local** | Python + scikit-learn | 3.11+ | Oracle, Classifier, Cortex |
+| **Containers** | Docker Compose | 2.20+ | Orchestration locale |
+| **Monitoring** | Grafana + Prometheus | - | Dashboards temps réel |
+
+### Google Cloud Platform
+
+| Service | Rôle | Intégration |
+|---------|------|-------------|
+| **GCS (Cloud Storage)** | Data Lake - archive brute | NiFi PutGCSObject |
+| **BigQuery** | Analytics lourdes, features ML | NiFi PutBigQueryBatch |
+| **Vertex AI** | Entraînement des modèles | API Python |
+| **Gemini** | NL→SQL pour Agri-Copilot | API REST |
+| **Looker Studio** | Dashboards business | Connecteur BigQuery |
+
+### Pourquoi ces choix ?
+
+- **NiFi plutôt qu'Airflow** : on a besoin de streaming temps réel, pas de batch. Et NiFi trace automatiquement d'où vient chaque donnée.
+- **ClickHouse plutôt que TimescaleDB** : 10× plus rapide sur les agrégations, et il s'intègre nativement avec Kafka.
+- **Kafka plutôt que RabbitMQ** : on peut rejouer les messages pour ré-entraîner les modèles ML. C'est un log, pas une queue.
+- **GCP plutôt qu'AWS** : BigQuery est imbattable pour les analytics ad-hoc, et Gemini s'intègre bien avec notre assistant IA.
+
+---
+
+## 🚀 Démarrage Rapide
+
+### Prérequis
 
 - **Docker** 24.0+ & **Docker Compose** 2.20+
 - **Python** 3.11+
-- **8 GB RAM** minimum (16 GB recommended)
-- **50 GB** free disk space
+- **8 Go RAM** minimum (16 Go recommandé)
+- **50 Go** d'espace disque libre
 
 ### Installation
 
 ```bash
-# 1. Clone repository
+# 1. Cloner le repository
 git clone https://github.com/vertiflow-team/vertiflow-data-platform.git
 cd vertiflow-data-platform
 
-# 2. Setup environment
+# 2. Configurer l'environnement
 cp .env.example .env
-# Edit .env with your parameters (most defaults work out-of-box)
+# Éditer .env avec vos paramètres (la plupart des valeurs par défaut fonctionnent)
 
-# 3. Start infrastructure (Kafka, ClickHouse, MongoDB, NiFi)
+# 3. Démarrer l'infrastructure (Kafka, ClickHouse, MongoDB, NiFi)
 docker-compose up -d
 
-# 4. Wait for healthchecks (~2 minutes)
-docker-compose ps  # All services should show "healthy"
+# 4. Attendre les healthchecks (~2 minutes)
+docker-compose ps  # Tous les services doivent afficher "healthy"
 
-# 5. Create Python virtual environment
+# 5. Créer l'environnement virtuel Python
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-# 6. Install dependencies
+# 6. Installer les dépendances
 pip install -r requirements.txt
 
-# 7. Initialize databases
+# 7. Initialiser les bases de données
 python infrastructure/init_infrastructure.py
 
-# 8. Download external datasets (optional but recommended)
+# 8. Télécharger les datasets externes (optionnel mais recommandé)
 chmod +x scripts/download_all_sources.sh
 ./scripts/download_all_sources.sh --priority 1  # 40 MB, ~10 min
 ```
 
-### Verify Installation
+### Vérifier l'Installation
 
 ```bash
-# Run integration tests
+# Lancer les tests d'intégration
 pytest tests/integration/ -v
 
-# Test MQTT -> ClickHouse pipeline
+# Tester le pipeline MQTT -> ClickHouse
 python tests/integration/test_mqtt_to_clickhouse.py
 
-# Query data
+# Vérifier les données
 docker exec -it clickhouse clickhouse-client --query \
   "SELECT count(*) FROM vertiflow.sensor_telemetry"
 ```
 
-### Access Interfaces
+### Accéder aux Interfaces
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
+| Service | URL | Identifiants |
+|---------|-----|--------------|
 | **NiFi UI** | https://localhost:8443/nifi | admin / admin |
 | **Grafana** | http://localhost:3000 | admin / admin |
-| **ClickHouse** | localhost:9000 (native) / localhost:8123 (HTTP) | default / (no password) |
+| **ClickHouse** | localhost:9000 (natif) / localhost:8123 (HTTP) | default / (sans mot de passe) |
 | **MongoDB** | localhost:27017 | vertiflow / vertiflow_password |
+| **Agri-Copilot Pro** | http://localhost:8501 (Streamlit) | - |
 
 ---
 
-## Project Structure
+## 📁 Structure du Projet
 
 ```
 vertiflow-data-platform/
-|
-+-- cloud_citadel/                    # LAYER 5-6: INTELLIGENCE
-|   +-- __init__.py
-|   +-- connectors/
-|   |   +-- feedback_loop.py          # Model retraining pipeline
-|   |   +-- stream_processor.py       # Kafka -> ClickHouse processor
-|   +-- nervous_system/
-|       +-- classifier.py             # ALGO A10 - Quality classification
-|       +-- cortex.py                 # ALGO A11 - Recipe optimization
-|       +-- nervous_system.py         # LSTM-based predictions
-|       +-- oracle.py                 # ALGO A9 - Yield prediction
-|       +-- simulator.py              # Bio-physics models
-|       +-- calibration/
-|       |   +-- agronomic_parameters.yaml
-|       +-- connectors/
-|           +-- clickhouse_sink.json
-|
-+-- config/                           # CONFIGURATION
-|   +-- environments/
-|   +-- mosquitto/
-|   +-- agronomic_parameters.yaml
-|   +-- external_data_sources.yaml
-|   +-- mapping.json
-|   +-- nifi_pipeline_dev.yaml
-|   +-- nifi_pipeline_prod.yaml
-|   +-- prometheus.yml
-|
-+-- dashboards/                       # LAYER 7: VISUALIZATION
-|   +-- grafana/
-|
-+-- docs/                             # DOCUMENTATION
-|   +-- architecture/                 # Technical architecture docs
-|   +-- deployment/                   # Deployment guides
-|   +-- diagrams/                     # Mermaid diagrams (.mmd)
-|   +-- project/                      # Project management docs
-|   +-- schemas/
-|   |   +-- telemetry_v3.json         # Telemetry contract
-|   |   +-- command_v3.json           # Command contract
-|   +-- 01_ARCHITECTURE.md
-|   +-- 02_DATA_GOVERNANCE.md
-|   +-- 03_DATA_CATALOG.md
-|   +-- 05_EXTERNAL_DATA_CATALOG.md
-|
-+-- infrastructure/                   # INFRASTRUCTURE AS CODE
-|   +-- init_infrastructure.py        # Master setup script
-|   +-- init_scripts/
-|       +-- clickhouse/
-|       |   +-- 01_tables.sql
-|       |   +-- 02_powerbi_views.sql
-|       |   +-- 03_external_data.sql
-|       +-- mongodb/
-|           +-- seed_data.js
-|           +-- plant_recipes.js
-|
-+-- models/                           # ML MODELS
-|   +-- train_all_models.py
-|   +-- train_harvest_lstm.py
-|   +-- train_oracle_model.py
-|   +-- train_quality_classifier.py
-|
-+-- scripts/                          # AUTOMATION SCRIPTS
-|   +-- data_ingestion/
-|   +-- data_sources/
-|   |   +-- handlers/                 # External API handlers
-|   |   +-- scrapers/                 # Web scrapers
-|   +-- etl/
-|   |   +-- aggregate_metrics.py
-|   |   +-- load_external_data.py
-|   |   +-- transform_telemetry.py
-|   +-- health/
-|   +-- simulators/
-|   |   +-- iot_sensor_simulator.py
-|   |   +-- lab_data_generator.py
-|   |   +-- led_spectrum_simulator.py
-|   |   +-- nutrient_sensor_simulator.py
-|   |   +-- vision_system_simulator.py
-|   +-- diagnostic_nifi_api.py        # (renamed from spaces)
-|   +-- mapping_156_parameters.py     # (renamed from spaces)
-|   +-- test_pipeline.py              # (renamed from PascalCase)
-|   +-- init_clickhouse.py
-|   +-- init_kafka_topics.py
-|   +-- init_mongodb.py
-|   +-- download_nasa_power.py
-|   +-- fetch_open_meteo.py
-|   +-- run_all_simulators.py
-|
-+-- tests/                            # AUTOMATED TESTS
-|   +-- unit/
-|   |   +-- test_classifier.py
-|   |   +-- test_cortex.py
-|   |   +-- test_oracle.py
-|   |   +-- test_simulator.py
-|   +-- integration/
-|   |   +-- test_clickhouse.py
-|   |   +-- test_kafka_connectivity.py
-|   |   +-- test_kafka_pipeline.py
-|   |   +-- test_mqtt_to_clickhouse.py
-|   +-- e2e/
-|       +-- test_full_pipeline.py
-|
-+-- security/                         # SECURITY & CERTIFICATES
-+-- monitoring/                       # OBSERVABILITY STACK
-+-- k8s/                              # KUBERNETES (future)
-+-- mlops/                            # MLFLOW (future)
-|
-+-- .env.example
-+-- .gitignore
-+-- docker-compose.yml                # Main services
-+-- docker-compose.metrics.yml        # Monitoring stack
-+-- docker-compose.secure.yml         # Secure configuration
-+-- Dockerfile
-+-- Makefile
-+-- requirements.txt
-+-- CHANGELOG.md
-+-- CONTRIBUTING.md
-+-- LICENSE
-+-- README.md
+│
+├── 🤖 agri-copilot-pro/              # ASSISTANT IA INTÉGRÉ
+│   ├── app_pro.py                    # Interface Streamlit
+│   ├── main.py                       # API FastAPI
+│   └── requirements.txt              # Dépendances spécifiques
+│
+├── 🧠 cloud_citadel/                 # COUCHE 5-6: INTELLIGENCE
+│   ├── connectors/
+│   │   ├── feedback_loop.py          # Pipeline ré-entraînement
+│   │   └── stream_processor.py       # Processeur Kafka → ClickHouse
+│   └── nervous_system/
+│       ├── classifier.py             # ALGO A10 - Classification qualité
+│       ├── cortex.py                 # ALGO A11 - Optimisation recettes
+│       ├── oracle.py                 # ALGO A9 - Prédiction rendement
+│       └── simulator.py              # Modèles bio-physiques
+│
+├── ⚙️ config/                        # CONFIGURATION
+│   ├── environments/                 # Configs par environnement
+│   ├── mosquitto/                    # Config MQTT
+│   ├── agronomic_parameters.yaml     # Paramètres agronomiques
+│   └── nifi_pipeline_*.yaml          # Templates NiFi
+│
+├── 📊 dashboards/                    # COUCHE 7: VISUALISATION
+│   └── grafana/                      # Dashboards Grafana
+│
+├── 📚 docs/                          # DOCUMENTATION
+│   ├── diagrams/                     # 🔹 Diagrammes Mermaid (.mmd)
+│   │   ├── architecture_globale.mmd
+│   │   ├── data_pipeline_v5.mmd
+│   │   ├── algorithmes.mmd
+│   │   └── master_v4.mmd
+│   ├── architecture/                 # Docs architecture technique
+│   ├── schemas/                      # Contrats de données
+│   │   ├── telemetry_v3.json
+│   │   └── command_v3.json
+│   └── *.md                          # Documentation générale
+│
+├── 🏗️ infrastructure/               # INFRASTRUCTURE AS CODE
+│   ├── init_infrastructure.py        # Script setup master
+│   └── init_scripts/
+│       ├── clickhouse/               # Scripts init ClickHouse
+│       └── mongodb/                  # Scripts init MongoDB
+│
+├── 🤖 models/                        # MODÈLES ML
+│   ├── train_oracle_model.py         # Entraînement Oracle
+│   └── train_quality_classifier.py   # Entraînement Classifier
+│
+├── 🔧 scripts/                       # SCRIPTS AUTOMATISATION
+│   ├── simulators/                   # Simulateurs IoT
+│   │   ├── iot_sensor_simulator.py
+│   │   └── led_spectrum_simulator.py
+│   ├── etl/                          # Scripts ETL
+│   └── data_sources/                 # Handlers APIs externes
+│
+├── 🧪 tests/                         # TESTS AUTOMATISÉS
+│   ├── unit/                         # Tests unitaires
+│   ├── integration/                  # Tests d'intégration
+│   └── e2e/                          # Tests bout-en-bout
+│
+├── 🔒 security/                      # SÉCURITÉ & CERTIFICATS
+├── 📈 monitoring/                    # STACK OBSERVABILITÉ
+├── ☸️ k8s/                           # KUBERNETES (futur)
+├── 📦 mlops/                         # MLFLOW (futur)
+│
+├── docker-compose.yml                # Services principaux
+├── docker-compose.metrics.yml        # Stack monitoring
+├── docker-compose.secure.yml         # Configuration sécurisée
+├── Dockerfile
+├── Makefile
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## Algorithms
+## 🔬 Algorithmes Scientifiques
 
-VertiFlow implements **11 scientific algorithms** for data processing and intelligence:
+VertiFlow implémente **11 algorithmes scientifiques** pour le traitement et l'intelligence des données :
 
-| ID | Name | Type | Location | Purpose |
-|----|------|------|----------|---------|
-| A1 | JSON Normalization | ETL | NiFi | Standardization of heterogeneous formats |
-| A2 | Z-Score Outlier Detection | Statistical | NiFi | Reject faulty sensor data (3 sigma threshold) |
-| A3 | Contextual Enrichment | Fusion | NiFi | Add metadata, legal lineage |
-| A4 | Dynamic Thresholding | Logic | MongoDB | Real-time alerts vs expert targets |
-| A5 | Rule Engine | Boolean | MongoDB | Reflex actions (emergency stop) |
-| A6 | Temporal Aggregation | SQL | ClickHouse | Rolling averages, noise reduction |
-| A7 | Pearson Correlation | SQL | ClickHouse | Prove causal links (light vs weight) |
-| A8 | ANOVA Segmentation | SQL | ClickHouse | A/B testing comparison of racks |
-| **A9** | **LSTM Time-Series** | Deep Learning | `oracle.py` | Harvest date prediction (7-day horizon) |
-| **A10** | **Random Forest Classification** | ML Supervised | `classifier.py` | Quality prediction (Premium/Standard/Reject) |
-| **A11** | **Gradient Descent Optimization** | Math | `cortex.py` | Recipe optimization (yield x quality - cost) |
+| ID | Nom | Type | Localisation | Fonction |
+|----|-----|------|--------------|----------|
+| A1 | Normalisation JSON | ETL | NiFi | Standardisation formats hétérogènes |
+| A2 | Détection Aberration Z-Score | Statistique | NiFi | Rejet données capteurs défectueux (seuil 3σ) |
+| A3 | Enrichissement Contextuel | Fusion | NiFi | Ajout métadonnées, lineage légal |
+| A4 | Seuillage Dynamique | Logique | MongoDB | Alertes temps réel vs cibles expert |
+| A5 | Moteur de Règles | Booléen | MongoDB | Actions réflexe (arrêt urgence) |
+| A6 | Agrégation Temporelle | SQL | ClickHouse | Moyennes glissantes, réduction bruit |
+| A7 | Corrélation Pearson | SQL | ClickHouse | Prouver liens causaux (lumière vs poids) |
+| A8 | Segmentation ANOVA | SQL | ClickHouse | Comparaison A/B testing des racks |
+| **A9** | **LSTM Séries Temporelles** | Deep Learning | `oracle.py` | Prédiction date récolte (horizon 7j) |
+| **A10** | **RandomForest Classification** | ML Supervisé | `classifier.py` | Prédiction qualité (Premium/Standard/Rejet) |
+| **A11** | **Gradient Descent Optimisation** | Math | `cortex.py` | Optimisation recette (rendement × qualité − coût) |
 
-### Bio-Physics Models (simulator.py)
+### Modèles Bio-Physiques (simulator.py)
 
-- **VPD (Vapor Pressure Deficit):** Tetens formula
+- **VPD (Vapor Pressure Deficit) :** Formule de Tetens
   ```
-  E_s(T) = 0.6108 x exp(17.27T / (T+237.3)) kPa
+  E_s(T) = 0.6108 × exp(17.27T / (T+237.3)) kPa
   ```
-- **Photosynthesis Rate:** Farquhar model with Michaelis-Menten CO2 kinetics
-- **Transpiration:** Penman-Monteith equation
-- **DLI (Daily Light Integral):** `DLI = (PPFD x daylength x 3.6) / 10^6` mol/m2/day
-- **Spectral Effects:** Blue/Red/Far-Red impacts on morphology
+- **Taux Photosynthèse :** Modèle Farquhar avec cinétique CO2 Michaelis-Menten
+- **Transpiration :** Équation Penman-Monteith
+- **DLI (Daily Light Integral) :** `DLI = (PPFD × durée_jour × 3.6) / 10⁶` mol/m²/jour
+- **Effets Spectraux :** Impacts Bleu/Rouge/Far-Red sur la morphologie
 
 ---
 
-## Data Governance
+## 🛡️ Comment on gère la qualité des données
 
-### Vance Protocol Implementation
+On ne fait pas confiance aux capteurs aveuglément. Voici notre approche :
 
-VertiFlow implements the **Vance Protocol** for enterprise data governance:
+### Tout est validé à l'entrée
 
-#### 1. Zero-Trust Validation
-
-Every MQTT message is validated against JSON Schema **before** entering Kafka:
+Chaque message MQTT passe par un contrôle strict avant d'aller plus loin. Le schéma attendu :
 
 ```json
 {
-  "device_id": "^ESP32-[A-Z0-9]{4}$",
-  "zone": ["ZONE_A", "ZONE_B", "NURSERY"],
-  "metric_type": ["temperature", "humidity", "co2", "par", "ph", "ec"],
-  "value": {"type": "number"},
-  "timestamp": {"type": "string", "format": "date-time"}
+  "device_id": "ESP32-XXXX",
+  "zone": "ZONE_A ou ZONE_B ou NURSERY",
+  "metric_type": "temperature, humidity, co2, par, ph, ec",
+  "value": "un nombre",
+  "timestamp": "format ISO 8601"
 }
 ```
 
-#### 2. Governance Stamping
+Si le message ne correspond pas → il est rejeté et envoyé dans la Dead Letter Queue.
 
-Valid messages receive automatic metadata injection:
+### On sait d'où viennent les données
 
-```json
-{
-  "governance.ingest.ts": 1735392000000,
-  "governance.schema.version": "v3.0",
-  "governance.environment": "production",
-  "data.tier": "BRONZE",
-  "lineage.source": "mqtt"
-}
-```
+Chaque donnée valide est enrichie automatiquement avec :
+- Quand elle a été ingérée
+- Quelle version du schéma
+- Quel environnement (dev/prod)
+- Son niveau de qualité (Bronze/Silver/Gold)
+- Sa source d'origine
 
-#### 3. Dead Letter Queue (3-Tier)
+### Si quelque chose échoue, on ne perd rien
 
 ```
-Invalid Data -> Wrap Error (structured JSON)
-             |
-             v
-        Kafka Topic (vertiflow.errors)
-             |
-             v
-        File Backup (/logs/dlq)
+Message invalide → On l'enveloppe avec l'erreur
+                 ↓
+           Topic Kafka (vertiflow.errors)
+                 ↓
+           Fichier backup (/logs/dlq)
 ```
 
-#### 4. Retention Policies (Bronze/Silver/Gold)
+Trois niveaux de fallback. On peut toujours revenir voir ce qui s'est passé.
 
-| Tier | Description | Retention | Storage |
-|------|-------------|-----------|---------|
-| **Bronze** | Raw telemetry | 30 days | ClickHouse (compressed) |
-| **Silver** | Aggregated (1min, 1h) | 90 days | ClickHouse |
-| **Gold** | ML features & predictions | Permanent | ClickHouse + MongoDB |
+### Niveaux de données (Bronze → Silver → Gold)
+
+| Niveau | C'est quoi | Combien de temps | Où |
+|--------|------------|------------------|-----|
+| **Bronze** | Les données brutes des capteurs | 30 jours | ClickHouse + GCS |
+| **Silver** | Agrégées par minute et par heure | 90 jours | ClickHouse + BigQuery |
+| **Gold** | Features ML, prédictions | Permanent | ClickHouse + MongoDB + BigQuery |
 
 ---
 
-## Machine Learning
+## 🤖 Les cerveaux de VertiFlow
 
-### 1. Oracle (Yield Predictions - A9)
+### Oracle : prédire le rendement
 
-**Model:** RandomForestRegressor (100 trees)
+On entraîne un RandomForest sur les données historiques pour prédire combien de grammes de basilic on va récolter dans 30 jours.
 
-**Features (5-dimensional):**
-- `temp_mean_24h`: Rolling average temperature
-- `par_mean_24h`: PAR light intensity
-- `humidity_mean_24h`: Relative humidity
-- `co2_mean_24h`: CO2 concentration
-- `temp_stddev_24h`: Temperature variability
+**Ce qu'il regarde :**
+- Température moyenne sur 24h
+- Lumière PAR moyenne
+- Humidité relative
+- Niveau de CO2
+- Stabilité de la température (écart-type)
 
-**Target:** `predicted_yield_g` (fresh biomass at day 30)
+**Résultats :** erreur de ±12g, précision de 87%. L'inférence prend moins de 100ms.
 
-**Performance:**
-- RMSE: 12.3g (on synthetic data)
-- R2: 0.87
-- Inference latency: < 100ms
+### Classifier : noter la qualité
 
-### 2. Classifier (Quality Grading - A10)
+Il classe chaque lot en trois catégories : **Premium**, **Standard** ou **À rejeter**.
 
-**Model:** RandomForest (mock implementation, ready for real model)
+Il analyse le VPD, la lumière cumulée (DLI), la conductivité de la solution nutritive et l'âge des plants.
 
-**Classes:** PREMIUM, STANDARD, REJECT
+### Cortex : optimiser les recettes
 
-**Features:**
-- air_temp_internal
-- vapor_pressure_deficit
-- light_dli_accumulated
-- nutrient_solution_ec
-- days_since_planting
+C'est le cerveau qui ajuste les paramètres de culture en continu. Il cherche le meilleur compromis entre rendement, qualité et coût énergétique.
 
-### 3. Cortex (Recipe Optimization - A11)
-
-**Algorithm:** scipy.optimize.minimize (L-BFGS-B)
-
-**Objective Function:**
 ```
-Score = Yield x 0.6 + Quality x 0.4 - Cost x 0.2
+Score = Rendement × 0.6 + Qualité × 0.4 − Coût × 0.2
 ```
 
-**Constraints (Biological Bounds):**
-- Temperature: 18-28C
-- EC (Electrical Conductivity): 1.2-2.5 mS/cm
-- DLI (Daily Light Integral): 10-20 mol/m2/day
+Il respecte des contraintes biologiques :
+- Température entre 18 et 28°C
+- EC entre 1.2 et 2.5 mS/cm
+- DLI entre 10 et 20 mol/m²/jour
 
-**Frequency:** 24-hour optimization cycles
+Cycle d'optimisation : toutes les 24h.
 
 ---
 
-## External Data Sources
+## 🌿 Agri-Copilot Pro
 
-### Integrated Datasets
+<div align="center">
+
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.31%2B-FF4B4B)](https://streamlit.io/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109%2B-009485)](https://fastapi.tiangolo.com/)
+[![Gemini](https://img.shields.io/badge/Google%20Gemini-AI-4285F4)](https://ai.google.dev/)
+[![BigQuery](https://img.shields.io/badge/BigQuery-Analytics-669DF6)](https://cloud.google.com/bigquery)
+
+</div>
+
+Notre assistant IA. Au lieu d'écrire du SQL, vous posez des questions en français (ou en anglais, arabe, tamazight) et il vous répond.
+
+**Comment ça marche :**
+1. Vous tapez : "Quelle était la température moyenne de la zone A hier ?"
+2. Gemini comprend la question et génère la requête SQL
+3. La requête est envoyée à ClickHouse ou BigQuery
+4. Vous recevez la réponse avec un graphique
+
+**Ce qu'il peut faire :**
+
+| | |
+|---|---|
+| 🗣️ Comprendre le français, l'anglais, l'arabe | 📊 Interroger ClickHouse et BigQuery |
+| 🔐 Limiter l'accès selon votre rôle | 💾 Mettre en cache les réponses fréquentes |
+| 📈 Générer des graphiques Plotly | ⚡ Temps de réponse < 2 secondes |
+
+### Pour l'essayer
+
+```bash
+cd agri-copilot-pro
+pip install -r requirements.txt
+
+# Interface chat
+streamlit run app_pro.py
+# → http://localhost:8501
+
+# API REST
+uvicorn main:app --host 0.0.0.0 --port 8000
+# → http://localhost:8000/api/docs
+```
+
+### Exemples de questions
+
+```
+"Compare l'humidité entre les zones A et B sur les 7 derniers jours"
+"Quel était le pic de CO2 hier dans la nursery ?"
+"Show me the correlation between temperature and yield"
+"أظهر لي متوسط درجة الحرارة"
+```
+
+> 📖 Plus de détails dans [agri-copilot-pro/README.md](agri-copilot-pro/README.md)
+
+---
+
+## 🌐 Sources de Données Externes
+
+### Datasets Intégrés
 
 | Source | Description | Volume | Usage |
 |--------|-------------|--------|-------|
-| **Cooper Hewitt PFC** | MIT OpenAg 73k environmental datapoints | 12 MB | Benchmark validation |
-| **Basil Viability FS2** | MIT basil growth experiment (2018-2019) | 23 MB | Model calibration |
-| **NASA POWER** | Solar irradiance & climate (Casablanca) | 2.5 MB | ML features (seasonal) |
-| **OpenAg Recipes** | Validated cultivation recipes | 5 MB | Control config templates |
-| **Wageningen Research** | LED spectrum studies | 250 MB | Spectral optimization |
+| **Cooper Hewitt PFC** | MIT OpenAg 73k datapoints environnementaux | 12 MB | Validation benchmark |
+| **Basil Viability FS2** | Expérience croissance basilic MIT (2018-2019) | 23 MB | Calibration modèles |
+| **NASA POWER** | Irradiance solaire & climat (Casablanca) | 2.5 MB | Features ML (saisonnalité) |
+| **OpenAg Recipes** | Recettes de culture validées | 5 MB | Templates config contrôle |
+| **Wageningen Research** | Études spectre LED | 250 MB | Optimisation spectrale |
 
-### Download External Data
+### Téléchargement Données Externes
 
 ```bash
-# Priority 1: Quick wins (40 MB, 10 min)
+# Priorité 1 : Quick wins (40 MB, 10 min)
 ./scripts/download_all_sources.sh --priority 1
 
-# Priority 2: Academic + Weather (650 MB, 30 min)
+# Priorité 2 : Académique + Météo (650 MB, 30 min)
 ./scripts/download_all_sources.sh --priority 2
 
-# All sources (1.1 GB, 1-2 hours)
+# Toutes les sources (1.1 GB, 1-2 heures)
 ./scripts/download_all_sources.sh --priority all
 ```
 
 ---
 
-## Performance Metrics
+## 📈 Métriques de Performance
 
-### Tested Capabilities
+### Capacités Testées
 
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Throughput** | 2,880 msg/min | 8 sensors x 3 zones x 2 msg/min x 60s |
-| **Latency (P99)** | < 5 seconds | MQTT -> ClickHouse end-to-end |
-| **Compression** | 5:1 ratio | Gorilla codec on floats |
-| **Query Speed** | < 500ms | SELECT on 30 days (10M rows) |
-| **Storage (30d)** | ~2 GB | With rotation & compression |
-| **DLQ Success** | 99.98% | 0.02% loss (Kafka total failure) |
+| Métrique | Valeur | Notes |
+|----------|--------|-------|
+| **Throughput** | 2 880 msg/min | 8 capteurs × 3 zones × 2 msg/min × 60s |
+| **Latence (P99)** | < 5 secondes | MQTT → ClickHouse bout-en-bout |
+| **Compression** | Ratio 5:1 | Codec Gorilla sur floats |
+| **Vitesse Requête** | < 500ms | SELECT sur 30 jours (10M lignes) |
+| **Stockage (30j)** | ~2 GB | Avec rotation & compression |
+| **Succès DLQ** | 99.98% | 0.02% perte (échec total Kafka) |
 
-### Scalability
+### Scalabilité
 
 ```
-Single Installation (3 Zones):
-  - Telemetry: 33 MB/month (compressed)
-  - Images: 370 MB/month (optimized)
-  - Logs: 315 MB/month (30d rotation)
+Installation Unique (3 Zones):
+  - Télémétrie: 33 MB/mois (compressé)
+  - Images: 370 MB/mois (optimisé)
+  - Logs: 315 MB/mois (rotation 30j)
 
 10 Installations:
-  - Total: ~20 GB/month (stable with TTL)
-  - ClickHouse cluster recommended
+  - Total: ~20 GB/mois (stable avec TTL)
+  - Cluster ClickHouse recommandé
 ```
 
 ---
 
-## Current Status
+## 📊 État Actuel
 
-### What Works (Functional)
+### ✅ Fonctionnel
 
-- Infrastructure Setup (Docker Compose with 7 services)
-- Health checks for all services
-- Simulator Module (complete bio-physics models)
-- Database Schemas (ClickHouse + MongoDB)
-- Test Suite (16+ test files with fixtures)
-- Documentation (comprehensive architecture docs)
+- Infrastructure Docker Compose (7 services)
+- Health checks pour tous les services
+- Module Simulateur (modèles bio-physiques complets)
+- Schémas bases de données (ClickHouse + MongoDB)
+- Suite de tests (16+ fichiers avec fixtures)
+- Documentation complète d'architecture
+- Assistant IA Agri-Copilot Pro
 
-### What's In Progress
+### 🔄 En Cours
 
-- ML Models (framework ready, needs real training data)
-- Stream Processing (design complete, integration pending)
-- Feedback Loop (designed but not operational)
-- NiFi Pipelines (templates exist, not fully deployed)
+- Modèles ML (framework prêt, besoin données réelles d'entraînement)
+- Traitement Stream (design complet, intégration en cours)
+- Boucle de Feedback (conçue mais non opérationnelle)
+- Pipelines NiFi (templates existants, déploiement partiel)
 
-### What's Planned
+### 📋 Planifié
 
-- Kubernetes deployment
-- REST API endpoints
-- React web dashboard
-- Computer vision for disease detection
+- Déploiement Kubernetes
+- Endpoints REST API
+- Dashboard web React
+- Vision par ordinateur pour détection maladies
 
 ---
 
-## Roadmap
+## 🗺️ Roadmap
 
-### v1.0 (Current) - Core Platform
+### v1.0 (Actuel) - Plateforme Core
 
-- [x] Real-time telemetry ingestion (MQTT -> Kafka -> ClickHouse)
-- [x] Zero-Trust validation + 3-tier DLQ
-- [x] Hybrid storage (ClickHouse + MongoDB)
-- [x] Cortex autonomous control (framework)
-- [x] Oracle ML predictions (framework)
-- [x] External data integration (NASA, OpenAg)
-- [x] Comprehensive test suite
-- [ ] Production deployment hardening
+- [x] Ingestion télémétrie temps réel (MQTT → Kafka → ClickHouse)
+- [x] Validation Zero-Trust + DLQ 3 niveaux
+- [x] Stockage hybride (ClickHouse + MongoDB)
+- [x] Contrôle autonome Cortex (framework)
+- [x] Prédictions ML Oracle (framework)
+- [x] Intégration données externes (NASA, OpenAg)
+- [x] Suite de tests complète
+- [x] Assistant IA Agri-Copilot Pro
+- [ ] Hardening déploiement production
 
-### v1.1 (Q2 2026) - Observability++
+### v1.1 (Q2 2026) - Observabilité++
 
-- [ ] Metrics Collector sidecar (Prometheus)
-- [ ] Shadow Validation Framework (Great Expectations)
-- [ ] Live Data Catalog (auto-generated)
-- [ ] Enhanced Grafana dashboards
-- [ ] REST API endpoints
+- [ ] Sidecar Metrics Collector (Prometheus)
+- [ ] Framework Shadow Validation (Great Expectations)
+- [ ] Data Catalog Live (auto-généré)
+- [ ] Dashboards Grafana améliorés
+- [ ] Endpoints REST API
 
 ### v1.2 (Q3 2026) - Computer Vision
 
-- [ ] PlantCV integration (image analysis)
-- [ ] Automatic disease detection
-- [ ] Sensorless plant_height measurement
+- [ ] Intégration PlantCV (analyse d'image)
+- [ ] Détection automatique maladies
+- [ ] Mesure plant_height sans capteur
 
 ### v2.0 (Q4 2026) - Multi-Tenant & Scale-Out
 
-- [ ] Multi-installation support (1 -> N farms)
-- [ ] ClickHouse cluster (replication)
-- [ ] Kafka cluster (3+ brokers)
-- [ ] GraphQL API
-- [ ] Web dashboard (React)
-- [ ] Kubernetes deployment
+- [ ] Support multi-installation (1 → N fermes)
+- [ ] Cluster ClickHouse (réplication)
+- [ ] Cluster Kafka (3+ brokers)
+- [ ] API GraphQL
+- [ ] Dashboard web (React)
+- [ ] Déploiement Kubernetes
 
 ---
 
-## Contributing
+## 🤝 Contribution
 
-We welcome contributions! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for:
+Nous accueillons les contributions ! Veuillez lire notre [CONTRIBUTING.md](CONTRIBUTING.md) pour :
 
-- Bug reporting guidelines
-- Feature request process
-- Pull request requirements
-- Code style standards (PEP 8, type hints)
+- Directives de rapport de bugs
+- Processus de demande de fonctionnalités
+- Exigences pour les pull requests
+- Standards de code (PEP 8, type hints)
 
-### Development Setup
+### Configuration Développement
 
 ```bash
-# Clone repo
+# Cloner le repo
 git clone https://github.com/vertiflow-team/vertiflow-data-platform.git
 cd vertiflow-data-platform
 
-# Create virtual environment
+# Créer environnement virtuel
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-# Install dependencies
+# Installer dépendances
 pip install -r requirements.txt
 
-# Run tests
+# Lancer les tests
 pytest tests/ -v
 
-# Code formatting
+# Formatage code
 black cloud_citadel/ scripts/
 flake8 cloud_citadel/ scripts/
 ```
 
-### Commit Convention
+### Convention de Commits
 
-We use [Conventional Commits](https://www.conventionalcommits.org/):
+Nous utilisons [Conventional Commits](https://www.conventionalcommits.org/) :
 
 ```
-feat: Add MQTT authentication support
-fix: Correct VPD calculation in simulator
-docs: Update architecture diagrams
-refactor: Simplify Cortex decision logic
-test: Add integration tests for DLQ
+feat: Ajouter support authentification MQTT
+fix: Corriger calcul VPD dans simulator
+docs: Mettre à jour diagrammes architecture
+refactor: Simplifier logique décision Cortex
+test: Ajouter tests intégration pour DLQ
 ```
 
 ---
 
-## Team
+## 📜 Licence
 
-### Core Contributors
+Ce projet est sous licence **GNU General Public License v3.0** (GPL-3.0).
+Voir [LICENSE](LICENSE) pour le texte complet.
 
-- **@Mounir** - System Architect, Data Scientist, Bio-Physicist
-- **@Imrane** - DevOps Engineer, Infrastructure, Monitoring
-- **@Mouhammed** - Data Engineer, ETL Pipelines, Kafka Expert
-- **@Asama** - Agronomist, Biological Calibration, Scientific Validation
-- **@MrZakaria** - Tech Lead, Data Governance, Architecture Review
-
-### Acknowledgments
-
-This project builds upon excellent work from:
-
-- **MIT OpenAg Initiative** - Cooper Hewitt & Basil FS2 datasets
-- **Wageningen University** - LED horticulture research
-- **NASA POWER Project** - Open climate data
-- **Apache Software Foundation** - NiFi, Kafka
-- **ClickHouse Inc.** - OLAP database
-- **MongoDB Inc.** - NoSQL database
+**En résumé :**
+- Usage commercial autorisé
+- Modifications autorisées
+- Distribution autorisée
+- Obligation de divulguer le source (copyleft)
+- Les dérivés doivent utiliser la même licence
 
 ---
 
-## License
+## 📞 Contact & Support
 
-This project is licensed under the **GNU General Public License v3.0** (GPL-3.0).
-See [LICENSE](LICENSE) for full text.
-
-**In summary:**
-- Commercial use allowed
-- Modifications allowed
-- Distribution allowed
-- Must disclose source (copyleft)
-- Derivatives must use same license
+- **Issues :** [GitHub Issues](https://github.com/vertiflow-team/vertiflow-data-platform/issues)
+- **Discussions :** [GitHub Discussions](https://github.com/vertiflow-team/vertiflow-data-platform/discussions)
+- **Documentation :** [docs/](docs/)
 
 ---
 
-## Contact & Support
+## 📚 Citation
 
-- **Issues:** [GitHub Issues](https://github.com/vertiflow-team/vertiflow-data-platform/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/vertiflow-team/vertiflow-data-platform/discussions)
-- **Documentation:** [docs/](docs/)
-
----
-
-## Citation
-
-If you use VertiFlow in your research, please cite:
+Si vous utilisez VertiFlow dans vos recherches, veuillez citer :
 
 ```bibtex
 @software{vertiflow2025,
-  title = {VertiFlow: Industrial Data Platform for Intelligent Vertical Farming},
+  title = {VertiFlow: Plateforme Data Industrielle pour l'Agriculture Verticale Intelligente},
   author = {Mounir and Imrane and Mouhammed and Asama and Zakaria},
   year = {2025},
   url = {https://github.com/vertiflow-team/vertiflow-data-platform},
@@ -794,16 +896,58 @@ If you use VertiFlow in your research, please cite:
 
 ---
 
-<div align="center">
+## 🙏 Remerciements
 
-**Built with care for sustainable agriculture**
+Ce projet s'appuie sur d'excellents travaux de :
 
-[Back to Top](#vertiflow)
-
-</div>
+- **MIT OpenAg Initiative** - Datasets Cooper Hewitt & Basil FS2
+- **Wageningen University** - Recherche horticulture LED
+- **NASA POWER Project** - Données climatiques ouvertes
+- **Apache Software Foundation** - NiFi, Kafka
+- **ClickHouse Inc.** - Base de données OLAP
+- **MongoDB Inc.** - Base de données NoSQL
 
 ---
 
-**2025 VertiFlow Core Team - All rights reserved**
+<div align="center">
 
-*Developed as part of the Moroccan National Initiative JobInTech at YNOV Morocco Campus*
+<br/>
+
+## 🏫 Cadre de Formation
+
+<br/>
+
+**Ce projet a été réalisé dans le cadre du programme national JobInTech**
+
+<img src="images/vue1.jpg" alt="VertiFlow System" width="600"/>
+
+<br/><br/>
+
+| | |
+|:---:|:---|
+| **Programme** | JobInTech |
+| **Ministère** | Transition Numérique et Réforme de l'Administration (MTNRA) |
+| **Partenaire** | Groupe CDG |
+| **Opérateur** | Maroc Numeric Cluster (MNC) |
+| **Formation** | Data Engineering |
+| **École** | YNOV Maroc Campus |
+
+<br/>
+
+---
+
+**Construit avec soin pour une agriculture durable** 🌱
+
+<br/>
+
+[⬆️ Retour en haut](#-vertiflow)
+
+<br/>
+
+---
+
+**© 2025 Équipe DATAFLOW - Tous droits réservés**
+
+*Projet de Fin de Formation Data Engineering - JobInTech / YNOV Maroc Campus*
+
+</div>

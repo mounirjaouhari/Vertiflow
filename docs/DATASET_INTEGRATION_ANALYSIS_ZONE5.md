@@ -13,12 +13,12 @@
 **3 CATÉGORIES DE DONNÉES STRATÉGIQUES** identifiées:
 1. **Données IoT en temps réel** (LED Spectrum + Nutriments) - **PRODUCTION ACTIVE**
 2. **Datasets de recherche scientifique** (MIT OpenAG, Frontiers) - **RÉFÉRENCE**
-3. **Baselines et recettes optimisées** (Vance, Wageningen) - **OPÉRATIONNEL**
+3. **Baselines et recettes optimisées** (Wageningen & recherche) - **OPÉRATIONNEL**
 
 ### Volume Total
 - **~1,700 fichiers JSON IoT** temps réel (LED + nutriments)
 - **50+ datasets de recherche** (articles scientifiques, expérimentations)
-- **6 recettes basilic optimisées** (Vance protocol déjà transformé)
+- **6 recettes basilic optimisées** (déjà transformées)
 
 ---
 

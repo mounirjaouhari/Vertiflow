@@ -1,7 +1,7 @@
 [
   {
     "recipe_id": "BASIL-GER-01",
-    "species_variety": "Basil Vance Optimal",
+    "species_variety": "Basil VertiFlow Optimal",
     "growth_stage": "Semis",
     "target_temp_day": 24.0,
     "target_temp_night": 24.0,
@@ -16,14 +16,14 @@
     "target_k_ppm": 0,
     "target_ec": 0.0,
     "target_ph": 6.0,
-    "author": "Vance Protocol - Optimal Basil",
+    "author": "VertiFlow - Optimal Basil",
     "validation_date": "2026-02-01",
     "version": 1,
     "is_active": 1
   },
   {
     "recipe_id": "BASIL-EME-02",
-    "species_variety": "Basil Vance Optimal",
+    "species_variety": "Basil VertiFlow Optimal",
     "growth_stage": "Semis",
     "target_temp_day": 23.0,
     "target_temp_night": 21.0,
@@ -38,14 +38,14 @@
     "target_k_ppm": 100,
     "target_ec": 0.8,
     "target_ph": 5.8,
-    "author": "Vance Protocol - Optimal Basil",
+    "author": "VertiFlow - Optimal Basil",
     "validation_date": "2026-02-01",
     "version": 1,
     "is_active": 1
   },
   {
     "recipe_id": "BASIL-VEG-03",
-    "species_variety": "Basil Vance Optimal",
+    "species_variety": "Basil VertiFlow Optimal",
     "growth_stage": "V\u00e9g\u00e9tatif",
     "target_temp_day": 24.0,
     "target_temp_night": 20.0,
@@ -60,14 +60,14 @@
     "target_k_ppm": 150,
     "target_ec": 1.4,
     "target_ph": 5.8,
-    "author": "Vance Protocol - Optimal Basil",
+    "author": "VertiFlow - Optimal Basil",
     "validation_date": "2026-02-01",
     "version": 1,
     "is_active": 1
   },
   {
     "recipe_id": "BASIL-VEG-04",
-    "species_variety": "Basil Vance Optimal",
+    "species_variety": "Basil VertiFlow Optimal",
     "growth_stage": "V\u00e9g\u00e9tatif",
     "target_temp_day": 25.0,
     "target_temp_night": 19.0,
@@ -82,14 +82,14 @@
     "target_k_ppm": 220,
     "target_ec": 2.2,
     "target_ph": 6.0,
-    "author": "Vance Protocol - Optimal Basil",
+    "author": "VertiFlow - Optimal Basil",
     "validation_date": "2026-02-01",
     "version": 1,
     "is_active": 1
   },
   {
     "recipe_id": "BASIL-PRE-05",
-    "species_variety": "Basil Vance Optimal",
+    "species_variety": "Basil VertiFlow Optimal",
     "growth_stage": "Bouton",
     "target_temp_day": 22.0,
     "target_temp_night": 17.0,
@@ -104,14 +104,14 @@
     "target_k_ppm": 250,
     "target_ec": 1.8,
     "target_ph": 6.2,
-    "author": "Vance Protocol - Optimal Basil",
+    "author": "VertiFlow - Optimal Basil",
     "validation_date": "2026-02-01",
     "version": 1,
     "is_active": 1
   },
   {
     "recipe_id": "BASIL-HAR-06",
-    "species_variety": "Basil Vance Optimal",
+    "species_variety": "Basil VertiFlow Optimal",
     "growth_stage": "R\u00e9colte",
     "target_temp_day": 18.0,
     "target_temp_night": 15.0,
@@ -126,7 +126,7 @@
     "target_k_ppm": 0,
     "target_ec": 0.0,
     "target_ph": 6.5,
-    "author": "Vance Protocol - Optimal Basil",
+    "author": "VertiFlow - Optimal Basil",
     "validation_date": "2026-02-01",
     "version": 1,
     "is_active": 1

@@ -3,11 +3,11 @@
 ---
 
 - TICKET-001 : Initialisation, architecture, documentation principale
-- TICKET-002 : Gouvernance des données (Vance Protocol)
+- TICKET-002 : Gouvernance des données (validation zero-trust)
 - TICKET-003 : Schémas JSON capteurs (telemetry_v3.json, command_v3.json)
 - TICKET-004 : Déploiement, scripts d'initialisation, validation, .env, .gitignore
-- TICKET-006 : Gouvernance avancée (protocole Vance)
-- TICKET-007 : Gouvernance avancée (protocole Vance)
+- TICKET-006 : Gouvernance avancée (validation zero-trust)
+- TICKET-007 : Gouvernance avancée (validation zero-trust)
 - TICKET-010 : Setup pipeline NiFi, nifi_pipeline_dev.yaml, nifi_pipeline_prod.yaml
 - TICKET-011 : Setup pipeline NiFi, nifi_pipeline_dev.yaml, nifi_pipeline_prod.yaml
 - TICKET-012 : Setup pipeline NiFi

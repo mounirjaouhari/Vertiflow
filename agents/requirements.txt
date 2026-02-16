@@ -1,0 +1,22 @@
+# VertiFlow AI Assistant - Dependencies
+# =====================================
+# Production-ready requirements for the Streamlit chat interface
+
+# Core Framework
+streamlit>=1.32.0
+
+# Google GenAI SDK (Gemini)
+google-genai>=1.0.0
+
+# Google Cloud BigQuery
+google-cloud-bigquery>=3.17.0
+
+# Google Authentication
+google-auth>=2.28.0
+
+# Protocol Buffers
+protobuf>=4.25.0
+
+# Data Visualization
+plotly>=5.18.0
+pandas>=2.2.0

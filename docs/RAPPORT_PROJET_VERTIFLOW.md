@@ -202,7 +202,7 @@ flowchart LR
     RETRY -->|3x| VAL
 ```
 
-### 3.2 Protocole Vance (Gouvernance)
+### 3.2 Gouvernance des Données
 
 Chaque FlowFile traverse un processus de **validation zero-trust**:
 

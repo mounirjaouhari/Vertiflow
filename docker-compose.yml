@@ -263,6 +263,97 @@ services:
     networks:
       - vertiflow-network
 
+  # --- INTELLIGENCE ARTIFICIELLE & AIDE DÉCISIONNELLE (Agri-Copilot Pro) ---
+  agri-copilot:
+    image: python:3.10-slim
+    container_name: agri_copilot_pro
+    restart: always
+    depends_on:
+      clickhouse:
+        condition: service_started
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_started
+    environment:
+      # Application
+      - APP_NAME=Agri-Copilot Pro
+      - ENVIRONMENT=production
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      
+      # Service Integration (VertiFlow existing services)
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=8123
+      - CLICKHOUSE_DATABASE=vertiflow
+      - CLICKHOUSE_USERNAME=default
+      - CLICKHOUSE_PASSWORD=default
+      
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - MONGODB_DATABASE=vertiflow_ops
+      
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - KAFKA_TOPIC_EVENTS=agri_copilot_events
+      
+      # Google Cloud (inherited from project .env)
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/vertiflow/security/gcp/vertiflow-gcp-key.json
+      
+      # Security
+      - SECRET_KEY=${SECRET_KEY:-VtiFlw2025SecureKeyGenerateMe32CharsMinimum}
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRY_HOURS=24
+      
+      # Rate Limiting & Caching
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_REQUESTS_PER_MINUTE=60
+      - CACHE_ENABLED=true
+      - CACHE_TTL_SECONDS=3600
+      
+      # Logging & Audit
+      - LOG_LEVEL=INFO
+      - LOG_FORMAT=json
+      - AUDIT_ENABLED=true
+      - AUDIT_LOG_FILE=/opt/vertiflow/logs/agri-copilot-audit.log
+    
+    volumes:
+      # Mount project root for code access
+      - ./:/opt/vertiflow/
+      
+      # GCP credentials for AI services
+      - ./security/gcp:/opt/vertiflow/security/gcp:ro
+      
+      # Logs volume for audit trails and application logs
+      - ./logs/agri-copilot:/opt/vertiflow/agri-copilot-pro/logs
+      
+      # Models (if agri-copilot uses ML models)
+      - ml-models:/opt/vertiflow/models:ro
+    
+    working_dir: /opt/vertiflow/agri-copilot-pro
+    
+    command: >
+      sh -c "
+        echo '⏳ Agri-Copilot Pro: Installing dependencies...' &&
+        pip install --no-cache-dir streamlit plotly google-cloud-bigquery google-genai pandas &&
+        echo '✅ Agri-Copilot Pro: Starting Streamlit app on port 8000...' &&
+        streamlit run app_pro.py --server.port=8000 --server.address=0.0.0.0 --server.headless=true
+      "
+    
+    networks:
+      - vertiflow-network
+    
+    ports:
+      - "8000:8000"
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
 # --- DÉFINITION RÉSEAU ET PERSISTANCE ---
 networks:
   vertiflow-network:

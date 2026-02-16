@@ -124,7 +124,7 @@ def init_mongodb():
             {"id": "global_config"},
             {"$set": {
                 "deployment_date": time.strftime('%Y-%m-%d'),
-                "vance_protocol_active": True,
+                "governance_protocol_active": True,
                 "schema_version": "157_cols_v2"
             }},
             upsert=True

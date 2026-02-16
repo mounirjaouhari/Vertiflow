@@ -77,7 +77,7 @@ Built for **agricultural researchers**, **data engineers**, and **AgTech compani
 | **Data Validation** | Basic checks | Zero-Trust schema validation with DLQ |
 | **Storage** | Single database | Hybrid (ClickHouse + MongoDB) optimized |
 | **ML Integration** | Separate systems | Native real-time predictions |
-| **Governance** | Manual tracking | Automated Vance Protocol lineage |
+| **Governance** | Manual tracking | Automated lineage tracking |
 | **Resilience** | Data loss possible | 3-tier DLQ guarantees 99.98% retention |
 | **External Data** | None | Integrated NASA, OpenAg, Wageningen |
 
@@ -94,7 +94,7 @@ Built for **agricultural researchers**, **data engineers**, and **AgTech compani
 ### Enterprise Resilience
 - **Dead Letter Queue (DLQ)** with 3-tier fallback
 - **Schema validation** rejects malformed data instantly
-- **Governance stamping** (Vance Protocol metadata injection)
+- **Governance stamping** (automatic metadata injection)
 - **No data loss** guarantee (99.98% success rate)
 
 ### Hybrid Storage Architecture
@@ -143,7 +143,7 @@ Built for **agricultural researchers**, **data engineers**, and **AgTech compani
 | LAYER 2: INGESTION (Apache NiFi)                                |
 | +------------------------------------------------------------+  |
 | | - Schema Validation (JSON Schema Draft 7)                  |  |
-| | - Governance Stamping (Vance Protocol)                     |  |
+| | - Governance Stamping (automatic lineage)                  |  |
 | | - Jolt Transform (Horizontal -> Vertical)                  |  |
 | | - Dead Letter Queue (3-tier fallback)                      |  |
 | +------------------------------------------------------------+  |
@@ -463,9 +463,9 @@ VertiFlow implements **11 scientific algorithms** for data processing and intell
 
 ## Data Governance
 
-### Vance Protocol Implementation
+### Zero-Trust Data Governance
 
-VertiFlow implements the **Vance Protocol** for enterprise data governance:
+VertiFlow implements enterprise-grade data governance:
 
 #### 1. Zero-Trust Validation
 
