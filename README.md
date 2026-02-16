@@ -52,7 +52,7 @@
 | **Équipe** | DATAFLOW |
 | **Formation** | Data Engineering - JobInTech |
 | **École** | YNOV Maroc Campus |
-| **Référent** | @MrZakaria |
+| **Encadrant** | @MrZakaria |
 
 ### 👥 Membres de l'Équipe
 
@@ -61,8 +61,8 @@
 | 🏗️ Architecte & Data Scientist | **@Mounir** | Conception système, Modèles ML, Bio-physique |
 | ⚙️ DevOps & Infrastructure | **@Imrane** | Docker, CI/CD, Monitoring |
 | 📊 Data Engineer | **@Mouhammed** | Pipelines ETL, Kafka, ClickHouse |
-| 🌿 Biologiste & Expert Métier | **@Asama** | Calibration agronomique, Validation scientifique |
-| 👨‍💼 Tech Lead & Data Architect | **@MrZakaria** | Revue architecture, Gouvernance des données |
+| 🌿 Expert Métier & QA | **@Asama** | Calibration agronomique, Validation scientifique |
+| 🎓 **Encadrant & Formateur** | **@MrZakaria** | Supervision pédagogique, Revue technique |
 
 ---
 
