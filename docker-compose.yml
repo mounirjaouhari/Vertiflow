@@ -62,7 +62,7 @@ services:
     environment:
       CLICKHOUSE_DB: vertiflow
       CLICKHOUSE_USER: default
-      CLICKHOUSE_PASSWORD: "default"
+      CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:-change-me-local-dev-password}"
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     volumes:
       - clickhouse-data:/var/lib/clickhouse
@@ -104,13 +104,13 @@ services:
       - NIFI_WEB_HTTPS_HOST=0.0.0.0
       - NIFI_WEB_HTTPS_PORT=8443
       - NIFI_WEB_PROXY_HOST=34.56.131.117:8443,34.56.131.117
-      - SINGLE_USER_CREDENTIALS_USERNAME=admin
-      - SINGLE_USER_CREDENTIALS_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
-      - NIFI_SENSITIVE_PROPS_KEY=vertiflowSecretKey2025
+      - SINGLE_USER_CREDENTIALS_USERNAME=${NIFI_USERNAME:-admin}
+      - SINGLE_USER_CREDENTIALS_PASSWORD=${NIFI_PASSWORD:-change-me-local-dev-password}
+      - NIFI_SENSITIVE_PROPS_KEY=${NIFI_SENSITIVE_PROPS_KEY:-change-me-local-dev-key}
       - NIFI_JVM_HEAP_INIT=2g
       - NIFI_JVM_HEAP_MAX=4g
       # GCP Service Account credentials for Cloud Storage and BigQuery
-      - GOOGLE_APPLICATION_CREDENTIALS=/opt/nifi/certs/vertiflow-gcp-key.json
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/opt/nifi/certs/vertiflow-gcp-key.json}
     volumes:
       - nifi-conf:/opt/nifi/nifi-current/conf
       - nifi-state:/opt/nifi/nifi-current/state
@@ -281,58 +281,58 @@ services:
       - ENVIRONMENT=production
       - PYTHONUNBUFFERED=1
       - PYTHONDONTWRITEBYTECODE=1
-      
+
       # Service Integration (VertiFlow existing services)
       - CLICKHOUSE_HOST=clickhouse
       - CLICKHOUSE_PORT=8123
       - CLICKHOUSE_DATABASE=vertiflow
       - CLICKHOUSE_USERNAME=default
-      - CLICKHOUSE_PASSWORD=default
-      
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-change-me-local-dev-password}
+
       - MONGODB_HOST=mongodb
       - MONGODB_PORT=27017
       - MONGODB_DATABASE=vertiflow_ops
-      
+
       - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
       - KAFKA_TOPIC_EVENTS=agri_copilot_events
-      
+
       # Google Cloud (inherited from project .env)
-      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - GOOGLE_APPLICATION_CREDENTIALS=/opt/vertiflow/security/gcp/vertiflow-gcp-key.json
-      
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-your-gcp-project-id}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-your-gemini-api-key}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/opt/vertiflow/security/gcp/vertiflow-gcp-key.json}
+
       # Security
-      - SECRET_KEY=${SECRET_KEY:-VtiFlw2025SecureKeyGenerateMe32CharsMinimum}
+      - SECRET_KEY=${SECRET_KEY:-change-this-secret-in-production}
       - JWT_ALGORITHM=HS256
       - JWT_EXPIRY_HOURS=24
-      
+
       # Rate Limiting & Caching
       - RATE_LIMIT_ENABLED=true
       - RATE_LIMIT_REQUESTS_PER_MINUTE=60
       - CACHE_ENABLED=true
       - CACHE_TTL_SECONDS=3600
-      
+
       # Logging & Audit
       - LOG_LEVEL=INFO
       - LOG_FORMAT=json
       - AUDIT_ENABLED=true
       - AUDIT_LOG_FILE=/opt/vertiflow/logs/agri-copilot-audit.log
-    
+
     volumes:
       # Mount project root for code access
       - ./:/opt/vertiflow/
-      
+
       # GCP credentials for AI services
       - ./security/gcp:/opt/vertiflow/security/gcp:ro
-      
+
       # Logs volume for audit trails and application logs
       - ./logs/agri-copilot:/opt/vertiflow/agri-copilot-pro/logs
-      
+
       # Models (if agri-copilot uses ML models)
       - ml-models:/opt/vertiflow/models:ro
-    
+
     working_dir: /opt/vertiflow/agri-copilot-pro
-    
+
     command: >
       sh -c "
         echo '⏳ Agri-Copilot Pro: Installing dependencies...' &&
@@ -340,13 +340,13 @@ services:
         echo '✅ Agri-Copilot Pro: Starting Streamlit app on port 8000...' &&
         streamlit run app_pro.py --server.port=8000 --server.address=0.0.0.0 --server.headless=true
       "
-    
+
     networks:
       - vertiflow-network
-    
+
     ports:
       - "8000:8000"
-    
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
